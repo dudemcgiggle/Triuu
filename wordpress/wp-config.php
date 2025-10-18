@@ -48,9 +48,13 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
     $_SERVER['HTTPS'] = 'on';
 }
 
+// Secure domain configuration - use Replit's environment or fallback to HTTP_HOST
+$replit_domain = getenv('REPLIT_DEV_DOMAIN') ?: getenv('REPLIT_DOMAINS');
+$site_domain = $replit_domain ?: $_SERVER['HTTP_HOST'];
+
 // Force HTTPS for all WordPress URLs
-define( 'WP_HOME', 'https://' . $_SERVER['HTTP_HOST'] );
-define( 'WP_SITEURL', 'https://' . $_SERVER['HTTP_HOST'] );
+define( 'WP_HOME', 'https://' . $site_domain );
+define( 'WP_SITEURL', 'https://' . $site_domain );
 define( 'FORCE_SSL_ADMIN', true );
 
 // File system method
