@@ -389,7 +389,9 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
       }else if(/^https?:\/\//i.test(loc)){
         location.innerHTML=\'<a href="\'+loc+\'" target="_blank" rel="noopener noreferrer">\'+loc+\'</a>\';
       }else{
-        location.textContent=loc;
+        // Make addresses clickable Google Maps links
+        const mapsUrl="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc);
+        location.innerHTML=\'<a href="\'+mapsUrl+\'" target="_blank" rel="noopener noreferrer">\'+loc+\'</a>\';
       }
       location.style.display="block";
     }else{
