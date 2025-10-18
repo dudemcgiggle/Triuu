@@ -67,6 +67,15 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Imported Elementor screenshots and thumbnails
   - Site now displays with complete production styling and layout
   - All page designs match kenpond.com production site
+- 2025-10-18: **Built TRIUU Sermons Manager Plugin**
+  - Created custom WordPress plugin for dynamic sermon management
+  - Custom post type "Sermon" with fields: sermon date, title, reverend, description
+  - Admin interface for adding, editing, and deleting upcoming sermons
+  - Monthly Spiritual Theme settings page (Settings > Monthly Theme)
+  - Dynamic shortcode [triuu_upcoming_sermons] displays 4 upcoming sermons
+  - Services page now pulls sermon data dynamically from database
+  - Full security implementation: nonces, sanitization, capability checks
+  - Plugin location: wordpress/wp-content/plugins/triuu-sermons-manager/
 
 ## Architecture
 **WordPress Setup:**
