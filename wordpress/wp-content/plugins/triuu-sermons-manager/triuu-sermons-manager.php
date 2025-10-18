@@ -419,10 +419,6 @@ class TRIUU_Sermons_Manager {
     }
     
     public function upcoming_sermons_shortcode($atts) {
-        $atts = shortcode_atts(array(
-            'limit' => 4
-        ), $atts);
-        
         $today = date('Y-m-d');
         $sermons = get_option('triuu_sermons_data', array());
         
@@ -433,8 +429,6 @@ class TRIUU_Sermons_Manager {
         usort($upcoming_sermons, function($a, $b) {
             return strcmp($a['date'], $b['date']);
         });
-        
-        $upcoming_sermons = array_slice($upcoming_sermons, 0, intval($atts['limit']));
         
         ob_start();
         
