@@ -222,16 +222,18 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                         <span class="cc-day-num<?= $key === $today_key ? ' today' : '' ?>"><?= $day ?></span>
                                                 </div>
                                                 <?php foreach ( $events[ $key ] ?? [] as $ev ): ?>
-                                                        <div class="cc-event">
+                                                        <div class="cc-event cc-event-clickable" 
+                                                             data-time="<?= esc_attr( $ev['time'] ) ?>"
+                                                             data-title="<?= esc_attr( $ev['title'] ) ?>"
+                                                             data-location="<?= esc_attr( $ev['location'] ) ?>"
+                                                             data-notes="<?= esc_attr( wp_strip_all_tags( $ev['notes_html'] ) ) ?>"
+                                                             data-notes-html="<?= esc_attr( $ev['notes_html'] ) ?>">
                                                                 <div class="cc-event-first">
                                                                         <span class="cc-time"><?= esc_html( $ev['time'] ) ?></span>
                                                                         <strong class="cc-title"><?= esc_html( $ev['title'] ) ?></strong>
                                                                 </div>
                                                                 <?php if ( $ev['location'] ): ?>
                                                                         <div class="cc-event-second"><?= esc_html( $ev['location'] ) ?></div>
-                                                                <?php endif; ?>
-                                                                <?php if ( $ev['notes_html'] ): ?>
-                                                                        <div class="cc-event-notes"><?= $ev['notes_html'] ?></div>
                                                                 <?php endif; ?>
                                                         </div>
                                                 <?php endforeach; ?>
@@ -246,9 +248,81 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
         <?php if ( empty( $events ) ) echo '<p class="cc-none">No events found.</p>'; ?>
 </div>
 
+<!-- Event Modal Popup -->
+<div id="cc-event-modal" class="cc-modal" style="display:none;">
+        <div class="cc-modal-overlay"></div>
+        <div class="cc-modal-content">
+                <button class="cc-modal-close">&times;</button>
+                <h2 class="cc-modal-title"></h2>
+                <div class="cc-modal-time"></div>
+                <div class="cc-modal-location"></div>
+                <div class="cc-modal-description"></div>
+        </div>
+</div>
+
+<style>
+/* Modal Styles */
+.cc-modal{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;display:flex;align-items:center;justify-content:center;}
+.cc-modal-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);cursor:pointer;}
+.cc-modal-content{position:relative;background:#fff;border-radius:8px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:1;}
+.cc-modal-close{position:absolute;top:10px;right:15px;background:transparent;border:0;font-size:32px;color:#999;cursor:pointer;padding:0;width:30px;height:30px;line-height:30px;}
+.cc-modal-close:hover{color:#333;}
+.cc-modal-title{margin:0 0 15px;color:#5A2B80;font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:700;}
+.cc-modal-time{font-size:1.1rem;font-weight:600;color:#574565;margin-bottom:10px;}
+.cc-modal-location{font-size:1rem;color:#666;margin-bottom:15px;font-style:italic;}
+.cc-modal-description{font-size:1rem;line-height:1.6;color:#333;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;}
+.cc-modal-description a{color:#5A2B80;text-decoration:underline;}
+.cc-modal-description a:hover{color:#6E4A81;}
+/* Make desktop events clickable */
+@media (min-width:801px){
+  .cc-event-clickable{cursor:pointer;transition:transform 0.15s ease, box-shadow 0.15s ease;}
+  .cc-event-clickable:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(90,43,128,0.3);}
+}
+</style>
+
 <?php
         /* auto-swap between modes <800 px / ≥801 px */
         echo '<script>(function(){const u=new URL(location);const mq=matchMedia("(max-width:800px)");function swap(){const wk=u.searchParams.get("view")==="week";if(mq.matches&&!wk){u.searchParams.set("view","week");u.searchParams.set("wk","0");location.replace(u);}if(!mq.matches&&wk){u.searchParams.delete("view");u.searchParams.delete("wk");location.replace(u);}}swap();mq.addEventListener?.("change",swap);})();</script>';
+        
+        /* Event modal popup script (desktop only) */
+        echo '<script>
+(function(){
+  if(window.innerWidth<=800)return;
+  const modal=document.getElementById("cc-event-modal");
+  const overlay=modal.querySelector(".cc-modal-overlay");
+  const close=modal.querySelector(".cc-modal-close");
+  const title=modal.querySelector(".cc-modal-title");
+  const time=modal.querySelector(".cc-modal-time");
+  const location=modal.querySelector(".cc-modal-location");
+  const description=modal.querySelector(".cc-modal-description");
+  
+  function showModal(ev){
+    title.textContent=ev.dataset.title||"";
+    time.textContent=ev.dataset.time||"";
+    location.textContent=ev.dataset.location||"";
+    location.style.display=ev.dataset.location?"block":"none";
+    description.innerHTML=ev.dataset.notesHtml||"No additional details.";
+    modal.style.display="flex";
+    document.body.style.overflow="hidden";
+  }
+  
+  function hideModal(){
+    modal.style.display="none";
+    document.body.style.overflow="";
+  }
+  
+  document.querySelectorAll(".cc-event-clickable").forEach(function(ev){
+    ev.addEventListener("click",function(){showModal(this);});
+  });
+  
+  overlay.addEventListener("click",hideModal);
+  close.addEventListener("click",hideModal);
+  
+  document.addEventListener("keydown",function(e){
+    if(e.key==="Escape"&&modal.style.display==="flex")hideModal();
+  });
+})();
+</script>';
 
         return ob_get_clean();
 } );
