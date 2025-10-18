@@ -221,12 +221,20 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                 <div class="cc-day-header">
                                                         <span class="cc-day-num<?= $key === $today_key ? ' today' : '' ?>"><?= $day ?></span>
                                                 </div>
-                                                <?php foreach ( $events[ $key ] ?? [] as $ev ): ?>
+                                                <?php foreach ( $events[ $key ] ?? [] as $ev ): 
+                                                        // Create preview text (first 50 chars of plain text)
+                                                        $plain_notes = wp_strip_all_tags( $ev['notes_html'] );
+                                                        $has_notes = !empty( trim( $plain_notes ) );
+                                                        $preview = $has_notes ? mb_substr( $plain_notes, 0, 50 ) : '';
+                                                        if ( $has_notes && mb_strlen( $plain_notes ) > 50 ) {
+                                                                $preview = rtrim( $preview ) . '...';
+                                                        }
+                                                ?>
                                                         <div class="cc-event cc-event-clickable" 
                                                              data-time="<?= esc_attr( $ev['time'] ) ?>"
                                                              data-title="<?= esc_attr( $ev['title'] ) ?>"
                                                              data-location="<?= esc_attr( $ev['location'] ) ?>"
-                                                             data-notes="<?= esc_attr( wp_strip_all_tags( $ev['notes_html'] ) ) ?>"
+                                                             data-notes="<?= esc_attr( $plain_notes ) ?>"
                                                              data-notes-html="<?= esc_attr( $ev['notes_html'] ) ?>">
                                                                 <div class="cc-event-first">
                                                                         <span class="cc-time"><?= esc_html( $ev['time'] ) ?></span>
@@ -234,6 +242,11 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                                 </div>
                                                                 <?php if ( $ev['location'] ): ?>
                                                                         <div class="cc-event-second"><?= esc_html( $ev['location'] ) ?></div>
+                                                                <?php endif; ?>
+                                                                <?php if ( $has_notes ): ?>
+                                                                        <div class="cc-event-preview">
+                                                                                <?= esc_html( $preview ) ?> <span class="cc-read-more">[Read More]</span>
+                                                                        </div>
                                                                 <?php endif; ?>
                                                         </div>
                                                 <?php endforeach; ?>
@@ -273,6 +286,9 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
 .cc-modal-description{font-size:1rem;line-height:1.6;color:#333;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;}
 .cc-modal-description a{color:#5A2B80;text-decoration:underline;}
 .cc-modal-description a:hover{color:#6E4A81;}
+/* Event preview with [Read More] */
+.cc-event-preview{font-size:0.78rem;color:#555;line-height:1.3;margin-top:3px;padding:2px 4px 0;}
+.cc-read-more{color:#5A2B80;font-weight:600;white-space:nowrap;}
 /* Make desktop events clickable */
 @media (min-width:801px){
   .cc-event-clickable{cursor:pointer;transition:transform 0.15s ease, box-shadow 0.15s ease;}
