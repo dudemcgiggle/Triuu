@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tri-County UU – About Us</title>
+  <!-- Import Barlow font for headings and body text -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;700&display=swap">
+  <style>
+    :root {
+      --accent-color: #614E6B;  /* Accent color for headers, buttons, etc. */
+      --hover-color: #A5849F;   /* Hover color */
+      --body-bg: #f5f5f5;       /* Overall page background */
+      --container-bg: #fff;     /* Main container background */
+      --placeholder-bg: #ddd;   /* For image placeholders */
+      --card-border: #ddd;      /* Card border color */
+    }
+    /* Reset & Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--body-bg);
+      color: #000000;
+      line-height: 1.5;
+      font-weight: 200;
+    }
+    .page-wrapper {
+      max-width: 1200px;
+      margin: 1em auto;
+      padding: 1em;
+      background: var(--container-bg);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+    header {
+      background: var(--accent-color);
+      color: #666666;
+      padding: 1em;
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    section {
+      margin-bottom: 2em;
+      padding: 1em;
+    }
+    h1 {
+      font-weight: 200;
+      text-transform: uppercase;
+      margin-bottom: 0.3em;
+    }
+    h2 {
+      font-weight: 300;
+      text-transform: uppercase;
+      color: #A5849F;
+      margin-bottom: 0.5em;
+    }
+    h3 {
+      font-weight: 400;
+      color: #4A566D;
+      margin-bottom: 0.5em;
+    }
+    h4 {
+      font-weight: 700;
+      color: #614E6B;
+      margin-bottom: 0.5em;
+    }
+    p {
+      margin-bottom: 1em;
+      color: #666666;
+      font-weight: 300;
+    }
+    strong {
+  color: #616161 !important; /* a medium-light grey */
+  font-weight: 400;
+}
+.eight h8 {
+  /* Use flex so the bullet and text can align nicely on one line */
+  display: flex;
+  align-items: center;
+
+  /* Basic heading styles */
+  text-transform: uppercase;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: #994a6a;
+  font-weight: 400;
+
+  /* Adjust vertical spacing and line height */
+  margin: 1em 0 0.5em;  /* top margin, then bottom margin */
+  line-height: 1.2;    /* tighter line spacing */
+}
+
+.eight h8::before {
+  /* Use a background image for the bullet */
+  content: "";
+  display: inline-block;
+  width: 20px; 
+  height: 20px;
+  background: url('/wp-content/uploads/2025/02/triuubullet.png') no-repeat center center;
+  background-size: contain;
+  margin-right: 8px;  /* spacing between bullet and text */
+}
+
+/* Optional: Make everything a bit smaller on very small screens */
+@media (max-width: 480px) {
+  .eight h8 {
+    font-size: 18px;  /* slightly smaller text on phones */
+    margin: 0.8em 0 0.4em;
+  }
+
+  .eight h8::before {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+  }
+}
+
+
+    /* Landscape Photo Placeholder */
+    .photo-placeholder-landscape {
+      width: 100%;
+      background: var(--placeholder-bg);
+      margin-bottom: 1em;
+    }
+    .photo-placeholder-landscape img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* Video Container for UU Voices */
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      height: 0;
+      overflow: hidden;
+      margin: 1em 0;
+      border-radius: 4px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+/* Container styling for side-by-side layout */
+.mission-vision-container {
+  display: flex;
+  flex-wrap: wrap;         /* Allows boxes to wrap on smaller screens */
+  gap: 2rem;               /* Spacing between boxes */
+  margin: 2rem 0;          /* Spacing around the section */
+  justify-content: center; /* Centers boxes horizontally */
+}
+
+/* Individual mission/vision box styling */
+.mission-box {
+  flex: 1;
+  min-width: 280px;        /* Ensures boxes don't get too narrow on small screens */
+  background: #fdfdfd;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  /* Center all text in this container */
+  text-align: center;
+
+  /* Initial state for fade/slide animation */
+  opacity: 0;
+  transform: translateY(20px);
+
+  /* Apply the fade-in-up animation */
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+/* Optional: Add a slight delay to the second box for a staggered effect */
+.mission-box:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+/* On hover, elevate the box and show a radial background effect */
+.mission-box:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle radial highlight on hover */
+.mission-box:hover::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(153, 74, 106, 0.15) 0%, transparent 70%);
+  animation: radialExpand 0.6s forwards;
+  pointer-events: none; /* So it doesn't interfere with text selection */
+}
+
+/* Headings inside each box */
+.mission-box h3 {
+  font-size: 2rem;        /* Larger heading text */
+  margin-bottom: 1rem;
+  color: #994a6a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Styled blockquote */
+.mission-box blockquote {
+  margin: 0 auto;
+  font-style: italic;
+  font-size: 1.2rem;       /* Larger blockquote text */
+  color: #444;
+  border-left: 4px solid #994a6a; /* You can remove this if you prefer no left border */
+  padding-left: 1rem;
+  display: inline-block;   /* Ensures the border and text are centered as a block */
+  text-align: center;
+}
+
+/* Keyframes for fade-in-up animation */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Keyframes for radial highlight on hover */
+@keyframes radialExpand {
+  0% {
+    transform: scale(0);
+    opacity: 0.1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+    }
+    /* Shared Values Diagram */
+    .shared-values-diagram {
+      text-align: center;
+      margin: 1em 0;
+    }
+    .shared-values-diagram img {
+      width: 600px;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <header>
+      <h1>Tri-County UU – About Us</h1>
+    </header>
+    
+    <!-- About Us Introduction -->
+    <section><h2>New to Tri-UU?</h2>
+      <div class="photo-placeholder-landscape">
+        <!-- Replace with your image URL -->
+        <img src="/wp-content/uploads/2025/02/triuu_candles.jpg" alt="About Us">
+      </div>
+   <p>
+  We are the <strong style="color: #666;">Tri-County Unitarian Universalists (Tri-UU)</strong> in Summerfield, Fla. <em>Unitarian Universalism</em> is a centuries-old movement that truly welcomes all people—no matter who they are or what religious or nonreligious beliefs they hold. We are <em>brave</em>, <em>curious</em>, <em>compassionate</em>, and a bit <em>feisty</em>, too. Most important in the Unitarian Universalist philosophy is the <strong style="color: #666;">free and responsible search for individual meaning</strong>.
+</p>
+
+<p>
+  Tri-UUers come from <em>diverse backgrounds</em>—from <strong style="color: #666;">traditional Christian</strong> and <strong style="color: #666;">Jewish</strong> to <strong style="color: #666;">Eastern</strong>, <strong style="color: #666;">Humanist</strong>, <strong style="color: #666;">Pagan</strong>, <strong style="color: #666;">agnostic</strong>, <strong style="color: #666;">atheist</strong>, and other philosophies—that make the world so interesting. As an <strong style="color: #666;">LGBTQ Welcoming Congregation</strong>, Tri-UU offers all people a <em>comfortable</em> and <em>supportive</em> home.
+</p>
+
+<p>
+  Committed to <em>“deeds, not creeds”</em>, Tri-UU has a rich history of <strong style="color: #666;">social justice activism</strong> and offers activities and classes to meet the <em>many interests</em> of our members.
+</p>
+
+<p>
+  <em>Sound intriguing?</em> Browse through our website, then consider a <strong style="color: #666;">visit to our congregation</strong> in Summerfield, Fla.
+</p>
+
+<p>
+  Come visit with an <em>open</em> or a <em>skeptical</em> mind, with a <em>bruised</em> or a <em>joyful</em> heart, because you will indeed be <strong style="color: #666;">welcomed</strong>. <strong style="color: #666;">Your adventure starts here!</strong>
+</p>
+
+
+    </section>
+    
+    <!-- UU Voices Heading & Video -->
+    <section>
+      <h2>UU Voices</h2>
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/hukG4sltxsI?si=B68fAhAEJ9gDKy-w" allowfullscreen></iframe>
+      </div>
+       <p>
+   Brief personal reflections on what it means to be a Unitarian Universalist. Speakers describe a welcoming community that honors individuality, reason, spiritual exploration, and living one’s values—without rigid dogma or fear-based beliefs. It’s a pluralistic faith embracing questions, diverse backgrounds, and an openness to both love and reason.
+      </p>
+    </section>
+    
+    <!-- Who We Are -->
+    <section><h2>Who We Are</h2>
+      <div class="photo-placeholder-landscape">
+        <!-- Replace with your image URL -->
+        <img src="/wp-content/uploads/2025/02/WomensMarchNov2024.jpg" alt="Who We Are">
+      </div>
+      
+      <p>
+        The Tri-County Unitarian Universalists congregation (Tri-UU) was formed in 1982. Ever since, our vibrant, open-minded, and diverse group continually strives to support and love one another in the pursuit of spiritual growth and social justice.
+      </p>
+      <p>
+        With a current membership of around 100—plus many who participate without formal membership—we welcome full-time and seasonal Florida residents, as well as people of all ages in one of the nation’s most highly concentrated retirement areas.
+      </p>
+      <p>
+        We are diverse in background and belief. Many have come from traditional Christian backgrounds, some Jewish, and others from other world beliefs and non-beliefs. Unitarian Universalism encourages each of us to search for individual spiritual meaning that comforts and challenges us to become our best selves. Guided by our Values and Covenant, we keep Love at the Center.
+      </p>
+      <p>
+        We draw inspiration from history, nature, science, and our congregational family, and we put our values into action through social justice initiatives and community programs.
+      </p>
+    </section>
+    
+    <!-- Mission & Vision as Side-by-Side Containers -->
+    <section>
+      <div class="mission-vision-container">
+        <div class="mission-box">
+          <h3>Our Mission</h3>
+          <blockquote>“We unite in religious community to seek spiritual growth, live with integrity, and serve with compassion.”</blockquote>
+        </div>
+        <div class="mission-box">
+          <h3>Our Vision</h3>
+          <blockquote>“We will be an influential voice for progressive religious values in a diverse community.”</blockquote>
+        </div>
+      </div>
+    </section>
+    
+<!-- How We're Different -->
+<section class="eight">  <h2>How We're Different</h2>
+  <div class="photo-placeholder-landscape">
+    <!-- Replace with your image URL -->
+    <img src="https://kenpond.com/wp-content/uploads/2025/02/triuumural.jpg" alt="How We're Different">
+  </div>
+
+  <p>
+    Each UU congregation independently sets its own rules. Creating the documents by which we govern ourselves is both a spiritual duty and a challenge. We work together to form our unique guidelines.
+  </p><br>
+  
+  <h8>We are progressive and inclusive.</h8>
+  <p>
+    Guided by covenantal principles such as “the worth and dignity of all,” we draw inspiration from science, history, and all world religions.
+  </p>
+  
+  <h8>We put our values into action.</h8>
+  <p>
+    On issues like immigration reform, marriage equality, environmental change, and LGBTQIA+ rights, we live out our values every day.
+  </p>
+  
+  <h8>We are diverse in background and belief.</h8>
+  <p>
+    Whatever you believe about God, or don’t, you will be welcomed here—and challenged to become your best self.
+  </p>
+  
+  <h8>We seek our own spiritual path.</h8>
+  <p>
+    Our fellowship encourages freedom of belief and the search for advancing truth. We strive to offer a warm, open, and supportive community for those who believe that ethical living is the supreme witness of religion.
+  </p>
+</section>
+
+<section class="eight">
+<section><h2>Values and Covenant</h2>
+  <div class="photo-placeholder-landscape">
+    <!-- Replace with your image URL -->
+    <img src="https://kenpond.com/wp-content/uploads/2025/02/CHARTRUG.jpg" alt="Values and Covenant">
+  </div>
+
+  <p>
+    As Unitarian Universalists, we covenant, congregation-to-congregation and through our Association, to support and assist one another in our ministries. We draw from our heritage of freedom, reason, hope, and courage, building on the foundation of love.
+  </p>
+  <p>
+    Love is the power that holds us together and is at the center of our shared values. We are accountable to one another for doing the work of living our shared values through the spiritual discipline of Love.
+  </p>
+
+  <p>Inseparable from one another, these shared values are:</p>
+
+  <h8>Interdependence</h8>
+  <p>
+    We honor the interdependent web of all existence. With reverence for the great web of life and with humility, we acknowledge our place in it.
+  </p>
+  <p>
+    We covenant to protect Earth and all beings from exploitation. We will create and nurture sustainable relationships of care and respect, mutuality and justice. We will work to repair harm and damaged relationships.
+  </p>
+
+  <h8>Pluralism</h8>
+  <p>
+    We celebrate that we are all sacred beings, diverse in culture, experience, and theology.
+  </p>
+  <p>
+    We covenant to learn from one another in our free and responsible search for truth and meaning. We embrace our differences and commonalities with Love, curiosity, and respect.
+  </p>
+
+  <h8>Justice</h8>
+  <p>
+    We work to be diverse multicultural Beloved Communities where all thrive.
+  </p>
+  <p>
+    We covenant to dismantle racism and all forms of systemic oppression. We support the use of inclusive democratic processes to make decisions within our congregations, our Association, and society at large.
+  </p>
+
+  <h8>Transformation</h8>
+  <p>
+    We adapt to the changing world.
+  </p>
+  <p>
+    We covenant to collectively transform and grow spiritually and ethically. Openness to change is fundamental to our Unitarian and Universalist heritages, never complete and never perfect.
+  </p>
+
+  <h8>Generosity</h8>
+  <p>
+    We cultivate a spirit of gratitude and hope.
+  </p>
+  <p>
+    We covenant to freely and compassionately share our faith, presence, and resources. Our generosity connects us to one another in relationships of interdependence and mutuality.
+  </p>
+
+  <h8>Equity</h8>
+  <p>
+    We declare that every person has the right to flourish with inherent dignity and worthiness.
+  </p>
+  <p>
+    We covenant to use our time, wisdom, attention, and money to build and sustain fully accessible and inclusive communities.
+  </p>
+
+  <h8>Inspiration</h8>
+  <p>
+    Direct experiences of transcending mystery and wonder are primary sources of Unitarian Universalist inspiration. These experiences open our hearts, renew our spirits, and transform our lives. We draw upon and are inspired by sacred, secular, and scientific understandings that help us make meaning and live into our values. These sources ground us and sustain us in ordinary, difficult, and joyous times. We respect the histories, contexts, and cultures in which these sources were created and are currently practiced. Grateful for the experiences that move us, aware of the religious ancestries we inherit, and enlivened by the diversity that enriches our faith, we are called to ever deepen and expand our wisdom.
+  </p>
+
+  <h8>Inclusion</h8>
+  <p>
+    Systems of power, privilege, and oppression have traditionally created barriers for persons and groups with particular identities, ages, abilities, and histories. We pledge to replace such barriers with ever-widening circles of solidarity and mutual respect. We strive to be an Association of congregations that truly welcome all persons who share our values. We commit to being an Association of congregations that empowers and enhances everyone’s participation, especially those with historically marginalized identities.
+  </p>
+
+  <h8>Freedom of Belief</h8>
+  <p>
+    Congregational freedom and the individual’s right to conscience are central to our Unitarian Universalist heritage.
+  </p>
+  <p>
+    Congregations may establish statements of purpose, covenants, and bonds of union so long as they do not require that members adhere to a particular creed.
+  </p>
+</section>
+<!-- Additional Activities -->
+<section>
+         <h2>Additional Activities</h2>
+      <div class="photo-placeholder-landscape">
+        <!-- Replace with your image URL -->
+        <img src="https://kenpond.com/wp-content/uploads/2025/02/LOVE-gathering.png" alt="Additional Activities">
+      </div>
+     
+      <h3>Choir</h3>
+      <p>
+        You needn’t be a trained singer—just a passion for celebrating through song. Musicians of all kinds are welcome.
+      </p>
+      <h3>Special Interest Activities</h3>
+      <p>
+        From book clubs to potluck dinners, explore a variety of activities that cater to diverse interests.
+      </p>
+      <h3>Worship Services</h3>
+      <p>
+        Join us every Sunday morning at 9:00 a.m. for service—followed by refreshments and friendly conversation. <a href="#">More information</a>
+      </p>
+      <h3>Social Justice Programs</h3>
+      <p>
+        Our vibrant social justice team spearheads activities from community marches to local advocacy, embodying our commitment to change.
+      </p>
+      <h3>Chalice Circle</h3>
+      <p>
+        Many members find that the Chalice Circle inspires fresh ideas and deepens their spiritual journey.
+      </p>
+      <h3>Lifespan Education Programs</h3>
+      <p>
+        Tailored for central Florida’s diverse age groups—especially retirees—our Lifespan Education activities provide ongoing support and enrichment.
+      </p>
+    </section>
+    
+    <!-- UU History & Famous Authors -->
+    <section>
+              <h2>UU History</h2>
+      <div class="photo-placeholder-landscape">
+        <!-- Replace with your image URL -->
+        <img src="https://kenpond.com/wp-content/uploads/2025/02/famous-uu-people.png" alt="UU History & Famous Authors">
+      </div>
+  <h3>Famous Authors &amp; Influential Figures</h3>
+      <p>
+        Celebrated voices such as Louisa May Alcott, Ray Bradbury, e. e. cummings, Charles Dickens, Ralph Waldo Emerson, T. S. Eliot, Herman Melville, May Sarton, and Kurt Vonnegut have shaped our cultural heritage. Influential leaders like John Dewey, Oliver Wendell Holmes, Juliet Ward Howe, Arthur Schlesinger, Adlai Stevenson, William Howard Taft, and Daniel Webster also grace our history.
+      </p>
+      <p>
+        Unitarian Universalism is a liberal religious tradition that emerged from the consolidation of Unitarianism and Universalism. With roots in Europe and the establishment of the Universalist Church of America in 1793 and the American Unitarian Association in 1825, our faith has evolved significantly.
+      </p>
+      <p>
+        In 1961, these traditions united under the Unitarian Universalist Association (UUA). Today, over 1000 congregations across the US and around the world continue to champion progressive spirituality and social justice.
+      </p>
+    
+    </section>
+    
+    <!-- The Tri-UU Congregation Today -->
+    <section><h2>The Tri-UU Congregation Today</h2>
+      <div class="photo-placeholder-landscape">
+        <!-- Replace with your image URL -->
+        <img src="https://kenpond.com/wp-content/uploads/2025/02/allpoeple.jpg" alt="The Tri-UU Congregation Today">
+      </div>
+     
+      <p>
+        Today, Tri-UU thrives as a diverse, welcoming community dedicated to social justice, spiritual growth, and communal care. We invite you to experience our warmth firsthand.
+      </p>
+    </section>
+    
+  </div>
+</body>
+</html>

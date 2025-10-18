@@ -1,503 +1,445 @@
 <div class="elementor-widget-container">
 <style>
-/* Services Page - Matching About Us Page Exact Styling */
-
-/* Reset and Base */
-.services-page * {
-    box-sizing: border-box;
+:root {
+  --accent-color: #614E6B;
+  --hover-color: #A5849F;
+  --body-bg: #f5f5f5;
+  --container-bg: #fff;
+  --placeholder-bg: #ddd;
+  --card-border: #ddd;
 }
 
-.services-page {
-    font-family: 'Barlow', sans-serif;
-    line-height: 1.6;
-    color: #000000;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Typography - Matching About Us */
-.services-page h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: #6E4F80;
-    text-align: center;
+.services-page-wrapper {
+  font-family: 'Barlow', sans-serif;
+  background: var(--body-bg);
+  color: #000000;
+  line-height: 1.5;
+  font-weight: 200;
+  max-width: 1200px;
+  margin: 1em auto;
+  padding: 1em;
+  background: var(--container-bg);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
-.services-page h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: #4C5A86;
+.services-page-wrapper section {
+  margin-bottom: 2em;
+  padding: 1em;
 }
 
-.services-page h3 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: #614E6B;
+.services-page-wrapper h1 {
+  font-weight: 200;
+  text-transform: uppercase;
+  margin-bottom: 0.3em;
+  text-align: center;
 }
 
-.services-page p {
-    font-size: 1rem;
-    line-height: 1.8;
-    margin-bottom: 1.2rem;
-    color: #666666;
+.services-page-wrapper h2 {
+  font-weight: 300;
+  text-transform: uppercase;
+  color: #A5849F;
+  margin-bottom: 0.5em;
 }
 
-.services-page strong {
-    font-weight: 700;
+.services-page-wrapper h3 {
+  font-weight: 400;
+  color: #4A566D;
+  margin-bottom: 0.5em;
 }
 
-.services-page em {
-    font-style: italic;
+.services-page-wrapper h4 {
+  font-weight: 700;
+  color: #614E6B;
+  margin-bottom: 0.5em;
 }
 
-/* Links */
-.services-page a {
-    color: #614E6B;
-    text-decoration: underline;
-    transition: color 0.3s ease;
+.services-page-wrapper p {
+  margin-bottom: 1em;
+  color: #666666;
+  font-weight: 300;
 }
 
-.services-page a:hover {
-    color: #A5849F;
+.services-page-wrapper strong {
+  color: #616161 !important;
+  font-weight: 400;
 }
 
-/* Hero Section */
-.services-hero-section {
-    margin: 0 auto 3rem;
-    padding: 2rem 1.5rem;
+.services-page-wrapper em {
+  font-style: italic;
 }
 
-.services-hero-section h1 {
-    margin-bottom: 0.5rem;
+/* Photo placeholders */
+.photo-placeholder-landscape {
+  width: 100%;
+  background: var(--placeholder-bg);
+  margin-bottom: 1em;
 }
 
-.services-hero-section h2 {
-    text-align: center;
-    font-size: 1.5rem;
-    font-weight: 400;
-    color: #4C5A86;
-    margin-bottom: 2rem;
+.photo-placeholder-landscape img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
-.services-hero-section .intro-text {
-    margin: 0 auto;
-    text-align: left;
-}
-
-.services-hero-section .note-box {
-    background: #f8f9fa;
-    border-left: 4px solid #614E6B;
-    padding: 1.5rem;
-    margin: 2rem 0;
-    border-radius: 4px;
-}
-
-.services-hero-section .note-box strong {
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #614E6B;
-}
-
-/* Hero Images Grid */
+/* Hero images grid */
 .hero-images-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin: 3rem auto;
-    padding: 0 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1em;
+  margin: 1em 0;
 }
 
 .hero-images-grid img {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
 }
 
-/* Content Section */
-.content-section {
-    margin: 3rem auto;
-    padding: 0 1.5rem;
+/* Note box */
+.note-box {
+  background: #f8f9fa;
+  border-left: 4px solid var(--accent-color);
+  padding: 1.5em;
+  margin: 1em 0;
+  border-radius: 4px;
 }
 
-.content-section h2 {
-    text-align: center;
-    margin-bottom: 0.5rem;
+.note-box strong {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-color) !important;
 }
 
-.content-section .subtitle {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #666666;
-    font-style: italic;
-    margin-bottom: 2.5rem;
-}
-
-/* Service Cards */
+/* Service cards */
 .service-cards {
-    display: grid;
-    gap: 2rem;
-    margin-top: 2rem;
+  display: grid;
+  gap: 1.5em;
+  margin-top: 1em;
 }
 
 .service-card {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  padding: 1.5em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .service-card .date {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #614E6B;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
+  font-size: 1em;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  margin-bottom: 0.5em;
 }
 
 .service-card .title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #6E4F80;
-    margin-bottom: 0.5rem;
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #4A566D;
+  margin-bottom: 0.5em;
 }
 
 .service-card .speaker {
-    font-size: 1.1rem;
-    color: #666666;
-    font-style: italic;
-    margin-bottom: 1rem;
+  font-size: 1em;
+  color: #666666;
+  font-style: italic;
+  margin-bottom: 1em;
 }
 
 .service-card .description {
-    font-size: 1rem;
-    color: #666666;
-    line-height: 1.7;
+  font-size: 1em;
+  color: #666666;
+  font-weight: 300;
+  line-height: 1.7;
 }
 
-/* Image Banner Section */
-.banner-section {
-    margin: 4rem auto;
-    padding: 0 1.5rem;
+/* Theme subtitle */
+.theme-subtitle {
+  text-align: center;
+  font-size: 1.1em;
+  color: #666666;
+  font-style: italic;
+  margin-bottom: 1.5em;
+  font-weight: 300;
 }
 
-.banner-image {
-    width: 100%;
-    height: auto;
-    max-height: 500px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 2rem;
-}
-
-.banner-content {
-    margin: 0 auto;
-    text-align: center;
-}
-
-.banner-content h2 {
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
-
-.banner-content p {
-    text-align: left;
-    margin-bottom: 1.5rem;
-}
-
+/* CTA Button */
 .cta-button {
-    display: inline-block;
-    background: #614E6B;
-    color: #fff;
-    padding: 0.9rem 2rem;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.3s ease;
-    margin-top: 1rem;
+  display: inline-block;
+  background: var(--accent-color);
+  color: #fff;
+  padding: 0.9em 2em;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s ease;
+  margin-top: 1em;
 }
 
 .cta-button:hover {
-    background: #A5849F;
-    text-decoration: none;
-    color: #fff;
+  background: var(--hover-color);
+  text-decoration: none;
+  color: #fff;
 }
 
-/* Music & Choir Section */
-.music-section {
-    margin: 4rem auto;
-    padding: 0 1.5rem;
-}
-
-.music-section h2 {
-    text-align: center;
-    margin-bottom: 0.5rem;
-}
-
-.music-section h3 {
-    text-align: center;
-    color: #666666;
-    font-weight: 400;
-    margin-bottom: 2rem;
-}
-
-.music-section > p {
-    margin: 1rem auto;
-    text-align: center;
-}
-
-/* Video Grid */
+/* Video grid */
 .video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
-    margin: 3rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1em;
+  margin: 1.5em 0;
 }
 
 .video-card {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
-    transition: box-shadow 0.3s ease;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
 }
 
 .video-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .video-card a {
-    text-decoration: none;
-    display: block;
+  text-decoration: none;
+  display: block;
 }
 
 .video-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
 }
 
 .video-card .video-title {
-    padding: 1rem;
-    color: #333;
-    font-weight: 600;
-    text-align: center;
-    font-size: 0.95rem;
+  padding: 0.8em;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  font-size: 0.9em;
 }
 
-/* Choir Photos */
+/* Choir photos */
 .choir-photos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin: 3rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1em;
+  margin: 1.5em 0;
 }
 
 .choir-photos img {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
 }
 
-/* Hymn Section */
+/* Hymn section */
 .hymn-section {
-    background: #f8f9fa;
-    padding: 3rem 2rem;
-    text-align: center;
-    margin: 4rem 0;
-    border-radius: 4px;
+  background: #f8f9fa;
+  padding: 2em 1.5em;
+  text-align: center;
+  margin: 2em 0;
+  border-radius: 4px;
 }
 
 .hymn-section h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: #4C5A86;
+  font-size: 1.3em;
+  margin-bottom: 1.5em;
+  color: #A5849F;
 }
 
 .hymn-section a {
-    display: inline-block;
-    background: #614E6B;
-    color: #fff;
-    padding: 1rem 2.5rem;
-    border-radius: 4px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background 0.3s ease;
+  display: inline-block;
+  background: var(--accent-color);
+  color: #fff;
+  padding: 1em 2.5em;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s ease;
 }
 
 .hymn-section a:hover {
-    background: #A5849F;
-    text-decoration: none;
+  background: var(--hover-color);
+  text-decoration: none;
 }
 
-/* Past Services Section */
+/* Past services section */
 .past-services {
-    margin: 4rem auto;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    background: #f8f9fa;
-    border-radius: 4px;
+  margin: 2em 0;
+  padding: 1.5em;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 4px;
 }
 
 .past-services h2 {
-    margin-bottom: 1rem;
+  margin-bottom: 1em;
 }
 
 .past-services p {
-    margin-bottom: 2rem;
+  margin-bottom: 1.5em;
 }
 
 .social-links {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 1em;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .social-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: #614E6B;
-    color: #fff;
-    padding: 0.9rem 1.8rem;
-    border-radius: 4px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  background: var(--accent-color);
+  color: #fff;
+  padding: 0.8em 1.5em;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s ease;
 }
 
 .social-link:hover {
-    background: #A5849F;
-    text-decoration: none;
-    color: #fff;
+  background: var(--hover-color);
+  text-decoration: none;
+  color: #fff;
 }
 
 .social-link svg {
-    width: 20px;
-    height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .services-page h1 {
-        font-size: 1.5rem;
-    }
-    
-    .services-page h2 {
-        font-size: 1.2rem;
-    }
-    
-    .service-card {
-        padding: 1.5rem;
-    }
-    
-    .video-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-    
-    .social-links {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .social-link {
-        width: 100%;
-        max-width: 300px;
-        justify-content: center;
-    }
+  .services-page-wrapper h1 {
+    font-size: 1.5em;
+  }
+  
+  .services-page-wrapper h2 {
+    font-size: 1.2em;
+  }
+  
+  .service-card {
+    padding: 1em;
+  }
+  
+  .video-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+  
+  .social-links {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .social-link {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
 }
 </style>
 
-<div class="services-page">
+<div class="services-page-wrapper">
 
-<!-- Hero Section -->
-<div class="services-hero-section">
+  <!-- Hero Section -->
+  <section>
     <h1>Services</h1>
     <h2>What to Expect</h2>
     
-    <div class="intro-text">
-        <p>Each service contains instrumental and vocal music, a 15- to 20-minute message, a joys, sorrows and concerns ritual, an offering, a story relating to the message, and a period of meditation or prayer. The Sunday service begins at 9:00 a.m. and lasts 60 minutes, followed by a period where people may respond to the message of the day.</p>
-        
-        <p>Each service begins with the lighting of our flaming chalice, a distinctive symbol of UU.</p>
-        
-        <p>The design originated during WWII as a symbol on documents given to refugees who fled without their identification papers.</p>
-    </div>
+    <p>Each service contains instrumental and vocal music, a 15- to 20-minute message, a joys, sorrows and concerns ritual, an offering, a story relating to the message, and a period of meditation or prayer. The Sunday service begins at 9:00 a.m. and lasts 60 minutes, followed by a period where people may respond to the message of the day.</p>
+    
+    <p>Each service begins with the lighting of our flaming chalice, a distinctive symbol of UU.</p>
+    
+    <p>The design originated during WWII as a symbol on documents given to refugees who fled without their identification papers.</p>
     
     <div class="note-box">
-        <p><strong>Note:</strong> Participation via Zoom is provided, in-person attendance is a richer experience. Please follow your own counsel on this.</p>
+      <p><strong>Note:</strong> Participation via Zoom is provided, in-person attendance is a richer experience. Please follow your own counsel on this.</p>
     </div>
-</div>
+  </section>
 
-<!-- Hero Images -->
-<div class="hero-images-grid">
-    <div>
+  <!-- Hero Images -->
+  <section>
+    <div class="hero-images-grid">
+      <div>
         <img src="https://static.wixstatic.com/media/93e23e_3c97114258b445d093005dd842cadef9~mv2.jpg/v1/crop/x_486,y_17,w_951,h_1024/fill/w_616,h_663,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/8%20cropped.jpg" alt="Flaming Chalice - UU Symbol">
-    </div>
-    <div>
+      </div>
+      <div>
         <img src="https://static.wixstatic.com/media/93e23e_21b81a25102440c5bd32a699ff3b4448~mv2.jpg/v1/fill/w_347,h_620,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/singing%20bowl_JPG.jpg" alt="Singing Bowl">
+      </div>
     </div>
-</div>
+  </section>
 
-<!-- Upcoming Services -->
-<div class="content-section">
+  <!-- Upcoming Services -->
+  <section>
     <h2>Upcoming Services</h2>
-    <p class="subtitle">October 2025 - Spiritual theme: Cultivating Compassion</p>
+    <p class="theme-subtitle">October 2025 - Spiritual theme: Cultivating Compassion</p>
     
     <div class="service-cards">
-        <div class="service-card">
-            <div class="date">Oct 5:</div>
-            <div class="title">Strong Like Water</div>
-            <div class="speaker">Rev. Kristina Spaude</div>
-            <div class="description">We have all experienced trauma. Many of us are still grappling with it, along with other challenging circumstances in our individual and collective lives. This morning we will celebrate our annual Ingathering and Water Communion service by considering what lessons we can learn from water. If you have water to bring, you're welcome to, but water will be provided during the service.</div>
-        </div>
+      <div class="service-card">
+        <div class="date">Oct 5:</div>
+        <div class="title">Strong Like Water</div>
+        <div class="speaker">Rev. Kristina Spaude</div>
+        <div class="description">We have all experienced trauma. Many of us are still grappling with it, along with other challenging circumstances in our individual and collective lives. This morning we will celebrate our annual Ingathering and Water Communion service by considering what lessons we can learn from water. If you have water to bring, you're welcome to, but water will be provided during the service.</div>
+      </div>
 
-        <div class="service-card">
-            <div class="date">Oct 12:</div>
-            <div class="title">A Free and Responsible Search for Truth and Meaning</div>
-            <div class="speaker">Rev. Kristina Spaude</div>
-            <div class="description">Drawing lessons about the importance of freedom of the press from journalists Maria Ressa and Masha Gessen, we'll explore what it means to search for truth and meaning at a time when journalists and news media are demonized.</div>
-        </div>
+      <div class="service-card">
+        <div class="date">Oct 12:</div>
+        <div class="title">A Free and Responsible Search for Truth and Meaning</div>
+        <div class="speaker">Rev. Kristina Spaude</div>
+        <div class="description">Drawing lessons about the importance of freedom of the press from journalists Maria Ressa and Masha Gessen, we'll explore what it means to search for truth and meaning at a time when journalists and news media are demonized.</div>
+      </div>
 
-        <div class="service-card">
-            <div class="date">Oct 19:</div>
-            <div class="title">Lost, Found, and now I'm Woke</div>
-            <div class="speaker">Rev. Kathy Schmitz</div>
-            <div class="description">The popular hymn, "Amazing Grace," speaks of the gift of greater understanding that comes with a wider perspective. What might that look like in our world today?</div>
-        </div>
+      <div class="service-card">
+        <div class="date">Oct 19:</div>
+        <div class="title">Lost, Found, and now I'm Woke</div>
+        <div class="speaker">Rev. Kathy Schmitz</div>
+        <div class="description">The popular hymn, "Amazing Grace," speaks of the gift of greater understanding that comes with a wider perspective. What might that look like in our world today?</div>
+      </div>
 
-        <div class="service-card">
-            <div class="date">Oct 26:</div>
-            <div class="title">Myths and Monsters</div>
-            <div class="speaker">Rev. Kristina Spaude</div>
-            <div class="description">Myths and monsters are two categories of stories that regularly draw Rev. Kristina's attention. Today we'll explore what we can learn about ourselves and the world by engaging some of these narratives, and what they can teach us about compassion.</div>
-        </div>
+      <div class="service-card">
+        <div class="date">Oct 26:</div>
+        <div class="title">Myths and Monsters</div>
+        <div class="speaker">Rev. Kristina Spaude</div>
+        <div class="description">Myths and monsters are two categories of stories that regularly draw Rev. Kristina's attention. Today we'll explore what we can learn about ourselves and the world by engaging some of these narratives, and what they can teach us about compassion.</div>
+      </div>
     </div>
-</div>
+  </section>
 
-<!-- Service Inspirations Banner -->
-<div class="banner-section">
-    <img class="banner-image" src="https://static.wixstatic.com/media/e756b8_f642b422746a423995eb97d712e5e61a~mv2_d_2710_1814_s_2.jpg/v1/fill/w_1400,h_550,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/e756b8_f642b422746a423995eb97d712e5e61a~mv2_d_2710_1814_s_2.jpg" alt="Service Inspiration">
+  <!-- Service Inspirations -->
+  <section>
+    <h2>Service Inspirations</h2>
+    <div class="photo-placeholder-landscape">
+      <img src="https://static.wixstatic.com/media/e756b8_f642b422746a423995eb97d712e5e61a~mv2_d_2710_1814_s_2.jpg/v1/fill/w_1400,h_550,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/e756b8_f642b422746a423995eb97d712e5e61a~mv2_d_2710_1814_s_2.jpg" alt="Service Inspiration">
+    </div>
     
-    <div class="banner-content">
-        <h2>Service Inspirations</h2>
-        <p>Our worship services focus on a wide variety of religious, philosophical, personal, and social issues. Although each service is different, we gather weekly to consider, individually and collectively, that which we hold of highest worth. For some, it's the community; for others, it's the natural world; and for still for others, it's a sense of some sort of something beyond our imagination.</p>
-        
-        <p>Our inspiration comes from a variety of sources: the wisdom of world religions, teachings from humanist and earth-centered traditions, words and deeds of prophetic people, and the direct experience of individuals.</p>
-        
-        <p>Our principal service is on Sundays at 9:00 a.m., at Tri-County Unitarian Universalist and also on zoom. Please see the Home page for details and links.</p>
-        
-        <a href="/visit-us" class="cta-button">Where We're Located</a>
+    <p>Our worship services focus on a wide variety of religious, philosophical, personal, and social issues. Although each service is different, we gather weekly to consider, individually and collectively, that which we hold of highest worth. For some, it's the community; for others, it's the natural world; and for still for others, it's a sense of some sort of something beyond our imagination.</p>
+    
+    <p>Our inspiration comes from a variety of sources: the wisdom of world religions, teachings from humanist and earth-centered traditions, words and deeds of prophetic people, and the direct experience of individuals.</p>
+    
+    <p>Our principal service is on Sundays at 9:00 a.m., at Tri-County Unitarian Universalist and also on zoom. Please see the Home page for details and links.</p>
+    
+    <div style="text-align: center;">
+      <a href="/visit-us" class="cta-button">Where We're Located</a>
     </div>
-</div>
+  </section>
 
-<!-- Music & Choir -->
-<div class="music-section">
+  <!-- Music & Choir -->
+  <section>
     <h2>Music & Choir</h2>
     <h3>Tri-UU Choir Videos</h3>
     
@@ -506,162 +448,162 @@
     <p>Here is a growing collection of Tri-UU choir videos. Most are performed by our former music director, Donna Kagan, and Tri-UU Choir members with music arrangements and editing by Frank Kelly. Enjoy!</p>
 
     <div class="video-grid">
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_509c65ee786f4e129f758f2f8795259c/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_4669d4024e1041519eaa5308c978e472~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Peaceful%20River%20-%20title.jpg" alt="Peaceful River">
-                <div class="video-title">Peaceful River</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_00e1ccf325544997a383a8475ad9e8d8/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_d2c1ddf8efd24b90afcff76d3687c7da~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/At%20this%20table%20-%20title.jpg" alt="At This Table">
-                <div class="video-title">At This Table</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_3c4ef2c658fa4226879308a7f0f924a5/480p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_3ca4ffee08ae4e99b9e94a2389c7a5c7~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/One-little-star-v2_JPG.jpg" alt="One Little Star">
-                <div class="video-title">One Little Star</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_84b270a2908f4933ad3716be7961b144/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_7341d1b15ba147d6b5ef7f79ff436d6c~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Festival%20Madrigal%20-%20Title.jpg" alt="Festival Madrigal">
-                <div class="video-title">Festival Madrigal</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_ae0d6a59c6104623981e48d87434c9b7/480p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_77735b20c7254b4286e948fb54c421e3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Hands%20'cross-title_JPG.jpg" alt="Hands Across the Water">
-                <div class="video-title">Hands Across the Water</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_2148d1814bce4925a008f0b0a57d5bc1/480p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_a6bff9d1fccd4f70a0e98b78b24b000d~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Change_the-World-v2_JPG.jpg" alt="Change the World">
-                <div class="video-title">Change the World</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_8fb70be61a5a4563b30fb35235183ebe/480p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_dbe90dd660bb486f8fa733e2554e94a8~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Each%20of%20Us-title_JPG.jpg" alt="Each of Us">
-                <div class="video-title">Each of Us</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_9b6e0e41608e47b2b681996c480767d4/480p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_d5213b9de9f64d13a7087ff65be17067~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Peace-Peace-v2_JPG.jpg" alt="Peace Peace">
-                <div class="video-title">Peace Peace</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_a37e58dc737446f1a79cde125976f258/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_f2b689b7ceb8497bbbd6ffe2fe4792c5~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Glory-Saints%20-title.jpg" alt="Glory of the Saints">
-                <div class="video-title">Glory of the Saints</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_c845c3da9233416c8db3a492071ef897/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_6c5be044880b429cb50aca52954a5676~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Sing%20Your%20Song%20Be%20Yourself%20-%20title.jpg" alt="Sing Your Song Be Yourself">
-                <div class="video-title">Sing Your Song, Be Yourself</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_c7d4ee45877248b28e3efd74c255912b/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_b4e9ffcc45654aa38dc34e8562b100d3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Make%20a%20Difference%20-%20title.jpg" alt="Make a Difference">
-                <div class="video-title">Make a Difference</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_1ec9cb7f224c487fb934c31963352d9a/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_2ebca9b21bca49a49bc0750cd935b01f~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Joy%20in%20My%20Heart%20-%20title.jpg" alt="Joy in My Heart">
-                <div class="video-title">Joy in My Heart</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_de58e3f96f3e4d73900a40c1cc433c49/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_8fae3a43de88471291227ea8353db4cd~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/We%203%20Kings%20-%20title%20(rev).jpg" alt="We 3 Kings">
-                <div class="video-title">We 3 Kings</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_0f9a891608344ce3bfe1a8844719bb1b/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_b395453e8c3542ba98265c7c26fb00df~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/It's%20Wintertime%20-%20title%20(rev).jpg" alt="It's Wintertime">
-                <div class="video-title">It's Wintertime</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_2062e42ea28c40d5ba6528d1c999109c/480p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_f59ffe84208d422892d47a8d5458acb3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Shine%20on%20Me-title_JPG.jpg" alt="Shine on Me">
-                <div class="video-title">Shine on Me</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_d365b2f13bdb4f0aa0223eddd42b5786/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_c49acf9dbbef4307858c3ade5a7c3872~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/The-Journey-v2_JPG.jpg" alt="The Journey">
-                <div class="video-title">The Journey</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_58e7e7ae659f4ec6b22ea81fa4f1af9a/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_a9fa1b2f193845199503b44ba2c833e7~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Time%20and%20Seasons%20-%20title.jpg" alt="Time and Seasons">
-                <div class="video-title">Time and Seasons</div>
-            </a>
-        </div>
-        
-        <div class="video-card">
-            <a href="https://video.wixstatic.com/video/93e23e_a4feebc84f404859940d5814a7b0560b/720p/mp4/file.mp4" target="_blank">
-                <img src="https://static.wixstatic.com/media/93e23e_d346372069b6483ebda5d5286f8dae68~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Ashokan%20Farewell%20-%20title.jpg" alt="Ashokan Farewell">
-                <div class="video-title">Ashokan Farewell</div>
-            </a>
-        </div>
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_509c65ee786f4e129f758f2f8795259c/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_4669d4024e1041519eaa5308c978e472~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Peaceful%20River%20-%20title.jpg" alt="Peaceful River">
+          <div class="video-title">Peaceful River</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_00e1ccf325544997a383a8475ad9e8d8/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_d2c1ddf8efd24b90afcff76d3687c7da~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/At%20this%20table%20-%20title.jpg" alt="At This Table">
+          <div class="video-title">At This Table</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_3c4ef2c658fa4226879308a7f0f924a5/480p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_3ca4ffee08ae4e99b9e94a2389c7a5c7~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/One-little-star-v2_JPG.jpg" alt="One Little Star">
+          <div class="video-title">One Little Star</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_84b270a2908f4933ad3716be7961b144/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_7341d1b15ba147d6b5ef7f79ff436d6c~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Festival%20Madrigal%20-%20Title.jpg" alt="Festival Madrigal">
+          <div class="video-title">Festival Madrigal</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_ae0d6a59c6104623981e48d87434c9b7/480p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_77735b20c7254b4286e948fb54c421e3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Hands%20'cross-title_JPG.jpg" alt="Hands Across the Water">
+          <div class="video-title">Hands Across the Water</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_2148d1814bce4925a008f0b0a57d5bc1/480p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_a6bff9d1fccd4f70a0e98b78b24b000d~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Change_the-World-v2_JPG.jpg" alt="Change the World">
+          <div class="video-title">Change the World</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_8fb70be61a5a4563b30fb35235183ebe/480p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_dbe90dd660bb486f8fa733e2554e94a8~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Each%20of%20Us-title_JPG.jpg" alt="Each of Us">
+          <div class="video-title">Each of Us</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_9b6e0e41608e47b2b681996c480767d4/480p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_d5213b9de9f64d13a7087ff65be17067~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Peace-Peace-v2_JPG.jpg" alt="Peace Peace">
+          <div class="video-title">Peace Peace</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_a37e58dc737446f1a79cde125976f258/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_f2b689b7ceb8497bbbd6ffe2fe4792c5~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Glory-Saints%20-title.jpg" alt="Glory of the Saints">
+          <div class="video-title">Glory of the Saints</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_c845c3da9233416c8db3a492071ef897/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_6c5be044880b429cb50aca52954a5676~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Sing%20Your%20Song%20Be%20Yourself%20-%20title.jpg" alt="Sing Your Song Be Yourself">
+          <div class="video-title">Sing Your Song, Be Yourself</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_c7d4ee45877248b28e3efd74c255912b/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_b4e9ffcc45654aa38dc34e8562b100d3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Make%20a%20Difference%20-%20title.jpg" alt="Make a Difference">
+          <div class="video-title">Make a Difference</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_1ec9cb7f224c487fb934c31963352d9a/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_2ebca9b21bca49a49bc0750cd935b01f~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Joy%20in%20My%20Heart%20-%20title.jpg" alt="Joy in My Heart">
+          <div class="video-title">Joy in My Heart</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_de58e3f96f3e4d73900a40c1cc433c49/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_8fae3a43de88471291227ea8353db4cd~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/We%203%20Kings%20-%20title%20(rev).jpg" alt="We 3 Kings">
+          <div class="video-title">We 3 Kings</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_0f9a891608344ce3bfe1a8844719bb1b/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_b395453e8c3542ba98265c7c26fb00df~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/It's%20Wintertime%20-%20title%20(rev).jpg" alt="It's Wintertime">
+          <div class="video-title">It's Wintertime</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_2062e42ea28c40d5ba6528d1c999109c/480p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_f59ffe84208d422892d47a8d5458acb3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Shine%20on%20Me-title_JPG.jpg" alt="Shine on Me">
+          <div class="video-title">Shine on Me</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_d365b2f13bdb4f0aa0223eddd42b5786/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_c49acf9dbbef4307858c3ade5a7c3872~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/The-Journey-v2_JPG.jpg" alt="The Journey">
+          <div class="video-title">The Journey</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_58e7e7ae659f4ec6b22ea81fa4f1af9a/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_a9fa1b2f193845199503b44ba2c833e7~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Time%20and%20Seasons%20-%20title.jpg" alt="Time and Seasons">
+          <div class="video-title">Time and Seasons</div>
+        </a>
+      </div>
+      
+      <div class="video-card">
+        <a href="https://video.wixstatic.com/video/93e23e_a4feebc84f404859940d5814a7b0560b/720p/mp4/file.mp4" target="_blank">
+          <img src="https://static.wixstatic.com/media/93e23e_d346372069b6483ebda5d5286f8dae68~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Ashokan%20Farewell%20-%20title.jpg" alt="Ashokan Farewell">
+          <div class="video-title">Ashokan Farewell</div>
+        </a>
+      </div>
     </div>
 
     <!-- Choir Photos -->
     <div class="choir-photos">
-        <img src="https://static.wixstatic.com/media/93e23e_f2d57aef4d0040b78ef34ad957f1641c~mv2.jpg/v1/fill/w_400,h_240,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/For%20site%205.jpg" alt="Choir Performance">
-        <img src="https://static.wixstatic.com/media/93e23e_2cd10f785a1047e2af372e7198cdc8bf~mv2.jpg/v1/fill/w_400,h_272,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/For%20site%201.jpg" alt="Choir Members">
-        <img src="https://static.wixstatic.com/media/93e23e_394e1dfda4fc4d0b9bd2123708d55b6f~mv2.jpg/v1/fill/w_400,h_388,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/For%20site%203.jpg" alt="Choir Singing">
+      <img src="https://static.wixstatic.com/media/93e23e_f2d57aef4d0040b78ef34ad957f1641c~mv2.jpg/v1/fill/w_400,h_240,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/For%20site%205.jpg" alt="Choir Performance">
+      <img src="https://static.wixstatic.com/media/93e23e_2cd10f785a1047e2af372e7198cdc8bf~mv2.jpg/v1/fill/w_400,h_272,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/For%20site%201.jpg" alt="Choir Members">
+      <img src="https://static.wixstatic.com/media/93e23e_394e1dfda4fc4d0b9bd2123708d55b6f~mv2.jpg/v1/fill/w_400,h_388,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/For%20site%203.jpg" alt="Choir Singing">
     </div>
-</div>
+  </section>
 
-<!-- Hymn Favorites -->
-<div class="hymn-section">
+  <!-- Hymn Favorites -->
+  <section class="hymn-section">
     <h2>And to hear any of nearly 100 Tri-UU hymn favorites, all with on-screen lyrics...</h2>
     <a href="/copy-of-services">Click Here!</a>
-</div>
+  </section>
 
-<!-- Past Services -->
-<div class="past-services">
+  <!-- Past Services -->
+  <section class="past-services">
     <h2>Past Services</h2>
     <p>Videos of select past sermons are on our Facebook page and Tri-UU YouTube Channel. Everyone subscribe okay?</p>
     
     <div class="social-links">
-        <a href="https://www.facebook.com/uufmcsummerfield/videos/" target="_blank" class="social-link">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-            Facebook Videos
-        </a>
-        <a href="https://www.youtube.com/@Tri-CountyUnitarianUnivers-e9r" target="_blank" class="social-link">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            YouTube Channel
-        </a>
+      <a href="https://www.facebook.com/uufmcsummerfield/videos/" target="_blank" class="social-link">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook Videos
+      </a>
+      <a href="https://www.youtube.com/@Tri-CountyUnitarianUnivers-e9r" target="_blank" class="social-link">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        YouTube Channel
+      </a>
     </div>
-</div>
+  </section>
 
 </div>
