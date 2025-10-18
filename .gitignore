@@ -44,3 +44,7 @@ Audition Files/
 # Project-specific junk/output
 *.tmp
 *.bak
+
+# Allow uploads for Triuu theme despite broader wp-content/uploads ignore:
+!Triuu/wp-content/uploads/
+!Triuu/wp-content/uploads/**
