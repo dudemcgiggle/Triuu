@@ -239,19 +239,20 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                         <span class="cc-day-num<?= $key === $today_key ? ' today' : '' ?>"><?= $day ?></span>
                                                 </div>
                                                 <?php foreach ( $events[ $key ] ?? [] as $ev ): 
-                                                        // Create preview text (first 120 chars of plain text)
-                                                        $plain_notes = wp_strip_all_tags( $ev['notes_html'] );
+                                                        // Create preview text (first 120 chars with line breaks preserved)
+                                                        // Convert <br> tags to newlines BEFORE stripping tags
+                                                        $preview_html = str_replace(['<br>', '<br/>', '<br />'], "\n", $ev['notes_html']);
+                                                        $plain_notes = wp_strip_all_tags( $preview_html );
                                                         
-                                                        // Replace ALL Zoom URLs with "Zoom Link" - comprehensive pattern
-                                                        // This pattern catches: https://zoom.us/j/99428664715?pwd=abc123 and all variations
+                                                        // Replace ALL Zoom URLs with "Zoom Link"
                                                         $plain_notes = preg_replace(
                                                                 '/https?:\/\/[^\s]*zoom\.us[^\s]*/i',
                                                                 'Zoom Link',
                                                                 $plain_notes
                                                         );
                                                         
-                                                        // Double-check: remove any remaining zoom.us text
-                                                        $plain_notes = preg_replace('/zoom\.us[^\s]*/i', 'Zoom Link', $plain_notes);
+                                                        // Remove multiple consecutive newlines (no empty lines)
+                                                        $plain_notes = preg_replace('/\n\n+/', "\n", $plain_notes);
                                                         
                                                         $has_notes = !empty( trim( $plain_notes ) );
                                                         $preview = $has_notes ? mb_substr( $plain_notes, 0, 120 ) : '';
@@ -319,7 +320,7 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
 .cc-modal-description a{color:#5A2B80;text-decoration:underline;}
 .cc-modal-description a:hover{color:#6E4A81;}
 /* Event preview with [Read More] */
-.cc-event-preview{font-size:0.78rem;color:#555;line-height:1.3;margin-top:3px;padding:2px 4px 0;}
+.cc-event-preview{font-size:0.78rem;color:#555;line-height:1.3;margin-top:3px;padding:2px 4px 0;white-space:pre-line;}
 .cc-read-more{color:#5A2B80;font-weight:600;white-space:nowrap;}
 /* Make desktop events clickable */
 @media (min-width:801px){
