@@ -347,8 +347,22 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
   function showModal(ev){
     title.textContent=ev.dataset.title||"";
     time.textContent=ev.dataset.time||"";
-    location.textContent=ev.dataset.location||"";
-    location.style.display=ev.dataset.location?"block":"none";
+    
+    // Handle location - make Zoom URLs clickable as "Zoom Link"
+    const loc=ev.dataset.location||"";
+    if(loc){
+      if(/zoom\.us/i.test(loc)){
+        location.innerHTML=\'<a href="\'+loc+\'" target="_blank" rel="noopener noreferrer">Zoom Link</a>\';
+      }else if(/^https?:\/\//i.test(loc)){
+        location.innerHTML=\'<a href="\'+loc+\'" target="_blank" rel="noopener noreferrer">\'+loc+\'</a>\';
+      }else{
+        location.textContent=loc;
+      }
+      location.style.display="block";
+    }else{
+      location.style.display="none";
+    }
+    
     description.innerHTML=ev.dataset.notesHtml||"No additional details.";
     modal.style.display="flex";
     document.body.style.overflow="hidden";
