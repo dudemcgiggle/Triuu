@@ -107,6 +107,9 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                 // Clean up "Name <email>" format - extract just the email
                 $desc = preg_replace( '/[^<]*<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/', '$1', $desc );
                 
+                // Remove "mailto:" prefix from plain text email addresses
+                $desc = preg_replace('/mailto:([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i', '$1', $desc);
+                
                 // Store Zoom URLs with placeholders BEFORE make_clickable to avoid double-wrapping
                 $zoom_links = [];
                 $desc = preg_replace_callback(
