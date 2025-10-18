@@ -195,12 +195,31 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                 </div>
 
                 <?php if ( ! empty( $events[ $key ] ) ):
-                        foreach ( $events[ $key ] as $ev ): ?>
+                        foreach ( $events[ $key ] as $ev ): 
+                                // Create 2-line preview for mobile
+                                $preview_html = str_replace(['<br>', '<br/>', '<br />'], "\n", $ev['notes_html']);
+                                $plain_notes = wp_strip_all_tags( $preview_html );
+                                $plain_notes = preg_replace('/https?:\/\/[^\s]*zoom\.us[^\s]*/i', 'Zoom Link', $plain_notes);
+                                $plain_notes = preg_replace('/\n\n+/', "\n", $plain_notes);
+                                $plain_notes = trim( $plain_notes );
+                                
+                                $mobile_display = '';
+                                if ( !empty( $plain_notes ) ) {
+                                        $lines = explode("\n", $plain_notes);
+                                        $mobile_display = implode("\n", array_slice($lines, 0, 2));
+                                        if ( count($lines) > 2 ) {
+                                                $mobile_display .= '...';
+                                        }
+                                }
+                                
+                                // Replace Zoom URLs in location
+                                $mob_location = !empty($ev['location']) ? preg_replace('/https?:\/\/[^\s]*zoom\.us[^\s]*/i', 'Zoom Link', $ev['location']) : '';
+                        ?>
                                 <div class="mob-event">
                                         <div class="mob-bar"><?= esc_html( $ev['time'] . ' ' . $ev['title'] ) ?></div>
                                         <div class="mob-body">
-                                                <?php if ( $ev['location'] )   echo '<div>' . esc_html( $ev['location'] ) . '</div>'; ?>
-                                                <?php if ( $ev['notes_html'] ) echo '<div>' . $ev['notes_html']         . '</div>'; ?>
+                                                <?php if ( $mob_location )   echo '<div>' . esc_html( $mob_location ) . '</div>'; ?>
+                                                <?php if ( $mobile_display ) echo '<div style="white-space:pre-line;">' . esc_html( $mobile_display ) . '</div>'; ?>
                                         </div>
                                 </div>
                 <?php endforeach; else: ?>
