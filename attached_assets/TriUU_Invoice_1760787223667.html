@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Invoice — Tri‑Country Unitarian Universalists</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --ink:#1b1f23;
+      --muted:#5b6166;
+      --brand:#5A0000; /* deep red accent per Ken's prefs */
+      --accent:#BE8B4A; /* warm gold accent */
+      --border:#e6e8ee;
+      --ok:#2a7a2a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--ink);
+      background:linear-gradient(180deg, #fafbff 0%, #f3f5fb 100%);
+    }
+    .wrap{
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 24px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow: 0 8px 22px rgba(20,23,28,.06);
+      overflow:hidden;
+    }
+    .header{
+      padding:28px 28px 0 28px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:24px;
+      align-items:start;
+    }
+    .brand{
+      display:flex;
+      gap:16px;
+      align-items:center;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:14px;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      box-shadow: inset 0 0 0 6px rgba(255,255,255,.6);
+      flex:0 0 56px;
+    }
+    h1{
+      margin:0 0 6px 0;
+      font-size:28px;
+      letter-spacing:.3px;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .labels{
+      border-left:3px solid var(--accent);
+      padding-left:14px;
+    }
+    .meta{
+      background: linear-gradient(180deg, rgba(190,139,74,.08), rgba(90,0,0,.06));
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px 16px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px 18px;
+    }
+    .meta div{font-size:14px}
+    .meta strong{display:block;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+    .addresses{
+      padding:18px 28px 8px 28px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:24px;
+    }
+    .panel{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:16px;
+      background:#fff;
+    }
+    .panel h3{
+      margin:0 0 8px 0;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:var(--muted);
+    }
+    .panel p{margin:4px 0;font-size:15px;line-height:1.4}
+    .content{
+      padding:10px 28px 28px 28px;
+    }
+    .section{
+      margin-top:22px;
+      border-top:1px dashed var(--border);
+      padding-top:20px;
+    }
+    .section h2{
+      font-size:18px;
+      margin:0 0 10px 0;
+      display:flex;align-items:center;gap:10px;
+    }
+    .tag{
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      background:rgba(90,0,0,.08);
+      color:var(--brand);
+      border:1px solid rgba(90,0,0,.2);
+    }
+    .kv{margin:8px 0 0 0;color:var(--muted)}
+    .bullets{margin:10px 0 0 20px}
+    .bullets li{margin:6px 0;line-height:1.45}
+    .twocol{
+      display:grid;grid-template-columns: 1fr 1fr;gap:18px;
+    }
+    .note{
+      background:linear-gradient(180deg, #fff, #fcfdff);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:14px 16px;
+      color:var(--muted);
+    }
+    .total{
+      margin-top:24px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:linear-gradient(90deg, rgba(190,139,74,.06), rgba(90,0,0,.03));
+    }
+    .total .amount{
+      font-size:28px;font-weight:800;color:var(--ink);
+    }
+    .total .status{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      background:rgba(42,122,42,.08);color:var(--ok);
+      border:1px solid rgba(42,122,42,.18);
+      font-size:12px;text-transform:uppercase;letter-spacing:.08em;
+    }
+    .actions{
+      display:flex;gap:10px;flex-wrap:wrap;margin:22px 28px 0 28px;
+    }
+    .btn{
+      appearance:none;border:1px solid var(--border);
+      background:#fff;color:var(--ink);
+      padding:10px 14px;border-radius:10px;cursor:pointer;
+      font-weight:600;font-size:14px;
+      box-shadow:0 2px 8px rgba(20,23,28,.06);
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      color:#fff;border:none;
+    }
+    .footer{
+      padding:12px 28px 28px 28px;
+      color:var(--muted);font-size:12px;
+    }
+    @media (max-width: 760px){
+      .header{grid-template-columns: 1fr}
+      .addresses{grid-template-columns:1fr}
+      .twocol{grid-template-columns:1fr}
+      .meta{grid-template-columns: 1fr 1fr}
+      .wrap{padding:16px;margin:20px auto}
+    }
+    /* Print */
+    @media print {
+      body{background:#fff}
+      .wrap{margin:0;max-width:none}
+      .actions{display:none}
+      .card{box-shadow:none;border:none}
+      .btn{display:none}
+      .total{background:#fff}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div class="labels">
+            <h1>Invoice</h1>
+            <p class="subtitle">Ken Pond Creative, DBA</p>
+          </div>
+        </div>
+        <div class="meta" id="meta">
+          <div><strong>Invoice #</strong><span id="invNo">TRIUU-2025-0824-001</span></div>
+          <div><strong>Date</strong><span id="invDate">August 24, 2025</span></div>
+          <div><strong>Project</strong><span>Tri‑UU Website & Calendar</span></div>
+          <div><strong>Phase</strong><span>Phase 1 — Complete</span></div>
+        </div>
+      </div>
+
+      <div class="addresses">
+        <div class="panel">
+          <h3>From</h3>
+          <p><strong>Ken W. Pond</strong></p>
+          <p>Ken Pond Creative, DBA</p>
+          <p>33306 Arbour Point Way, #102</p>
+          <p>Leesburg, FL 34788</p>
+        </div>
+        <div class="panel">
+          <h3>Bill To</h3>
+          <p><strong>Tri‑Country Unitarian Universalists</strong></p>
+          <p>(352) 245‑7944</p>
+          <p><a href="mailto:InfoTriUU.org@gmail.com">InfoTriUU.org@gmail.com</a></p>
+          <p>7280 SE 135th St.</p>
+          <p>Summerfield, FL 34491</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" onclick="window.print()">Print / Save as PDF</button>
+        <button class="btn" onclick="toggleSections()">Collapse / Expand Sections</button>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>Scope of Work <span class="tag">Summary</span></h2>
+          <p class="kv">Deliverables cover a custom Google Calendar integration and a custom‑designed WordPress site built specifically for Tri‑UU’s needs.</p>
+        </div>
+
+        <div class="section">
+          <h2>Custom Google Calendar Integration</h2>
+
+          <div class="twocol">
+            <div>
+              <h3>1) Custom Calendar Display</h3>
+              <ul class="bullets">
+                <li>I created a standalone calendar feature that plugs directly into your website.</li>
+                <li>On computers: a full month‑at‑a‑glance calendar grid with days, events, and month navigation.</li>
+                <li>On phones/tablets: a simple, mobile‑friendly 7‑day rolling list with week‑by‑week navigation.</li>
+              </ul>
+
+              <h3>2) Live Connection to Google Calendar</h3>
+              <ul class="bullets">
+                <li>The calendar automatically pulls events from Google Calendar in real time.</li>
+                <li>You only add or edit events once in Google Calendar; the website reflects updates instantly.</li>
+              </ul>
+
+              <h3>3) Event Details</h3>
+              <ul class="bullets">
+                <li>Event name and time (or “All Day”).</li>
+                <li>Location when provided.</li>
+                <li>Notes/description text with clickable links where appropriate.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>4) User Navigation</h3>
+              <ul class="bullets">
+                <li>Visitors can move between weeks or months with built‑in “Next/Previous” links.</li>
+                <li>View auto‑jumps to the calendar section so visitors don’t lose their place.</li>
+              </ul>
+
+              <h3>5) Automatic Mobile/Desktop Switching</h3>
+              <ul class="bullets">
+                <li>The system detects device size and shows list or grid automatically—no extra setup required.</li>
+              </ul>
+
+              <h3>6) Error Handling & Safety</h3>
+              <ul class="bullets">
+                <li>If Google Calendar can’t be reached, a clear message appears rather than a broken layout.</li>
+                <li>Event descriptions are processed safely so outside links open securely.</li>
+              </ul>
+
+              <h3>7) Extra Compatibility Work</h3>
+              <ul class="bullets">
+                <li>A helper enhancement improves Simple Calendar plugin event displays so start times and descriptions appear consistently with your custom calendar.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Value Statement</h2>
+          <div class="note">
+            This custom calendar system saves time by eliminating duplicate updates—Google Calendar becomes your single source of truth. Visitors get a clean, responsive experience on any device. Overall, it provides a professional and reliable way to showcase events, reducing manual work while giving your audience the information they need at a glance.
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>WordPress Website Setup — Scope of Work</h2>
+
+          <h3>Core Website Platform</h3>
+          <ul class="bullets">
+            <li>Latest WordPress (6.8.2) on a secure Apache / PHP 8.3 server with MySQL 8 for stability, compatibility, and performance.</li>
+          </ul>
+
+          <h3>Theme &amp; Design</h3>
+          <ul class="bullets">
+            <li>Built on Hello Elementor and enhanced with Elementor Pro for editing flexibility.</li>
+            <li>Entire layout, structure, and visual presentation custom‑designed for Tri‑UU’s brand and goals—no pre‑made template.</li>
+          </ul>
+
+          <h3>Essential Plugins Installed &amp; Configured</h3>
+          <ul class="bullets">
+            <li>Yoast SEO – search engine optimization.</li>
+            <li>Google Analytics (MonsterInsights) – visitor analytics and reports.</li>
+            <li>WPForms Lite – contact forms.</li>
+            <li>OptinMonster – pop‑ups and lead capture.</li>
+            <li>Jetpack – security monitoring, backups, stats, additional blocks/widgets.</li>
+            <li>Image Optimizer – automatic compression and resizing for fast loads.</li>
+            <li>Simple Calendar – connects to Google Calendar and displays events.</li>
+          </ul>
+
+          <h3>Server &amp; Hosting Setup</h3>
+          <ul class="bullets">
+            <li>Performance tuned: 512&nbsp;MB PHP memory, large file uploads, modern protocols (OpenSSL, cURL).</li>
+            <li>Remote connections enabled (forms, API calls, updates).</li>
+            <li>Secure defaults (no public error display, SOAP support, modern PHP).</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>About Us Page — Work Completed</h2>
+          <ul class="bullets">
+            <li>Custom look &amp; feel using Tri‑UU colors, fonts, and imagery.</li>
+            <li>Engaging sections: welcome with photo, video intro, Who We Are story, mission/vision/values.</li>
+            <li>Community focus: choir, book clubs, social justice, and education programs with supportive images.</li>
+            <li>History &amp; Today: UU heritage alongside a snapshot of Tri‑UU’s life today.</li>
+            <li>Responsive design with smooth animations and easy‑to‑read layouts.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>Our Organization Page — Work Completed</h2>
+          <ul class="bullets">
+            <li>Leadership introductions: Rev. Kristina Spaude (photo &amp; full bio), plus space for past ministers and interns.</li>
+            <li>Board &amp; Music Director highlighted with photos and role descriptions.</li>
+            <li>Teams &amp; Committees: Care, Membership, Worship, Education, Finance, Social Justice, etc., with names, roles, images.</li>
+            <li>Interactive profiles: “Read more” pop‑ups (modals) for former ministers and interns.</li>
+            <li>Member resources: governance document downloads, congregational history, “Get Involved” CTA with graphics.</li>
+            <li>Custom styling with brand colors, grids, and responsive layouts.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>Homepage — Work Completed</h2>
+          <ul class="bullets">
+            <li>Warm welcome: custom hero with name, tagline, and featured image.</li>
+            <li>Who We Are: Tri‑UU story (founded 1982) with custom icons, colors, and responsive formatting.</li>
+            <li>Services highlight: clear Sunday service details (time, location, Zoom link) with bold CTA button.</li>
+            <li>Daily Life at Tri‑UU: book clubs, discussion groups, meditation, potlucks, and social justice programs.</li>
+            <li>Public Calendar: fully custom Google Calendar integration on the homepage with desktop &amp; mobile views.</li>
+            <li>Mission &amp; Values banner: “The Heart of Tri‑UU” with affirmations of growth, justice, compassion, community.</li>
+            <li>Visual design: custom fonts, brand colors, background images, and smooth animations.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>Image Production &amp; Enhancement</h2>
+          <div class="note">
+            Approximately 30 images were either professionally photographed in a portable studio setup or enhanced in Photoshop (color correction, clarity adjustments, cropping, and resizing). These images were then integrated into the website’s custom layouts to ensure a polished, branded visual presentation. <strong>Provided free of charge.</strong>
+          </div>
+        </div>
+
+        <div class="total">
+          <div>
+            <div class="status">Phase 1 — Complete</div>
+          </div>
+          <div class="amount">$2,500 Due Now</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div>Questions or adjustments? Reply to this invoice and I’ll update it immediately.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Auto-fill today's date if desired; leave existing if manually set.
+    (function(){
+      const el = document.getElementById('invDate');
+      if(el && el.textContent.trim() === ''){
+        const d = new Date();
+        const opts = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
+        el.textContent = d.toLocaleDateString(undefined, opts);
+      }
+    })();
+
+    function toggleSections(){
+      const sections = document.querySelectorAll('.section > ul, .section > .twocol, .section > .note');
+      sections.forEach(s => {
+        const st = getComputedStyle(s);
+        if(st.display === 'none'){ s.style.display = ''; }
+        else { s.style.display = 'none'; }
+      });
+    }
+  </script>
+</body>
+</html>
