@@ -15,17 +15,25 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
 **Important:** To edit the active theme, modify files in `wordpress/wp-content/themes/triuu/`, NOT the root-level directories.
 
 ## Current State
-- **Fully configured and running** on Replit
+- **Fully configured and running** on Replit with production database imported
 - WordPress 6.8.3 with SQLite database integration
-- Theme version: 3.4.4 (Hello Elementor / Triuu customized)
+- Theme: Hello Elementor (parent theme for Triuu customization)
+- Site: Tri-County Unitarian Universalists (TRI-UU)
+- Database table prefix: `RYX_` (from kenpond.com production data)
 - PHP 8.2.23
-- Ready for WordPress installation wizard at `/wp-admin/install.php`
+- **Production data imported** from MySQL database dump
 
 ## Recent Changes
 - 2025-10-18: Initial import to Replit environment
 - 2025-10-18: Configured complete WordPress environment with SQLite database
 - 2025-10-18: Set up PHP development server on port 5000
 - 2025-10-18: Configured deployment settings for production
+- 2025-10-18: **Imported production MySQL database** (converted to SQLite format)
+  - Converted MySQL dump (localhost_1760781795824.sql) to SQLite
+  - Database contains multiple sites (RYX_, jiA_, ysB_, JGK_ prefixes)
+  - Active site: RYX_ prefix (kenpond.com / Triuu site)
+  - Updated wp-config.php table prefix to RYX_
+  - Updated site URLs from kenpond.com to Replit domain
 
 ## Architecture
 **WordPress Setup:**
@@ -41,17 +49,28 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
 
 **Key Configuration:**
 - Database: SQLite (file-based) at `wordpress/wp-content/database/wordpress.db`
+  - Converted from MySQL production database
+  - Contains multiple WordPress installations (4 sites total)
+  - Active site uses `RYX_` table prefix
+- Table Prefix: `RYX_` (configured in wp-config.php)
 - Server: PHP built-in server binding to `0.0.0.0:5000`
 - URLs: Dynamic configuration via `$_SERVER['HTTP_HOST']` for Replit proxy support
 - File system: Direct method for file operations
 - Debug mode: Enabled with logging to `wordpress/wp-content/debug.log`
 
 ## Setup Notes
-**To complete WordPress installation:**
-1. Visit the site's webview (it will redirect to `/wp-admin/install.php`)
-2. Select language and click Continue
-3. Fill in site information (title, username, password, email)
-4. After installation, go to Appearance > Themes to activate the Triuu theme
+**Current Status:**
+- Site is fully configured with production database imported
+- WordPress admin login available at `/wp-admin/`
+- Use existing WordPress credentials from kenpond.com production site
+- No installation wizard needed - site is ready to use
+
+**Database Information:**
+- The imported database contains 4 WordPress sites:
+  1. **RYX_** - kenpond.com (Triuu/TRI-UU site) - **ACTIVE**
+  2. jiA_ - dataforyourbeta.com
+  3. ysB_ - temporary staging site
+  4. JGK_ - temporary staging site
 
 **Theme Features:**
 - Custom fonts (Barlow, Manrope, Roboto Condensed)
