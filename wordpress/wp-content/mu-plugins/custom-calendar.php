@@ -394,6 +394,13 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
     }
     
     description.innerHTML=ev.dataset.notesHtml||"No additional details.";
+    
+    // Clean up mailto: links - show just the email address
+    description.querySelectorAll("a[href^=\'mailto:\']").forEach(function(link){
+      const email=link.href.replace(/^mailto:/i,"");
+      link.textContent=email;
+    });
+    
     modal.style.display="flex";
     document.body.style.overflow="hidden";
   }
