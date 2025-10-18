@@ -107,7 +107,21 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                 // Convert plain email addresses to mailto links
                 $desc = make_clickable( $desc );
                 
-                // Add target="_blank" to all links
+                // Replace Zoom URLs with "Zoom Link" text
+                $desc = preg_replace(
+                        '/<a href="(https?:\/\/[^"]*zoom\.us[^"]*)"[^>]*>.*?<\/a>/i',
+                        '<a href="$1" target="_blank" rel="noopener noreferrer">Zoom Link</a>',
+                        $desc
+                );
+                
+                // Also handle plain Zoom URLs that might not be linked yet
+                $desc = preg_replace(
+                        '/(https?:\/\/[^\s]*zoom\.us[^\s<]*)/i',
+                        '<a href="$1" target="_blank" rel="noopener noreferrer">Zoom Link</a>',
+                        $desc
+                );
+                
+                // Add target="_blank" to any remaining links
                 $desc = str_replace( '<a href', '<a target="_blank" rel="noopener noreferrer" href', $desc );
                 
                 // Convert newlines to <br>
