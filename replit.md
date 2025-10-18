@@ -41,6 +41,12 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Installed must-use plugins (password protection, custom calendar, caching)
   - Installed 17 production plugins (Elementor Pro, Jetpack, Yoast SEO, WPForms, etc.)
   - Added custom admin styling (CSS, JS, images)
+- 2025-10-18: **Fixed Google Fonts loading issues**
+  - Downloaded 135 Google Font files locally (Barlow, Manrope, Roboto, Roboto Slab, Roboto Condensed, Poppins)
+  - Updated Elementor font CSS files to use relative paths instead of external URLs
+  - Fixed serialized PHP data in database after URL replacements
+  - Configured font URLs to use relative paths for HTTPS/HTTP compatibility
+  - All fonts now load correctly from local files without CORS errors
 
 ## Architecture
 **WordPress Setup:**
