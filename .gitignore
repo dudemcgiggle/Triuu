@@ -1,0 +1,46 @@
+﻿# Node / web
+node_modules/
+dist/
+build/
+.cache/
+.vite/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.lnk
+.vscode/
+.idea/
+
+# Archives / binaries / large media you don't want in git
+*.zip
+*.7z
+*.rar
+*.iso
+*.exe
+*.msi
+
+# Audio/Video and bulky design sources
+*.wav
+*.mp3
+*.flac
+*.aac
+*.mp4
+*.mov
+*.mkv
+*.psd
+*.ai
+*.aep
+
+# Adobe Audition and massive backups
+Audition Files/
+**/Backup/
+*.sesx
+
+# Project-specific junk/output
+*.tmp
+*.bak
