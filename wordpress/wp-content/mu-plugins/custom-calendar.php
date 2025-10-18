@@ -254,7 +254,10 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                         // Remove multiple consecutive newlines (no empty lines)
                                                         $plain_notes = preg_replace('/\n\n+/', "\n", $plain_notes);
                                                         
-                                                        $has_notes = !empty( trim( $plain_notes ) );
+                                                        // Remove leading and trailing whitespace/newlines
+                                                        $plain_notes = trim( $plain_notes );
+                                                        
+                                                        $has_notes = !empty( $plain_notes );
                                                         $preview = $has_notes ? mb_substr( $plain_notes, 0, 120 ) : '';
                                                         if ( $has_notes && mb_strlen( $plain_notes ) > 120 ) {
                                                                 $preview = rtrim( $preview ) . '...';
@@ -277,9 +280,7 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                                         <div class="cc-event-second"><?= esc_html( $display_location ) ?></div>
                                                                 <?php endif; ?>
                                                                 <?php if ( $has_notes ): ?>
-                                                                        <div class="cc-event-preview">
-                                                                                <?= esc_html( $preview ) ?> <span class="cc-read-more">[Read More]</span>
-                                                                        </div>
+                                                                        <div class="cc-event-preview"><?= esc_html( $preview ) ?> <span class="cc-read-more">[Read More]</span></div>
                                                                 <?php endif; ?>
                                                         </div>
                                                 <?php endforeach; ?>
