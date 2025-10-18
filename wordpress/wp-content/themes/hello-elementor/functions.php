@@ -1,190 +1,165 @@
 <?php
 /**
- * Hello Elementor – streamlined bootstrap
- * - Guarded constants
- * - Asset versioning (filemtime in dev)
- * - Correct parent/child enqueue order
- * - Local CSS (reset/theme/header-footer) + self-hosted fonts.css
- * - Typekit + resource hints
- * - Elementor locations
- * - Excerpt -> <meta name="description">
+ * Theme functions and definitions
+ *
+ * @package HelloElementor
  */
 
-if ( ! defined( 'ABSPATH' ) ) { exit; }
-
-/* ------------------------------------------------------------------------- *
- * Constants (guarded)
- * ------------------------------------------------------------------------- */
-if ( ! defined( 'HELLO_ELEMENTOR_VERSION' ) ) define( 'HELLO_ELEMENTOR_VERSION', '3.4.4' );
-if ( ! defined( 'HELLO_THEME_PATH' ) )        define( 'HELLO_THEME_PATH',        get_template_directory() );
-if ( ! defined( 'HELLO_THEME_URL' ) )         define( 'HELLO_THEME_URL',         get_template_directory_uri() );
-if ( ! defined( 'HELLO_THEME_ASSETS_PATH' ) ) define( 'HELLO_THEME_ASSETS_PATH', HELLO_THEME_PATH . '/assets' );
-if ( ! defined( 'HELLO_THEME_ASSETS_URL' ) )  define( 'HELLO_THEME_ASSETS_URL',  HELLO_THEME_URL  . '/assets' );
-
-/**
- * Version helper: uses filemtime() in WP_DEBUG to bust cache in Local; falls back to theme version.
- */
-function hello_asset_ver( $rel_path_from_theme_root ) {
-	$abs = trailingslashit( get_template_directory() ) . ltrim( $rel_path_from_theme_root, '/\\' );
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && file_exists( $abs ) ) {
-		$mtime = @filemtime( $abs );
-		if ( $mtime ) return (string) $mtime;
-	}
-	return HELLO_ELEMENTOR_VERSION;
+if ( ! defined( 'ABSPATH' ) ) {
+        exit; // Exit if accessed directly.
 }
 
-/* ------------------------------------------------------------------------- *
+// Version constant
+define( 'HELLO_ELEMENTOR_VERSION', '3.4.4' );
+define( 'HelloTheme\Modules\AdminHome\Components\EHP_THEME_SLUG', 'hello-elementor' );
+
+// Paths & URLs
+define( 'HELLO_THEME_PATH',        get_template_directory() );
+define( 'HELLO_THEME_URL',         get_template_directory_uri() );
+define( 'HELLO_THEME_ASSETS_PATH', HELLO_THEME_PATH . '/assets/' );
+define( 'HELLO_THEME_ASSETS_URL',  HELLO_THEME_URL  . '/assets/' );
+define( 'HELLO_THEME_STYLE_URL',   HELLO_THEME_ASSETS_URL . 'css/' );
+define( 'HELLO_THEME_SCRIPTS_URL', HELLO_THEME_ASSETS_URL . 'js/' );
+
+// Load includes
+require HELLO_THEME_PATH . '/includes/module-base.php';
+require HELLO_THEME_PATH . '/theme.php';
+require HELLO_THEME_PATH . '/includes/elementor-functions.php';
+require HELLO_THEME_PATH . '/includes/settings-functions.php';
+require HELLO_THEME_PATH . '/includes/customizer-functions.php';
+
+// Initialize theme
+HelloTheme\Theme::instance();
+
+/**
  * Theme setup
- * ------------------------------------------------------------------------- */
-function hello_elementor_setup_clean() {
-	// Track theme version (optional)
-	$opt = 'hello_theme_version';
-	$cur = (string) get_option( $opt );
-	if ( empty( $cur ) || version_compare( $cur, HELLO_ELEMENTOR_VERSION, '<' ) ) {
-		update_option( $opt, HELLO_ELEMENTOR_VERSION );
-	}
-
-	add_theme_support( 'automatic-feed-links' );
-	add_theme_support( 'title-tag' );
-	add_theme_support( 'post-thumbnails' );
-	add_theme_support( 'html5', [ 'search-form','comment-form','comment-list','gallery','caption','script','style','navigation-widgets' ] );
-	add_theme_support( 'custom-logo', [ 'height'=>100, 'width'=>350, 'flex-height'=>true, 'flex-width'=>true ] );
-	add_theme_support( 'align-wide' );
-	add_theme_support( 'responsive-embeds' );
-	add_theme_support( 'editor-styles' );
-	add_editor_style( 'editor-styles.css' );
-
-	register_nav_menus( [
-		'menu-1' => esc_html__( 'Header Menu', 'hello-elementor' ),
-		'menu-2' => esc_html__( 'Footer Menu', 'hello-elementor' ),
-	] );
-
-	// Excerpts on pages (used for meta description below)
-	add_post_type_support( 'page', 'excerpt' );
-
-	// Optional Woo
-	if ( apply_filters( 'hello_elementor_add_woocommerce_support', true ) ) {
-		add_theme_support( 'woocommerce' );
-		add_theme_support( 'wc-product-gallery-zoom' );
-		add_theme_support( 'wc-product-gallery-lightbox' );
-		add_theme_support( 'wc-product-gallery-slider' );
-	}
-}
-add_action( 'after_setup_theme', 'hello_elementor_setup_clean' );
-
-/** Content width */
-function hello_elementor_content_width_clean() {
-	$GLOBALS['content_width'] = (int) apply_filters( 'hello_elementor_content_width', 800 );
-}
-add_action( 'after_setup_theme', 'hello_elementor_content_width_clean', 0 );
-
-/* ------------------------------------------------------------------------- *
- * Styles & Fonts
- * ------------------------------------------------------------------------- */
-/**
- * Enqueue theme styles + local assets.
- * Expected files (put them if you use them):
- *   assets/css/reset.css
- *   assets/css/theme.css
- *   assets/css/header-footer.css
- *   assets/css/fonts.css      <-- your self-hosted @font-face rules
  */
-function hello_elementor_enqueue_styles_clean() {
-	if ( is_admin() ) return;
+function hello_elementor_setup() {
+        if ( is_admin() ) {
+                $opt = 'hello_theme_version';
+                if ( ! get_option( $opt ) || version_compare( get_option( $opt ), HELLO_ELEMENTOR_VERSION, '<' ) ) {
+                        update_option( $opt, HELLO_ELEMENTOR_VERSION );
+                }
+        }
 
-	$template   = get_template();
-	$stylesheet = get_stylesheet();
+        register_nav_menus([
+                'menu-1' => esc_html__( 'Header Menu', 'hello-elementor' ),
+                'menu-2' => esc_html__( 'Footer Menu', 'hello-elementor' ),
+        ]);
 
-	// Base style.css (parent/child aware)
-	if ( $stylesheet !== $template ) {
-		wp_enqueue_style( 'hello-parent',
-			trailingslashit( get_template_directory_uri() ) . 'style.css',
-			[],
-			hello_asset_ver( 'style.css' )
-		);
-		wp_enqueue_style( 'hello-child',
-			trailingslashit( get_stylesheet_directory_uri() ) . 'style.css',
-			[ 'hello-parent' ],
-			hello_asset_ver( 'style.css' )
-		);
-		$base_dep = 'hello-child';
-	} else {
-		wp_enqueue_style( 'hello-base',
-			trailingslashit( get_template_directory_uri() ) . 'style.css',
-			[],
-			hello_asset_ver( 'style.css' )
-		);
-		$base_dep = 'hello-base';
-	}
+        add_post_type_support( 'page', 'excerpt' );
 
-	$css_url = trailingslashit( HELLO_THEME_ASSETS_URL )  . 'css/';
-	// reset.css
-	if ( apply_filters( 'hello_elementor_enqueue_style', true ) ) {
-		if ( file_exists( HELLO_THEME_ASSETS_PATH . '/css/reset.css' ) ) {
-			wp_enqueue_style( 'hello-reset', $css_url . 'reset.css', [ $base_dep ], hello_asset_ver( 'assets/css/reset.css' ) );
-		}
-		// theme.css
-		if ( file_exists( HELLO_THEME_ASSETS_PATH . '/css/theme.css' ) ) {
-			wp_enqueue_style( 'hello-theme', $css_url . 'theme.css', [ 'hello-reset' ], hello_asset_ver( 'assets/css/theme.css' ) );
-		} else {
-			// If no reset/theme, keep chain sane:
-			wp_register_style( 'hello-theme', false, [ $base_dep ], HELLO_ELEMENTOR_VERSION );
-			wp_enqueue_style( 'hello-theme' );
-		}
-	}
+        add_theme_support( 'post-thumbnails' );
+        add_theme_support( 'automatic-feed-links' );
+        add_theme_support( 'title-tag' );
+        add_theme_support( 'html5', [
+                'search-form', 'comment-form', 'comment-list', 'gallery',
+                'caption', 'script', 'style', 'navigation-widgets'
+        ]);
+        add_theme_support( 'custom-logo', [
+                'height' => 100,
+                'width'  => 350,
+                'flex-height' => true,
+                'flex-width'  => true,
+        ]);
+        add_theme_support( 'align-wide' );
+        add_theme_support( 'responsive-embeds' );
+        add_theme_support( 'editor-styles' );
+        add_editor_style( 'editor-styles.css' );
 
-	// header-footer.css (after theme.css)
-	if ( apply_filters( 'hello_elementor_header_footer', true ) && file_exists( HELLO_THEME_ASSETS_PATH . '/css/header-footer.css' ) ) {
-		wp_enqueue_style( 'hello-header-footer', $css_url . 'header-footer.css', [ 'hello-theme' ], hello_asset_ver( 'assets/css/header-footer.css' ) );
-	}
-
-	// Self-hosted fonts.css (after everything so it wins)
-	if ( file_exists( HELLO_THEME_ASSETS_PATH . '/css/fonts.css' ) ) {
-		wp_enqueue_style( 'hello-fonts', $css_url . 'fonts.css', [ 'hello-theme' ], hello_asset_ver( 'assets/css/fonts.css' ) );
-	}
-
-	// Typekit (optional) – keep null version for CDN caching
-	if ( apply_filters( 'hello_elementor_load_typekit', true ) ) {
-		wp_enqueue_style( 'hello-typekit', 'https://use.typekit.net/dcl5phc.css', [], null );
-	}
+        // Optional: WooCommerce support
+        if ( apply_filters( 'hello_elementor_add_woocommerce_support', true ) ) {
+                add_theme_support( 'woocommerce' );
+                add_theme_support( 'wc-product-gallery-zoom' );
+                add_theme_support( 'wc-product-gallery-lightbox' );
+                add_theme_support( 'wc-product-gallery-slider' );
+        }
 }
-add_action( 'wp_enqueue_scripts', 'hello_elementor_enqueue_styles_clean', 20 );
+add_action( 'after_setup_theme', 'hello_elementor_setup' );
 
-/** Resource hints for Typekit (preconnect/dns-prefetch) */
-function hello_elementor_resource_hints_clean( $hints, $rel ) {
-	if ( in_array( $rel, [ 'preconnect', 'dns-prefetch' ], true ) ) {
-		$hints[] = 'https://use.typekit.net';
-		$hints[] = 'https://fonts.adobe.com';
-	}
-	return $hints;
+/**
+ * Enqueue styles
+ */
+function hello_elementor_scripts_styles() {
+        if ( apply_filters( 'hello_elementor_enqueue_style', true ) ) {
+                wp_enqueue_style(
+                        'hello-elementor-reset',
+                        HELLO_THEME_STYLE_URL . 'reset.css',
+                        [],
+                        HELLO_ELEMENTOR_VERSION
+                );
+                wp_enqueue_style(
+                        'hello-elementor-theme',
+                        HELLO_THEME_STYLE_URL . 'theme.css',
+                        [],
+                        HELLO_ELEMENTOR_VERSION
+                );
+        }
+
+        if ( apply_filters( 'hello_elementor_header_footer', true ) ) {
+                wp_enqueue_style(
+                        'hello-elementor-header-footer',
+                        HELLO_THEME_STYLE_URL . 'header-footer.css',
+                        [],
+                        HELLO_ELEMENTOR_VERSION
+                );
+        }
 }
-add_filter( 'wp_resource_hints', 'hello_elementor_resource_hints_clean', 10, 2 );
+add_action( 'wp_enqueue_scripts', 'hello_elementor_scripts_styles' );
 
-/* ------------------------------------------------------------------------- *
- * Elementor locations
- * ------------------------------------------------------------------------- */
-function hello_elementor_register_locations_clean( $manager ) {
-	if ( apply_filters( 'hello_elementor_register_elementor_locations', true ) ) {
-		$manager->register_all_core_location();
-	}
+/**
+ * Adobe Fonts
+ */
+function hello_elementor_enqueue_adobe_fonts() {
+        wp_enqueue_style(
+                'hello-elementor-typekit',
+                'https://use.typekit.net/dcl5phc.css',
+                [],
+                null
+        );
 }
-add_action( 'elementor/theme/register_locations', 'hello_elementor_register_locations_clean' );
+add_action( 'wp_enqueue_scripts', 'hello_elementor_enqueue_adobe_fonts' );
 
-/* ------------------------------------------------------------------------- *
- * Meta description from Page/Post excerpt (singular only)
- * ------------------------------------------------------------------------- */
-function hello_elementor_meta_description_clean() {
-	if ( ! is_singular() || ! apply_filters( 'hello_elementor_description_meta_tag', true ) ) return;
-	$post = get_queried_object();
-	if ( ! empty( $post->post_excerpt ) ) {
-		printf( "<meta name=\"description\" content=\"%s\" />\n", esc_attr( wp_strip_all_tags( $post->post_excerpt ) ) );
-	}
+/**
+ * Elementor Locations
+ */
+function hello_elementor_register_elementor_locations( $manager ) {
+        if ( apply_filters( 'hello_elementor_register_elementor_locations', true ) ) {
+                $manager->register_all_core_location();
+        }
 }
-add_action( 'wp_head', 'hello_elementor_meta_description_clean', 1 );
+add_action( 'elementor/theme/register_locations', 'hello_elementor_register_elementor_locations' );
 
-/* ------------------------------------------------------------------------- *
- * body_open shim (legacy)
- * ------------------------------------------------------------------------- */
+/**
+ * Content width
+ */
+function hello_elementor_content_width() {
+        $GLOBALS['content_width'] = apply_filters( 'hello_elementor_content_width', 800 );
+}
+add_action( 'after_setup_theme', 'hello_elementor_content_width', 0 );
+
+/**
+ * Meta description tag
+ */
+function hello_elementor_add_description_meta_tag() {
+        if (
+                ! is_singular() ||
+                ! apply_filters( 'hello_elementor_description_meta_tag', true )
+        ) {
+                return;
+        }
+        $post = get_queried_object();
+        if ( ! empty( $post->post_excerpt ) ) {
+                echo '<meta name="description" content="' . esc_attr( wp_strip_all_tags( $post->post_excerpt ) ) . '">' . "\n";
+        }
+}
+add_action( 'wp_head', 'hello_elementor_add_description_meta_tag' );
+
+/**
+ * Backward compatibility for body_open
+ */
 if ( ! function_exists( 'hello_elementor_body_open' ) ) {
-	function hello_elementor_body_open() { wp_body_open(); }
+        function hello_elementor_body_open() {
+                wp_body_open();
+        }
 }
