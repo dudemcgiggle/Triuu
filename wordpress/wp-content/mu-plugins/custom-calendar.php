@@ -239,7 +239,7 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                         <span class="cc-day-num<?= $key === $today_key ? ' today' : '' ?>"><?= $day ?></span>
                                                 </div>
                                                 <?php foreach ( $events[ $key ] ?? [] as $ev ): 
-                                                        // Create preview text (first 120 chars with line breaks preserved)
+                                                        // Create preview text (first 2 lines only)
                                                         // Convert <br> tags to newlines BEFORE stripping tags
                                                         $preview_html = str_replace(['<br>', '<br/>', '<br />'], "\n", $ev['notes_html']);
                                                         $plain_notes = wp_strip_all_tags( $preview_html );
@@ -257,10 +257,15 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                         // Remove leading and trailing whitespace/newlines
                                                         $plain_notes = trim( $plain_notes );
                                                         
+                                                        // Show only first 2 lines for preview
                                                         $has_notes = !empty( $plain_notes );
-                                                        $preview = $has_notes ? mb_substr( $plain_notes, 0, 120 ) : '';
-                                                        if ( $has_notes && mb_strlen( $plain_notes ) > 120 ) {
-                                                                $preview = rtrim( $preview ) . '...';
+                                                        $preview = '';
+                                                        if ( $has_notes ) {
+                                                                $lines = explode("\n", $plain_notes);
+                                                                $preview = implode("\n", array_slice($lines, 0, 2));
+                                                                if ( count($lines) > 2 ) {
+                                                                        $preview .= '...';
+                                                                }
                                                         }
                                                 ?>
                                                         <div class="cc-event cc-event-clickable" 
