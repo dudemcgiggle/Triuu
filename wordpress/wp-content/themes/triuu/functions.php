@@ -172,6 +172,21 @@ function hello_elementor_meta_description_clean() {
 add_action( 'wp_head', 'hello_elementor_meta_description_clean', 1 );
 
 /* ------------------------------------------------------------------------- *
+ * Services Page Modern Styling
+ * ------------------------------------------------------------------------- */
+function triuu_enqueue_services_page_styles() {
+        if ( is_page( 'services' ) ) {
+                wp_enqueue_style(
+                        'services-page-modern',
+                        content_url( 'uploads/elementor/css/services-page.css' ),
+                        [],
+                        filemtime( WP_CONTENT_DIR . '/uploads/elementor/css/services-page.css' )
+                );
+        }
+}
+add_action( 'wp_enqueue_scripts', 'triuu_enqueue_services_page_styles', 25 );
+
+/* ------------------------------------------------------------------------- *
  * body_open shim (legacy)
  * ------------------------------------------------------------------------- */
 if ( ! function_exists( 'hello_elementor_body_open' ) ) {
