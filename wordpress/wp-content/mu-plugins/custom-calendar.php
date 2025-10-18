@@ -196,45 +196,22 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
 
                 <?php if ( ! empty( $events[ $key ] ) ):
                         foreach ( $events[ $key ] as $ev ): 
-                                // Create 2-line preview for mobile (max ~100 chars total)
-                                $preview_html = str_replace(['<br>', '<br/>', '<br />'], "\n", $ev['notes_html']);
-                                $plain_notes = wp_strip_all_tags( $preview_html );
-                                $plain_notes = preg_replace('/https?:\/\/[^\s]*zoom\.us[^\s]*/i', 'Zoom Link', $plain_notes);
-                                $plain_notes = preg_replace('/\n\n+/', "\n", $plain_notes);
-                                $plain_notes = trim( $plain_notes );
-                                
-                                $mobile_display = '';
-                                if ( !empty( $plain_notes ) ) {
-                                        $lines = explode("\n", $plain_notes);
-                                        
-                                        // Take first 2 lines, but limit total length to ~100 chars
-                                        $first_line = isset($lines[0]) ? $lines[0] : '';
-                                        $second_line = isset($lines[1]) ? $lines[1] : '';
-                                        
-                                        // Build preview with character limit
-                                        if (mb_strlen($first_line) > 50) {
-                                                $mobile_display = mb_substr($first_line, 0, 50) . '...';
+                                // For mobile, show FULL description with clickable links
+                                // Replace Zoom URLs in location with clickable "Zoom Link"
+                                $mob_location = '';
+                                if ( !empty($ev['location']) ) {
+                                        if ( preg_match('/zoom\.us/i', $ev['location']) ) {
+                                                $mob_location = '<a href="' . esc_url($ev['location']) . '" target="_blank" rel="noopener noreferrer">Zoom Link</a>';
                                         } else {
-                                                $mobile_display = $first_line;
-                                                if (!empty($second_line)) {
-                                                        $remaining = 100 - mb_strlen($first_line);
-                                                        if (mb_strlen($second_line) > $remaining) {
-                                                                $mobile_display .= "\n" . mb_substr($second_line, 0, $remaining) . '...';
-                                                        } else {
-                                                                $mobile_display .= "\n" . $second_line;
-                                                                if (count($lines) > 2) {
-                                                                        $mobile_display .= '...';
-                                                                }
-                                                        }
-                                                }
+                                                $mob_location = esc_html($ev['location']);
                                         }
                                 }
-                                
                         ?>
                                 <div class="mob-event">
                                         <div class="mob-bar"><?= esc_html( $ev['time'] . ' ' . $ev['title'] ) ?></div>
                                         <div class="mob-body">
-                                                <?php if ( $mobile_display ) echo '<div style="white-space:pre-line;">' . esc_html( $mobile_display ) . '</div>'; ?>
+                                                <?php if ( $mob_location ) echo '<div>' . $mob_location . '</div>'; ?>
+                                                <?php if ( $ev['notes_html'] ) echo '<div>' . $ev['notes_html'] . '</div>'; ?>
                                         </div>
                                 </div>
                 <?php endforeach; else: ?>
