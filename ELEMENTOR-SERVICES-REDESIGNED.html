@@ -15,12 +15,15 @@
   box-sizing: border-box;
 }
 
-.services-page-wrapper {
+body {
   font-family: 'Barlow', sans-serif;
   background: var(--body-bg);
   color: #000000;
   line-height: 1.5;
   font-weight: 200;
+}
+
+.page-wrapper {
   max-width: 1200px;
   margin: 1em auto;
   padding: 1em;
@@ -28,53 +31,59 @@
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
-.services-page-wrapper section {
+header {
+  background: var(--accent-color);
+  color: #666666;
+  padding: 1em;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+section {
   margin-bottom: 2em;
   padding: 1em;
 }
 
-.services-page-wrapper h1 {
+h1 {
   font-weight: 200;
   text-transform: uppercase;
   margin-bottom: 0.3em;
-  text-align: center;
 }
 
-.services-page-wrapper h2 {
+h2 {
   font-weight: 300;
   text-transform: uppercase;
   color: #A5849F;
   margin-bottom: 0.5em;
 }
 
-.services-page-wrapper h3 {
+h3 {
   font-weight: 400;
   color: #4A566D;
   margin-bottom: 0.5em;
 }
 
-.services-page-wrapper h4 {
+h4 {
   font-weight: 700;
   color: #614E6B;
   margin-bottom: 0.5em;
 }
 
-.services-page-wrapper p {
+p {
   margin-bottom: 1em;
   color: #666666;
   font-weight: 300;
 }
 
-.services-page-wrapper strong {
+strong {
   color: #616161 !important;
   font-weight: 400;
 }
 
-.services-page-wrapper em {
+em {
   font-style: italic;
 }
 
-/* Photo placeholders */
 .photo-placeholder-landscape {
   width: 100%;
   background: var(--placeholder-bg);
@@ -87,22 +96,6 @@
   display: block;
 }
 
-/* Hero images grid */
-.hero-images-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1em;
-  margin: 1em 0;
-}
-
-.hero-images-grid img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 4px;
-}
-
-/* Note box */
 .note-box {
   background: #f8f9fa;
   border-left: 4px solid var(--accent-color);
@@ -117,7 +110,28 @@
   color: var(--accent-color) !important;
 }
 
-/* Service cards */
+.hero-images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1em;
+  margin: 1em 0;
+}
+
+.hero-images-grid img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.theme-subtitle {
+  text-align: center;
+  font-size: 1.1em;
+  color: #666666;
+  font-style: italic;
+  margin-bottom: 1.5em;
+  font-weight: 300;
+}
+
 .service-cards {
   display: grid;
   gap: 1.5em;
@@ -129,7 +143,7 @@
   border: 1px solid var(--card-border);
   border-radius: 4px;
   padding: 1.5em;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 
 .service-card .date {
@@ -141,8 +155,8 @@
 }
 
 .service-card .title {
-  font-size: 1.4em;
-  font-weight: 700;
+  font-size: 1.3em;
+  font-weight: 400;
   color: #4A566D;
   margin-bottom: 0.5em;
 }
@@ -152,26 +166,16 @@
   color: #666666;
   font-style: italic;
   margin-bottom: 1em;
+  font-weight: 300;
 }
 
 .service-card .description {
   font-size: 1em;
   color: #666666;
   font-weight: 300;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
-/* Theme subtitle */
-.theme-subtitle {
-  text-align: center;
-  font-size: 1.1em;
-  color: #666666;
-  font-style: italic;
-  margin-bottom: 1.5em;
-  font-weight: 300;
-}
-
-/* CTA Button */
 .cta-button {
   display: inline-block;
   background: var(--accent-color);
@@ -190,7 +194,6 @@
   color: #fff;
 }
 
-/* Video grid */
 .video-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -203,11 +206,12 @@
   border: 1px solid var(--card-border);
   border-radius: 4px;
   overflow: hidden;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
   transition: box-shadow 0.3s ease;
 }
 
 .video-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
 }
 
 .video-card a {
@@ -230,7 +234,6 @@
   font-size: 0.9em;
 }
 
-/* Choir photos */
 .choir-photos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -241,10 +244,9 @@
 .choir-photos img {
   width: 100%;
   height: auto;
-  border-radius: 4px;
+  display: block;
 }
 
-/* Hymn section */
 .hymn-section {
   background: #f8f9fa;
   padding: 2em 1.5em;
@@ -254,9 +256,8 @@
 }
 
 .hymn-section h2 {
-  font-size: 1.3em;
+  font-size: 1.2em;
   margin-bottom: 1.5em;
-  color: #A5849F;
 }
 
 .hymn-section a {
@@ -275,7 +276,6 @@
   text-decoration: none;
 }
 
-/* Past services section */
 .past-services {
   margin: 2em 0;
   padding: 1.5em;
@@ -323,13 +323,12 @@
   height: 18px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
-  .services-page-wrapper h1 {
+  h1 {
     font-size: 1.5em;
   }
   
-  .services-page-wrapper h2 {
+  h2 {
     font-size: 1.2em;
   }
   
@@ -354,9 +353,8 @@
 }
 </style>
 
-<div class="services-page-wrapper">
+<div class="page-wrapper">
 
-  <!-- Hero Section -->
   <section>
     <h1>Services</h1>
     <h2>What to Expect</h2>
@@ -372,7 +370,6 @@
     </div>
   </section>
 
-  <!-- Hero Images -->
   <section>
     <div class="hero-images-grid">
       <div>
@@ -384,7 +381,6 @@
     </div>
   </section>
 
-  <!-- Upcoming Services -->
   <section>
     <h2>Upcoming Services</h2>
     <p class="theme-subtitle">October 2025 - Spiritual theme: Cultivating Compassion</p>
@@ -420,7 +416,6 @@
     </div>
   </section>
 
-  <!-- Service Inspirations -->
   <section>
     <h2>Service Inspirations</h2>
     <div class="photo-placeholder-landscape">
@@ -438,7 +433,6 @@
     </div>
   </section>
 
-  <!-- Music & Choir -->
   <section>
     <h2>Music & Choir</h2>
     <h3>Tri-UU Choir Videos</h3>
@@ -575,7 +569,6 @@
       </div>
     </div>
 
-    <!-- Choir Photos -->
     <div class="choir-photos">
       <img src="https://static.wixstatic.com/media/93e23e_f2d57aef4d0040b78ef34ad957f1641c~mv2.jpg/v1/fill/w_400,h_240,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/For%20site%205.jpg" alt="Choir Performance">
       <img src="https://static.wixstatic.com/media/93e23e_2cd10f785a1047e2af372e7198cdc8bf~mv2.jpg/v1/fill/w_400,h_272,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/For%20site%201.jpg" alt="Choir Members">
@@ -583,13 +576,11 @@
     </div>
   </section>
 
-  <!-- Hymn Favorites -->
   <section class="hymn-section">
     <h2>And to hear any of nearly 100 Tri-UU hymn favorites, all with on-screen lyrics...</h2>
     <a href="/copy-of-services">Click Here!</a>
   </section>
 
-  <!-- Past Services -->
   <section class="past-services">
     <h2>Past Services</h2>
     <p>Videos of select past sermons are on our Facebook page and Tri-UU YouTube Channel. Everyone subscribe okay?</p>
