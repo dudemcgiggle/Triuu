@@ -200,13 +200,19 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                 <?php if ( ! empty( $events[ $key ] ) ):
                         foreach ( $events[ $key ] as $ev ): 
                                 // For mobile, show FULL description with clickable links
-                                // Replace Zoom URLs in location with clickable "Zoom Link"
+                                // Handle location with clickable links
                                 $mob_location = '';
                                 if ( !empty($ev['location']) ) {
                                         if ( preg_match('/zoom\.us/i', $ev['location']) ) {
+                                                // Zoom URL - display as "Zoom Link"
                                                 $mob_location = '<a href="' . esc_url($ev['location']) . '" target="_blank" rel="noopener noreferrer">Zoom Link</a>';
+                                        } elseif ( preg_match('/^https?:\/\//i', $ev['location']) ) {
+                                                // Regular URL - display as clickable link
+                                                $mob_location = '<a href="' . esc_url($ev['location']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($ev['location']) . '</a>';
                                         } else {
-                                                $mob_location = esc_html($ev['location']);
+                                                // Address - make it a Google Maps link
+                                                $maps_url = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($ev['location']);
+                                                $mob_location = '<a href="' . esc_url($maps_url) . '" target="_blank" rel="noopener noreferrer">' . esc_html($ev['location']) . '</a>';
                                         }
                                 }
                         ?>
