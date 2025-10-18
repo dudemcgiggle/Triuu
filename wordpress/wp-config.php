@@ -43,9 +43,15 @@ define( 'WP_DEBUG_DISPLAY', false );
 /**
  * Replit environment configuration
  */
-// Allow all hosts since Replit uses a proxy
+// Fix for proxy/load balancer - tell WordPress it's being served over HTTPS
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
+
+// Force HTTPS for all WordPress URLs
 define( 'WP_HOME', 'https://' . $_SERVER['HTTP_HOST'] );
 define( 'WP_SITEURL', 'https://' . $_SERVER['HTTP_HOST'] );
+define( 'FORCE_SSL_ADMIN', true );
 
 // File system method
 define( 'FS_METHOD', 'direct' );
