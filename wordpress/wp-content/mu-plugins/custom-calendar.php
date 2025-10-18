@@ -179,9 +179,9 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
         ob_start(); ?>
 <div id="custom-calendar" class="custom-calendar" data-view="<?= esc_attr( $view ) ?>">
         <div class="cc-month-year">
-                <a href="<?= $prev_link ?>" class="cc-prev">&lt;</a>
+                <a href="<?= $prev_link ?>" class="cc-prev">‹</a>
                 <?= $header_lbl ?>
-                <a href="<?= $next_link ?>" class="cc-next">&gt;</a>
+                <a href="<?= $next_link ?>" class="cc-next">›</a>
         </div>
 
 <?php if ( $view === 'week' ): /* ░░ PHONE LIST ░░ */ ?>
@@ -230,9 +230,9 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
 
         <!-- bottom nav bar -->
         <div class="cc-month-year">
-                <a href="<?= $prev_link ?>" class="cc-prev">&lt;</a>
+                <a href="<?= $prev_link ?>" class="cc-prev">‹</a>
                 <?= $header_lbl ?>
-                <a href="<?= $next_link ?>" class="cc-next">&gt;</a>
+                <a href="<?= $next_link ?>" class="cc-next">›</a>
         </div>
 
 <?php else: /* ░░ DESKTOP MONTH GRID ░░ */ ?>
