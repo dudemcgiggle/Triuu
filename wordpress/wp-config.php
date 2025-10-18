@@ -31,7 +31,7 @@ define('NONCE_SALT',       'Or(.{V+_8|4 1ycP6v|o3s(5r&{bKP8qqRfAV{0@?e||hIW,tQap
 /**
  * WordPress database table prefix.
  */
-$table_prefix = 'wp_';
+$table_prefix = 'RYX_';
 
 /**
  * For developers: WordPress debugging mode.
