@@ -135,6 +135,29 @@ em {
   text-decoration: underline;
 }
 
+.what-to-expect-wrapper {
+  display: flex;
+  gap: 2em;
+  align-items: flex-start;
+}
+
+.what-to-expect-content {
+  flex: 1;
+}
+
+.what-to-expect-image {
+  width: 300px;
+  height: 300px;
+  flex-shrink: 0;
+}
+
+.what-to-expect-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
 .hero-images-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -397,6 +420,16 @@ em {
     max-width: 300px;
     justify-content: center;
   }
+  
+  .what-to-expect-wrapper {
+    flex-direction: column;
+  }
+  
+  .what-to-expect-image {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
 }
 </style>
 
@@ -406,22 +439,27 @@ em {
     <h1>Services</h1>
     <h2>What to Expect</h2>
     
-    <p>Each service contains instrumental and vocal music, a 15- to 20-minute message, a joys, sorrows and concerns ritual, an offering, a story relating to the message, and a period of meditation or prayer. The Sunday service begins at 9:00 a.m. and lasts 60 minutes, followed by a period where people may respond to the message of the day.</p>
-    
-    <p>Each service begins with the lighting of our flaming chalice, a distinctive symbol of UU.</p>
-    
-    <p>The design originated during WWII as a symbol on documents given to refugees who fled without their identification papers.</p>
-    
-    <div class="note-box">
-      <p><strong>Note:</strong> Join us in person or on <a href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank">Zoom</a></p>
+    <div class="what-to-expect-wrapper">
+      <div class="what-to-expect-content">
+        <p>Each service contains instrumental and vocal music, a 15- to 20-minute message, a joys, sorrows and concerns ritual, an offering, a story relating to the message, and a period of meditation or prayer. The Sunday service begins at 9:00 a.m. and lasts 60 minutes, followed by a period where people may respond to the message of the day.</p>
+        
+        <p>Each service begins with the lighting of our flaming chalice, a distinctive symbol of UU.</p>
+        
+        <p>The design originated during WWII as a symbol on documents given to refugees who fled without their identification papers.</p>
+        
+        <div class="note-box">
+          <p><strong>Note:</strong> Join us in person or on <a href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank">Zoom</a></p>
+        </div>
+      </div>
+      
+      <div class="what-to-expect-image">
+        <img src="https://static.wixstatic.com/media/93e23e_3c97114258b445d093005dd842cadef9~mv2.jpg/v1/crop/x_486,y_17,w_951,h_1024/fill/w_616,h_663,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/8%20cropped.jpg" alt="Flaming Chalice - UU Symbol">
+      </div>
     </div>
   </section>
 
   <section>
     <div class="hero-images-grid">
-      <div>
-        <img src="https://static.wixstatic.com/media/93e23e_3c97114258b445d093005dd842cadef9~mv2.jpg/v1/crop/x_486,y_17,w_951,h_1024/fill/w_616,h_663,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/8%20cropped.jpg" alt="Flaming Chalice - UU Symbol">
-      </div>
       <div>
         <img src="https://static.wixstatic.com/media/93e23e_21b81a25102440c5bd32a699ff3b4448~mv2.jpg/v1/fill/w_347,h_620,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/singing%20bowl_JPG.jpg" alt="Singing Bowl">
       </div>
