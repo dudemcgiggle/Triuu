@@ -98,24 +98,41 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
         $clean_description = function( $desc ) {
                 if ( empty( $desc ) ) return '';
                 
-                // Strip out <b>, <u>, <strong>, <em>, <i> tags but keep content
-                $desc = strip_tags( $desc, '<a><br>' );
+                // FIRST: Extract URLs from any existing anchor tags before stripping
+                $desc = preg_replace('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>.*?<\/a>/i', '$1', $desc);
+                
+                // Strip ALL tags except <br>
+                $desc = strip_tags( $desc, '<br>' );
                 
                 // Clean up "Name <email>" format - extract just the email
                 $desc = preg_replace( '/[^<]*<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/', '$1', $desc );
                 
-                // FIRST: Replace plain Zoom URLs with clickable "Zoom Link" BEFORE make_clickable
-                $desc = preg_replace(
-                        '/(https?:\/\/[^\s<]*zoom\.us[^\s<]*)/i',
-                        '<a href="$1" target="_blank" rel="noopener noreferrer">Zoom Link</a>',
+                // Store Zoom URLs with placeholders BEFORE make_clickable to avoid double-wrapping
+                $zoom_links = [];
+                $desc = preg_replace_callback(
+                        '/(https?:\/\/[^\s<>]*zoom\.us[^\s<>]*)/i',
+                        function($matches) use (&$zoom_links) {
+                                $index = count($zoom_links);
+                                $zoom_links[$index] = $matches[1];
+                                return '___ZOOM_LINK_' . $index . '___';
+                        },
                         $desc
                 );
                 
-                // Convert plain email addresses to mailto links
+                // Convert plain email addresses and other URLs to links
                 $desc = make_clickable( $desc );
                 
+                // Replace placeholders with actual Zoom Link anchors
+                foreach ($zoom_links as $index => $url) {
+                        $desc = str_replace(
+                                '___ZOOM_LINK_' . $index . '___',
+                                '<a href="' . esc_url($url) . '" target="_blank" rel="noopener noreferrer">Zoom Link</a>',
+                                $desc
+                        );
+                }
+                
                 // Add target="_blank" to any remaining links that don't have it
-                $desc = preg_replace('/<a href(?![^>]*target=)/i', '<a target="_blank" rel="noopener noreferrer" href', $desc);
+                $desc = preg_replace('/<a\s+href=(["\'])(?![^>]*target=)/i', '<a target="_blank" rel="noopener noreferrer" href=$1', $desc);
                 
                 // Convert newlines to <br>
                 $desc = nl2br( $desc );
@@ -252,8 +269,11 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                                         <span class="cc-time"><?= esc_html( $ev['time'] ) ?></span>
                                                                         <strong class="cc-title"><?= esc_html( $ev['title'] ) ?></strong>
                                                                 </div>
-                                                                <?php if ( $ev['location'] ): ?>
-                                                                        <div class="cc-event-second"><?= esc_html( $ev['location'] ) ?></div>
+                                                                <?php if ( $ev['location'] ): 
+                                                                        // Replace Zoom URLs with "Zoom Link" text for display
+                                                                        $display_location = preg_replace('/https?:\/\/[^\s]*zoom\.us[^\s]*/i', 'Zoom Link', $ev['location']);
+                                                                ?>
+                                                                        <div class="cc-event-second"><?= esc_html( $display_location ) ?></div>
                                                                 <?php endif; ?>
                                                                 <?php if ( $has_notes ): ?>
                                                                         <div class="cc-event-preview">
