@@ -52,6 +52,11 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Resolved redirect loops when accessing Appearance > Themes and other admin pages
   - WordPress now correctly uses Replit domain for authentication cookies and redirects
   - Admin pages are now fully accessible without localhost redirect issues
+- 2025-10-18: **Fixed router.php admin page routing issue**
+  - Router was incorrectly routing /wp-admin/ requests through front-end index.php
+  - Updated router to properly handle WordPress admin URLs and wp-login.php
+  - Appearance > Themes and all other admin pages now load correctly
+  - PHP built-in server now correctly distinguishes between admin and front-end requests
 
 ## Architecture
 **WordPress Setup:**
