@@ -44,3 +44,25 @@ Audition Files/
 # Project-specific junk/output
 *.tmp
 *.bak
+
+# WordPress
+wordpress/wp-content/database/
+wordpress/wp-content/uploads/
+wordpress/wp-content/upgrade/
+wordpress/wp-content/cache/
+wordpress/wp-content/debug.log
+wordpress/wp-content/backup-db/
+wordpress/wp-content/advanced-cache.php
+wordpress/wp-content/wp-cache-config.php
+wordpress/.htaccess
+
+# SQLite Database
+*.db
+*.db-shm
+*.db-wal
+
+# Replit
+.replit
+.config/
+.local/
+.upm/
