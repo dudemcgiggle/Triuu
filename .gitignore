@@ -48,3 +48,8 @@ Audition Files/
 # Allow uploads for Triuu theme despite broader wp-content/uploads ignore:
 !Triuu/wp-content/uploads/
 !Triuu/wp-content/uploads/**
+
+# Generated plugin caches/backups
+Triuu/wp-content/uploads/wp-file-manager-pro/
+Triuu/wp-content/uploads/wpforms/cache/
+
