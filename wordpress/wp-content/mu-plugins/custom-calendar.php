@@ -104,19 +104,18 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                 // Clean up "Name <email>" format - extract just the email
                 $desc = preg_replace( '/[^<]*<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/', '$1', $desc );
                 
-                // Convert plain email addresses to mailto links
-                $desc = make_clickable( $desc );
-                
-                // Replace ALL Zoom URLs with "Zoom Link" text
-                // This catches zoom.us links with any subdomain, path, and query params
+                // FIRST: Replace plain Zoom URLs with clickable "Zoom Link" BEFORE make_clickable
                 $desc = preg_replace(
-                        '/<a[^>]+href=["\']([^"\']*zoom\.us[^"\']*)["\'][^>]*>.*?<\/a>/i',
+                        '/(https?:\/\/[^\s<]*zoom\.us[^\s<]*)/i',
                         '<a href="$1" target="_blank" rel="noopener noreferrer">Zoom Link</a>',
                         $desc
                 );
                 
-                // Add target="_blank" to any remaining links
-                $desc = str_replace( '<a href', '<a target="_blank" rel="noopener noreferrer" href', $desc );
+                // Convert plain email addresses to mailto links
+                $desc = make_clickable( $desc );
+                
+                // Add target="_blank" to any remaining links that don't have it
+                $desc = preg_replace('/<a href(?![^>]*target=)/i', '<a target="_blank" rel="noopener noreferrer" href', $desc);
                 
                 // Convert newlines to <br>
                 $desc = nl2br( $desc );
