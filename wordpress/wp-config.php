@@ -48,9 +48,18 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
     $_SERVER['HTTPS'] = 'on';
 }
 
-// Secure domain configuration - use Replit's environment or fallback to HTTP_HOST
-$replit_domain = getenv('REPLIT_DEV_DOMAIN') ?: getenv('REPLIT_DOMAINS');
-$site_domain = $replit_domain ?: $_SERVER['HTTP_HOST'];
+// Secure domain configuration - prioritize proxy headers, then Replit env, then HTTP_HOST
+if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+    // Extract first host from X-Forwarded-Host header (remove port if present)
+    $forwarded_hosts = explode(',', $_SERVER['HTTP_X_FORWARDED_HOST']);
+    $site_domain = trim(explode(':', $forwarded_hosts[0])[0]);
+    // Update HTTP_HOST to match the public domain for cookie/auth compatibility
+    $_SERVER['HTTP_HOST'] = $site_domain;
+} else {
+    // Fallback to Replit environment variables or HTTP_HOST
+    $replit_domain = getenv('REPLIT_DEV_DOMAIN') ?: getenv('REPLIT_DOMAINS');
+    $site_domain = $replit_domain ?: $_SERVER['HTTP_HOST'];
+}
 
 // Force HTTPS for all WordPress URLs
 define( 'WP_HOME', 'https://' . $site_domain );

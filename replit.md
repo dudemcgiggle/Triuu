@@ -47,6 +47,11 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Fixed serialized PHP data in database after URL replacements
   - Configured font URLs to use relative paths for HTTPS/HTTP compatibility
   - All fonts now load correctly from local files without CORS errors
+- 2025-10-18: **Fixed WordPress admin authentication redirect issue**
+  - Updated wp-config.php to properly detect domain from HTTP_X_FORWARDED_HOST header
+  - Resolved redirect loops when accessing Appearance > Themes and other admin pages
+  - WordPress now correctly uses Replit domain for authentication cookies and redirects
+  - Admin pages are now fully accessible without localhost redirect issues
 
 ## Architecture
 **WordPress Setup:**
