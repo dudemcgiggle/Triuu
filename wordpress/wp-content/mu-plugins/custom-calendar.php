@@ -305,7 +305,7 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                              data-notes-html="<?= esc_attr( $ev['notes_html'] ) ?>">
                                                                 <div class="cc-event-first">
                                                                         <span class="cc-time"><?= esc_html( $ev['time'] ) ?></span>
-                                                                        <strong class="cc-title"><?= esc_html( $ev['title'] ) ?></strong>
+                                                                        <span class="cc-title"><?= esc_html( $ev['title'] ) ?></span>
                                                                 </div>
                                                                 <?php if ( $has_notes ): ?>
                                                                         <div class="cc-event-preview"><?= esc_html( $preview ) ?> <span class="cc-read-more">[Read More]</span></div>
