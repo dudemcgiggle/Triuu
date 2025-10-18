@@ -169,9 +169,15 @@ em {
   justify-items: center;
 }
 
-.exact-crop-75 {
+.congregation-gathering-container {
   width: 100%;
-  aspect-ratio: 100 / 50;
+  height: 300px;
+  overflow: hidden;
+  position: relative;
+}
+
+.congregation-gathering-image {
+  width: 100%;
   object-fit: cover;
   object-position: top center;
   display: block;
@@ -486,10 +492,8 @@ em {
   </section>
 
   <section class="hero-images-section">
-    <div class="hero-images-grid">
-      <div>
-        <img src="/wp-content/uploads/2025/congregation-gathering.jpg" alt="Congregation Gathering" class="exact-crop-75">
-      </div>
+    <div class="congregation-gathering-container">
+      <img src="/wp-content/uploads/2025/congregation-gathering.jpg" alt="Congregation Gathering" class="congregation-gathering-image">
     </div>
   </section>
 
