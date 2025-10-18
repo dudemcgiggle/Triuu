@@ -345,7 +345,7 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
 .cc-modal-title{margin:0 0 15px;color:#5A2B80;font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:700;}
 .cc-modal-time{font-size:1.1rem;font-weight:600;color:#574565;margin-bottom:10px;}
 .cc-modal-location{font-size:1rem;color:#666;margin-bottom:15px;font-style:italic;}
-.cc-modal-description{font-size:1rem;line-height:1.6;color:#333;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;}
+.cc-modal-description{font-family:'Barlow Condensed',sans-serif;font-size:1rem;line-height:1.3;color:#333;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;}
 .cc-modal-description a{color:#5A2B80;text-decoration:underline;}
 .cc-modal-description a:hover{color:#6E4A81;}
 /* Event preview with [Read More] */
