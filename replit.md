@@ -80,8 +80,9 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
 **Current Status:**
 - Site is fully configured with production database imported
 - WordPress admin login available at `/wp-admin/`
-- Use existing WordPress credentials from kenpond.com production site
+- Use existing WordPress credentials from kenpond.com production site (username: kenneth)
 - No installation wizard needed - site is ready to use
+- **Access Note**: Always use the Replit HTTPS URL to access WordPress admin - do not use localhost URLs
 
 **Database Information:**
 - The imported database contains 4 WordPress sites:
