@@ -222,11 +222,11 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                         <span class="cc-day-num<?= $key === $today_key ? ' today' : '' ?>"><?= $day ?></span>
                                                 </div>
                                                 <?php foreach ( $events[ $key ] ?? [] as $ev ): 
-                                                        // Create preview text (first 50 chars of plain text)
+                                                        // Create preview text (first 120 chars of plain text)
                                                         $plain_notes = wp_strip_all_tags( $ev['notes_html'] );
                                                         $has_notes = !empty( trim( $plain_notes ) );
-                                                        $preview = $has_notes ? mb_substr( $plain_notes, 0, 50 ) : '';
-                                                        if ( $has_notes && mb_strlen( $plain_notes ) > 50 ) {
+                                                        $preview = $has_notes ? mb_substr( $plain_notes, 0, 120 ) : '';
+                                                        if ( $has_notes && mb_strlen( $plain_notes ) > 120 ) {
                                                                 $preview = rtrim( $preview ) . '...';
                                                         }
                                                 ?>
