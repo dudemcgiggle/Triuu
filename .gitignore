@@ -53,3 +53,9 @@ Audition Files/
 Triuu/wp-content/uploads/wp-file-manager-pro/
 Triuu/wp-content/uploads/wpforms/cache/
 
+
+# --- allow Triuu theme uploads policy to be tracked ---
+!Triuu/
+!Triuu/wp-content/
+!Triuu/wp-content/uploads/
+!Triuu/wp-content/uploads/**
