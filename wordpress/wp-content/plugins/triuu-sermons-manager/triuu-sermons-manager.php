@@ -127,6 +127,7 @@ class TRIUU_Sermons_Manager {
     
     private function get_sermon_by_id($sermon_id) {
         $sermons = get_option('triuu_sermons_data', array());
+        $sermons = wp_unslash($sermons);
         
         foreach ($sermons as $sermon) {
             if ($sermon['id'] == $sermon_id) {
@@ -265,6 +266,7 @@ class TRIUU_Sermons_Manager {
                     
                     <?php
                     $sermons = get_option('triuu_sermons_data', array());
+                    $sermons = wp_unslash($sermons);
                     
                     usort($sermons, function($a, $b) {
                         return strcmp($b['date'], $a['date']);
@@ -421,6 +423,7 @@ class TRIUU_Sermons_Manager {
     public function upcoming_sermons_shortcode($atts) {
         $today = date('Y-m-d');
         $sermons = get_option('triuu_sermons_data', array());
+        $sermons = wp_unslash($sermons);
         
         $upcoming_sermons = array_filter($sermons, function($sermon) use ($today) {
             return $sermon['date'] >= $today;
