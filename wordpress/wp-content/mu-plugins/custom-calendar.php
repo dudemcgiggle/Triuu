@@ -342,9 +342,9 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
 .cc-modal-content{position:relative;background:#fff;border-radius:8px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:1;}
 .cc-modal-close{position:absolute;top:10px;right:15px;background:transparent;border:0;font-size:32px;color:#999;cursor:pointer;padding:0;width:30px;height:30px;line-height:30px;}
 .cc-modal-close:hover{color:#333;}
-.cc-modal-title{margin:0 0 15px;color:#5A2B80;font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:700;}
-.cc-modal-time{font-size:1.1rem;font-weight:600;color:#574565;margin-bottom:10px;}
-.cc-modal-location{font-size:1rem;color:#666;margin-bottom:15px;font-style:italic;}
+.cc-modal-title{margin:0 0 15px;color:#5A2B80;font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:700;line-height:1.2;}
+.cc-modal-time{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:600;color:#574565;margin-bottom:10px;line-height:1.2;}
+.cc-modal-location{font-family:'Barlow Condensed',sans-serif;font-size:1rem;color:#666;margin-bottom:15px;font-style:italic;line-height:1.2;}
 .cc-modal-description{font-family:'Barlow Condensed',sans-serif;font-size:1rem;line-height:1.3;color:#333;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;}
 .cc-modal-description a{color:#5A2B80;text-decoration:underline;}
 .cc-modal-description a:hover{color:#6E4A81;}
