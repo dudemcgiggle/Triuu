@@ -2,8 +2,8 @@
 /**
  * Plugin Name: TRIUU Sermons Manager
  * Plugin URI: https://triuu.org
- * Description: Manage sermons with custom post type, monthly themes, and dynamic frontend display
- * Version: 1.0.0
+ * Description: Simple sermon management with monthly themes and dynamic frontend display
+ * Version: 2.0.0
  * Author: TRIUU
  * Author URI: https://triuu.org
  * Text Domain: triuu-sermons
@@ -26,145 +26,302 @@ class TRIUU_Sermons_Manager {
     }
     
     private function __construct() {
-        add_action('init', array($this, 'register_sermon_post_type'));
-        add_action('add_meta_boxes', array($this, 'add_sermon_metaboxes'));
-        add_action('save_post_sermon', array($this, 'save_sermon_meta'), 10, 2);
-        add_action('admin_menu', array($this, 'add_settings_page'));
+        add_action('admin_menu', array($this, 'add_admin_menu'));
+        add_action('admin_init', array($this, 'handle_sermon_actions'));
         add_action('admin_init', array($this, 'register_settings'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         add_shortcode('triuu_upcoming_sermons', array($this, 'upcoming_sermons_shortcode'));
     }
     
-    public function register_sermon_post_type() {
-        $labels = array(
-            'name'                  => _x('Sermons', 'Post type general name', 'triuu-sermons'),
-            'singular_name'         => _x('Sermon', 'Post type singular name', 'triuu-sermons'),
-            'menu_name'             => _x('Sermons', 'Admin Menu text', 'triuu-sermons'),
-            'name_admin_bar'        => _x('Sermon', 'Add New on Toolbar', 'triuu-sermons'),
-            'add_new'               => __('Add New', 'triuu-sermons'),
-            'add_new_item'          => __('Add New Sermon', 'triuu-sermons'),
-            'new_item'              => __('New Sermon', 'triuu-sermons'),
-            'edit_item'             => __('Edit Sermon', 'triuu-sermons'),
-            'view_item'             => __('View Sermon', 'triuu-sermons'),
-            'all_items'             => __('All Sermons', 'triuu-sermons'),
-            'search_items'          => __('Search Sermons', 'triuu-sermons'),
-            'parent_item_colon'     => __('Parent Sermons:', 'triuu-sermons'),
-            'not_found'             => __('No sermons found.', 'triuu-sermons'),
-            'not_found_in_trash'    => __('No sermons found in Trash.', 'triuu-sermons'),
-            'featured_image'        => _x('Sermon Cover Image', 'Overrides the "Featured Image" phrase', 'triuu-sermons'),
-            'set_featured_image'    => _x('Set cover image', 'Overrides the "Set featured image" phrase', 'triuu-sermons'),
-            'remove_featured_image' => _x('Remove cover image', 'Overrides the "Remove featured image" phrase', 'triuu-sermons'),
-            'use_featured_image'    => _x('Use as cover image', 'Overrides the "Use as featured image" phrase', 'triuu-sermons'),
-            'archives'              => _x('Sermon archives', 'The post type archive label used in nav menus', 'triuu-sermons'),
-            'insert_into_item'      => _x('Insert into sermon', 'Overrides the "Insert into post"/"Insert into page" phrase', 'triuu-sermons'),
-            'uploaded_to_this_item' => _x('Uploaded to this sermon', 'Overrides the "Uploaded to this post"/"Uploaded to this page" phrase', 'triuu-sermons'),
-            'filter_items_list'     => _x('Filter sermons list', 'Screen reader text for the filter links heading on the post type listing screen', 'triuu-sermons'),
-            'items_list_navigation' => _x('Sermons list navigation', 'Screen reader text for the pagination heading on the post type listing screen', 'triuu-sermons'),
-            'items_list'            => _x('Sermons list', 'Screen reader text for the items list heading on the post type listing screen', 'triuu-sermons'),
+    public function add_admin_menu() {
+        add_menu_page(
+            __('Sermons', 'triuu-sermons'),
+            __('Sermons', 'triuu-sermons'),
+            'manage_options',
+            'triuu-sermons',
+            array($this, 'render_manage_sermons_page'),
+            'dashicons-book-alt',
+            5
         );
         
-        $args = array(
-            'labels'             => $labels,
-            'public'             => true,
-            'publicly_queryable' => true,
-            'show_ui'            => true,
-            'show_in_menu'       => true,
-            'query_var'          => true,
-            'rewrite'            => array('slug' => 'sermons'),
-            'capability_type'    => 'post',
-            'has_archive'        => true,
-            'hierarchical'       => false,
-            'menu_position'      => 5,
-            'menu_icon'          => 'dashicons-book-alt',
-            'supports'           => array('title', 'editor', 'thumbnail', 'revisions'),
-            'show_in_rest'       => true,
-        );
-        
-        register_post_type('sermon', $args);
-    }
-    
-    public function add_sermon_metaboxes() {
-        add_meta_box(
-            'sermon_details',
-            __('Sermon Details', 'triuu-sermons'),
-            array($this, 'render_sermon_details_metabox'),
-            'sermon',
-            'normal',
-            'high'
-        );
-    }
-    
-    public function render_sermon_details_metabox($post) {
-        wp_nonce_field('triuu_sermon_meta_nonce', 'triuu_sermon_nonce');
-        
-        $sermon_date = get_post_meta($post->ID, '_sermon_date', true);
-        $reverend = get_post_meta($post->ID, '_sermon_reverend', true);
-        $description = get_post_meta($post->ID, '_sermon_description', true);
-        ?>
-        <div style="padding: 10px 0;">
-            <p>
-                <label for="sermon_date" style="display: block; font-weight: 600; margin-bottom: 5px;">
-                    <?php _e('Sermon Date', 'triuu-sermons'); ?> <span style="color: red;">*</span>
-                </label>
-                <input type="date" id="sermon_date" name="sermon_date" value="<?php echo esc_attr($sermon_date); ?>" style="width: 100%; max-width: 300px; padding: 5px;" required />
-            </p>
-            
-            <p style="margin-top: 15px;">
-                <label for="sermon_reverend" style="display: block; font-weight: 600; margin-bottom: 5px;">
-                    <?php _e('Reverend', 'triuu-sermons'); ?> <span style="color: red;">*</span>
-                </label>
-                <input type="text" id="sermon_reverend" name="sermon_reverend" value="<?php echo esc_attr($reverend); ?>" style="width: 100%; max-width: 500px; padding: 5px;" placeholder="e.g., Rev. Kristina Spaude" required />
-            </p>
-            
-            <p style="margin-top: 15px;">
-                <label for="sermon_description" style="display: block; font-weight: 600; margin-bottom: 5px;">
-                    <?php _e('Sermon Description', 'triuu-sermons'); ?> <span style="color: red;">*</span>
-                </label>
-                <textarea id="sermon_description" name="sermon_description" rows="6" style="width: 100%; padding: 5px;" placeholder="Enter the sermon description..." required><?php echo esc_textarea($description); ?></textarea>
-            </p>
-            
-            <p style="margin-top: 10px; color: #666; font-size: 12px;">
-                <em><?php _e('* Required fields', 'triuu-sermons'); ?></em>
-            </p>
-        </div>
-        <?php
-    }
-    
-    public function save_sermon_meta($post_id, $post) {
-        if (!isset($_POST['triuu_sermon_nonce']) || !wp_verify_nonce($_POST['triuu_sermon_nonce'], 'triuu_sermon_meta_nonce')) {
-            return;
-        }
-        
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-            return;
-        }
-        
-        if (!current_user_can('edit_post', $post_id)) {
-            return;
-        }
-        
-        if (isset($_POST['sermon_date'])) {
-            update_post_meta($post_id, '_sermon_date', sanitize_text_field($_POST['sermon_date']));
-        }
-        
-        if (isset($_POST['sermon_reverend'])) {
-            update_post_meta($post_id, '_sermon_reverend', sanitize_text_field($_POST['sermon_reverend']));
-        }
-        
-        if (isset($_POST['sermon_description'])) {
-            update_post_meta($post_id, '_sermon_description', sanitize_textarea_field($_POST['sermon_description']));
-        }
-    }
-    
-    public function add_settings_page() {
         add_submenu_page(
-            'edit.php?post_type=sermon',
-            __('Monthly Theme Settings', 'triuu-sermons'),
+            'triuu-sermons',
+            __('Manage Sermons', 'triuu-sermons'),
+            __('Manage Sermons', 'triuu-sermons'),
+            'manage_options',
+            'triuu-sermons',
+            array($this, 'render_manage_sermons_page')
+        );
+        
+        add_submenu_page(
+            'triuu-sermons',
+            __('Monthly Theme', 'triuu-sermons'),
             __('Monthly Theme', 'triuu-sermons'),
             'manage_options',
-            'triuu-sermons-settings',
-            array($this, 'render_settings_page')
+            'triuu-sermons-theme',
+            array($this, 'render_theme_settings_page')
         );
+    }
+    
+    public function handle_sermon_actions() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        
+        if (isset($_POST['triuu_save_sermon']) && check_admin_referer('triuu_sermon_action', 'triuu_sermon_nonce')) {
+            $this->save_sermon();
+        }
+        
+        if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['sermon_id']) && check_admin_referer('triuu_delete_sermon_' . $_GET['sermon_id'], 'nonce')) {
+            $this->delete_sermon(sanitize_text_field($_GET['sermon_id']));
+        }
+    }
+    
+    private function save_sermon() {
+        $sermons = get_option('triuu_sermons_data', array());
+        
+        $sermon_id = isset($_POST['sermon_id']) ? sanitize_text_field($_POST['sermon_id']) : '';
+        
+        $sermon_data = array(
+            'id' => $sermon_id ? $sermon_id : uniqid('sermon_', true),
+            'title' => sanitize_text_field($_POST['sermon_title']),
+            'date' => sanitize_text_field($_POST['sermon_date']),
+            'reverend' => sanitize_text_field($_POST['sermon_reverend']),
+            'description' => sanitize_textarea_field($_POST['sermon_description'])
+        );
+        
+        if ($sermon_id) {
+            foreach ($sermons as $key => $sermon) {
+                if ($sermon['id'] == $sermon_id) {
+                    $sermons[$key] = $sermon_data;
+                    break;
+                }
+            }
+            $message = 'updated';
+        } else {
+            $sermons[] = $sermon_data;
+            $message = 'added';
+        }
+        
+        update_option('triuu_sermons_data', $sermons);
+        
+        wp_redirect(admin_url('admin.php?page=triuu-sermons&message=' . $message));
+        exit;
+    }
+    
+    private function delete_sermon($sermon_id) {
+        $sermons = get_option('triuu_sermons_data', array());
+        
+        foreach ($sermons as $key => $sermon) {
+            if ($sermon['id'] == $sermon_id) {
+                unset($sermons[$key]);
+                break;
+            }
+        }
+        
+        $sermons = array_values($sermons);
+        update_option('triuu_sermons_data', $sermons);
+        
+        wp_redirect(admin_url('admin.php?page=triuu-sermons&message=deleted'));
+        exit;
+    }
+    
+    private function get_sermon_by_id($sermon_id) {
+        $sermons = get_option('triuu_sermons_data', array());
+        
+        foreach ($sermons as $sermon) {
+            if ($sermon['id'] == $sermon_id) {
+                return $sermon;
+            }
+        }
+        
+        return null;
+    }
+    
+    public function render_manage_sermons_page() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        
+        $editing = isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['sermon_id']);
+        $sermon_to_edit = $editing ? $this->get_sermon_by_id(sanitize_text_field($_GET['sermon_id'])) : null;
+        
+        $adding = isset($_GET['action']) && $_GET['action'] === 'add';
+        
+        ?>
+        <div class="wrap">
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            
+            <?php
+            if (isset($_GET['message'])) {
+                $message = '';
+                $type = 'success';
+                
+                switch ($_GET['message']) {
+                    case 'added':
+                        $message = __('Sermon added successfully!', 'triuu-sermons');
+                        break;
+                    case 'updated':
+                        $message = __('Sermon updated successfully!', 'triuu-sermons');
+                        break;
+                    case 'deleted':
+                        $message = __('Sermon deleted successfully!', 'triuu-sermons');
+                        break;
+                }
+                
+                if ($message) {
+                    echo '<div class="notice notice-' . esc_attr($type) . ' is-dismissible"><p>' . esc_html($message) . '</p></div>';
+                }
+            }
+            ?>
+            
+            <?php if ($adding || $editing) : ?>
+                <div style="background: #fff; padding: 20px; margin-top: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
+                    <h2><?php echo $editing ? __('Edit Sermon', 'triuu-sermons') : __('Add New Sermon', 'triuu-sermons'); ?></h2>
+                    
+                    <form method="post" action="">
+                        <?php wp_nonce_field('triuu_sermon_action', 'triuu_sermon_nonce'); ?>
+                        
+                        <?php if ($editing && $sermon_to_edit) : ?>
+                            <input type="hidden" name="sermon_id" value="<?php echo esc_attr($sermon_to_edit['id']); ?>" />
+                        <?php endif; ?>
+                        
+                        <table class="form-table">
+                            <tr>
+                                <th scope="row">
+                                    <label for="sermon_title"><?php _e('Sermon Title', 'triuu-sermons'); ?> <span style="color: red;">*</span></label>
+                                </th>
+                                <td>
+                                    <input type="text" 
+                                           id="sermon_title" 
+                                           name="sermon_title" 
+                                           value="<?php echo $editing && $sermon_to_edit ? esc_attr($sermon_to_edit['title']) : ''; ?>" 
+                                           class="regular-text" 
+                                           required 
+                                           style="width: 100%; max-width: 600px;" />
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <th scope="row">
+                                    <label for="sermon_date"><?php _e('Sermon Date', 'triuu-sermons'); ?> <span style="color: red;">*</span></label>
+                                </th>
+                                <td>
+                                    <input type="date" 
+                                           id="sermon_date" 
+                                           name="sermon_date" 
+                                           value="<?php echo $editing && $sermon_to_edit ? esc_attr($sermon_to_edit['date']) : ''; ?>" 
+                                           required 
+                                           style="padding: 5px;" />
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <th scope="row">
+                                    <label for="sermon_reverend"><?php _e('Reverend', 'triuu-sermons'); ?> <span style="color: red;">*</span></label>
+                                </th>
+                                <td>
+                                    <input type="text" 
+                                           id="sermon_reverend" 
+                                           name="sermon_reverend" 
+                                           value="<?php echo $editing && $sermon_to_edit ? esc_attr($sermon_to_edit['reverend']) : ''; ?>" 
+                                           class="regular-text" 
+                                           placeholder="e.g., Rev. Kristina Spaude" 
+                                           required 
+                                           style="width: 100%; max-width: 600px;" />
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <th scope="row">
+                                    <label for="sermon_description"><?php _e('Sermon Description', 'triuu-sermons'); ?> <span style="color: red;">*</span></label>
+                                </th>
+                                <td>
+                                    <textarea id="sermon_description" 
+                                              name="sermon_description" 
+                                              rows="8" 
+                                              class="large-text" 
+                                              placeholder="Enter the sermon description..." 
+                                              required 
+                                              style="width: 100%; max-width: 800px;"><?php echo $editing && $sermon_to_edit ? esc_textarea($sermon_to_edit['description']) : ''; ?></textarea>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        <p class="submit">
+                            <input type="submit" name="triuu_save_sermon" class="button button-primary" value="<?php echo $editing ? __('Update Sermon', 'triuu-sermons') : __('Save Sermon', 'triuu-sermons'); ?>" />
+                            <a href="<?php echo admin_url('admin.php?page=triuu-sermons'); ?>" class="button"><?php _e('Cancel', 'triuu-sermons'); ?></a>
+                        </p>
+                    </form>
+                </div>
+            <?php else : ?>
+                <div style="margin: 20px 0;">
+                    <a href="<?php echo admin_url('admin.php?page=triuu-sermons&action=add'); ?>" class="button button-primary">
+                        <?php _e('Add New Sermon', 'triuu-sermons'); ?>
+                    </a>
+                </div>
+                
+                <div style="background: #fff; padding: 20px; margin-top: 20px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
+                    <h2><?php _e('All Sermons', 'triuu-sermons'); ?></h2>
+                    
+                    <?php
+                    $sermons = get_option('triuu_sermons_data', array());
+                    
+                    usort($sermons, function($a, $b) {
+                        return strcmp($b['date'], $a['date']);
+                    });
+                    
+                    if (!empty($sermons)) :
+                    ?>
+                        <table class="wp-list-table widefat fixed striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%;"><?php _e('Title', 'triuu-sermons'); ?></th>
+                                    <th style="width: 15%;"><?php _e('Date', 'triuu-sermons'); ?></th>
+                                    <th style="width: 20%;"><?php _e('Reverend', 'triuu-sermons'); ?></th>
+                                    <th style="width: 25%;"><?php _e('Description', 'triuu-sermons'); ?></th>
+                                    <th style="width: 10%;"><?php _e('Actions', 'triuu-sermons'); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($sermons as $sermon) : 
+                                    $description_truncated = strlen($sermon['description']) > 100 ? substr($sermon['description'], 0, 100) . '...' : $sermon['description'];
+                                    
+                                    $formatted_date = '';
+                                    if (!empty($sermon['date'])) {
+                                        $date_obj = DateTime::createFromFormat('Y-m-d', $sermon['date']);
+                                        if ($date_obj) {
+                                            $formatted_date = $date_obj->format('F j, Y');
+                                        }
+                                    }
+                                ?>
+                                <tr>
+                                    <td><strong><?php echo esc_html($sermon['title']); ?></strong></td>
+                                    <td><?php echo esc_html($formatted_date); ?></td>
+                                    <td><?php echo esc_html($sermon['reverend']); ?></td>
+                                    <td><?php echo esc_html($description_truncated); ?></td>
+                                    <td>
+                                        <a href="<?php echo admin_url('admin.php?page=triuu-sermons&action=edit&sermon_id=' . $sermon['id']); ?>" class="button button-small">
+                                            <?php _e('Edit', 'triuu-sermons'); ?>
+                                        </a>
+                                        <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=triuu-sermons&action=delete&sermon_id=' . $sermon['id']), 'triuu_delete_sermon_' . $sermon['id'], 'nonce'); ?>" 
+                                           class="button button-small" 
+                                           onclick="return confirm('<?php _e('Are you sure you want to delete this sermon?', 'triuu-sermons'); ?>');">
+                                            <?php _e('Delete', 'triuu-sermons'); ?>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else : ?>
+                        <p style="padding: 20px 0; color: #666;">
+                            <?php _e('No sermons found. Click "Add New Sermon" to create your first sermon.', 'triuu-sermons'); ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
     }
     
     public function register_settings() {
@@ -214,7 +371,7 @@ class TRIUU_Sermons_Manager {
         <?php
     }
     
-    public function render_settings_page() {
+    public function render_theme_settings_page() {
         if (!current_user_can('manage_options')) {
             return;
         }
@@ -261,48 +418,27 @@ class TRIUU_Sermons_Manager {
         <?php
     }
     
-    public function enqueue_admin_scripts($hook) {
-        global $post_type;
-        
-        if ('sermon' !== $post_type) {
-            return;
-        }
-        
-        if ('post.php' === $hook || 'post-new.php' === $hook) {
-            wp_enqueue_style('wp-color-picker');
-            wp_enqueue_script('wp-color-picker');
-        }
-    }
-    
     public function upcoming_sermons_shortcode($atts) {
         $atts = shortcode_atts(array(
             'limit' => 4
         ), $atts);
         
         $today = date('Y-m-d');
+        $sermons = get_option('triuu_sermons_data', array());
         
-        $args = array(
-            'post_type' => 'sermon',
-            'posts_per_page' => intval($atts['limit']),
-            'post_status' => 'publish',
-            'meta_key' => '_sermon_date',
-            'orderby' => 'meta_value',
-            'order' => 'ASC',
-            'meta_query' => array(
-                array(
-                    'key' => '_sermon_date',
-                    'value' => $today,
-                    'compare' => '>=',
-                    'type' => 'CHAR'
-                )
-            )
-        );
+        $upcoming_sermons = array_filter($sermons, function($sermon) use ($today) {
+            return $sermon['date'] >= $today;
+        });
         
-        $sermons_query = new WP_Query($args);
+        usort($upcoming_sermons, function($a, $b) {
+            return strcmp($a['date'], $b['date']);
+        });
+        
+        $upcoming_sermons = array_slice($upcoming_sermons, 0, intval($atts['limit']));
         
         ob_start();
         
-        if ($sermons_query->have_posts()) :
+        if (!empty($upcoming_sermons)) :
             $monthly_theme = get_option('triuu_monthly_theme', '');
             
             if (!empty($monthly_theme)) :
@@ -311,14 +447,10 @@ class TRIUU_Sermons_Manager {
             <?php endif; ?>
             
             <div class="service-cards">
-                <?php while ($sermons_query->have_posts()) : $sermons_query->the_post(); 
-                    $sermon_date = get_post_meta(get_the_ID(), '_sermon_date', true);
-                    $reverend = get_post_meta(get_the_ID(), '_sermon_reverend', true);
-                    $description = get_post_meta(get_the_ID(), '_sermon_description', true);
-                    
+                <?php foreach ($upcoming_sermons as $sermon) : 
                     $formatted_date = '';
-                    if (!empty($sermon_date)) {
-                        $date_obj = DateTime::createFromFormat('Y-m-d', $sermon_date);
+                    if (!empty($sermon['date'])) {
+                        $date_obj = DateTime::createFromFormat('Y-m-d', $sermon['date']);
                         if ($date_obj) {
                             $formatted_date = $date_obj->format('M j');
                         }
@@ -326,11 +458,11 @@ class TRIUU_Sermons_Manager {
                 ?>
                 <div class="service-card">
                     <div class="date"><?php echo esc_html($formatted_date); ?>:</div>
-                    <div class="title"><?php echo esc_html(get_the_title()); ?></div>
-                    <div class="speaker"><?php echo esc_html($reverend); ?></div>
-                    <div class="description"><?php echo esc_html($description); ?></div>
+                    <div class="title"><?php echo esc_html($sermon['title']); ?></div>
+                    <div class="speaker"><?php echo esc_html($sermon['reverend']); ?></div>
+                    <div class="description"><?php echo esc_html($sermon['description']); ?></div>
                 </div>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             </div>
             
         <?php else : ?>
@@ -340,8 +472,6 @@ class TRIUU_Sermons_Manager {
                 </p>
             </div>
         <?php endif;
-        
-        wp_reset_postdata();
         
         return ob_get_clean();
     }
