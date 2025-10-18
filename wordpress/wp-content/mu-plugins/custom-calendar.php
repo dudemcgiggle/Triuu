@@ -196,7 +196,7 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
 
                 <?php if ( ! empty( $events[ $key ] ) ):
                         foreach ( $events[ $key ] as $ev ): 
-                                // Create 2-line preview for mobile
+                                // Create 2-line preview for mobile (max ~100 chars total)
                                 $preview_html = str_replace(['<br>', '<br/>', '<br />'], "\n", $ev['notes_html']);
                                 $plain_notes = wp_strip_all_tags( $preview_html );
                                 $plain_notes = preg_replace('/https?:\/\/[^\s]*zoom\.us[^\s]*/i', 'Zoom Link', $plain_notes);
@@ -206,9 +206,27 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                 $mobile_display = '';
                                 if ( !empty( $plain_notes ) ) {
                                         $lines = explode("\n", $plain_notes);
-                                        $mobile_display = implode("\n", array_slice($lines, 0, 2));
-                                        if ( count($lines) > 2 ) {
-                                                $mobile_display .= '...';
+                                        
+                                        // Take first 2 lines, but limit total length to ~100 chars
+                                        $first_line = isset($lines[0]) ? $lines[0] : '';
+                                        $second_line = isset($lines[1]) ? $lines[1] : '';
+                                        
+                                        // Build preview with character limit
+                                        if (mb_strlen($first_line) > 50) {
+                                                $mobile_display = mb_substr($first_line, 0, 50) . '...';
+                                        } else {
+                                                $mobile_display = $first_line;
+                                                if (!empty($second_line)) {
+                                                        $remaining = 100 - mb_strlen($first_line);
+                                                        if (mb_strlen($second_line) > $remaining) {
+                                                                $mobile_display .= "\n" . mb_substr($second_line, 0, $remaining) . '...';
+                                                        } else {
+                                                                $mobile_display .= "\n" . $second_line;
+                                                                if (count($lines) > 2) {
+                                                                        $mobile_display .= '...';
+                                                                }
+                                                        }
+                                                }
                                         }
                                 }
                                 
@@ -273,14 +291,32 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                         // Remove leading and trailing whitespace/newlines
                                                         $plain_notes = trim( $plain_notes );
                                                         
-                                                        // Show only first 2 lines for preview
+                                                        // Show only first 2 lines for preview (max ~100 chars total)
                                                         $has_notes = !empty( $plain_notes );
                                                         $preview = '';
                                                         if ( $has_notes ) {
                                                                 $lines = explode("\n", $plain_notes);
-                                                                $preview = implode("\n", array_slice($lines, 0, 2));
-                                                                if ( count($lines) > 2 ) {
-                                                                        $preview .= '...';
+                                                                
+                                                                // Take first 2 lines, but limit total length to ~100 chars
+                                                                $first_line = isset($lines[0]) ? $lines[0] : '';
+                                                                $second_line = isset($lines[1]) ? $lines[1] : '';
+                                                                
+                                                                // Build preview with character limit
+                                                                if (mb_strlen($first_line) > 50) {
+                                                                        $preview = mb_substr($first_line, 0, 50) . '...';
+                                                                } else {
+                                                                        $preview = $first_line;
+                                                                        if (!empty($second_line)) {
+                                                                                $remaining = 100 - mb_strlen($first_line);
+                                                                                if (mb_strlen($second_line) > $remaining) {
+                                                                                        $preview .= "\n" . mb_substr($second_line, 0, $remaining) . '...';
+                                                                                } else {
+                                                                                        $preview .= "\n" . $second_line;
+                                                                                        if (count($lines) > 2) {
+                                                                                                $preview .= '...';
+                                                                                        }
+                                                                                }
+                                                                        }
                                                                 }
                                                         }
                                                 ?>
