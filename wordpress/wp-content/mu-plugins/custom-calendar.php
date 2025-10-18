@@ -212,13 +212,10 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                         }
                                 }
                                 
-                                // Replace Zoom URLs in location
-                                $mob_location = !empty($ev['location']) ? preg_replace('/https?:\/\/[^\s]*zoom\.us[^\s]*/i', 'Zoom Link', $ev['location']) : '';
                         ?>
                                 <div class="mob-event">
                                         <div class="mob-bar"><?= esc_html( $ev['time'] . ' ' . $ev['title'] ) ?></div>
                                         <div class="mob-body">
-                                                <?php if ( $mob_location )   echo '<div>' . esc_html( $mob_location ) . '</div>'; ?>
                                                 <?php if ( $mobile_display ) echo '<div style="white-space:pre-line;">' . esc_html( $mobile_display ) . '</div>'; ?>
                                         </div>
                                 </div>
@@ -297,12 +294,6 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                                         <span class="cc-time"><?= esc_html( $ev['time'] ) ?></span>
                                                                         <strong class="cc-title"><?= esc_html( $ev['title'] ) ?></strong>
                                                                 </div>
-                                                                <?php if ( $ev['location'] ): 
-                                                                        // Replace Zoom URLs with "Zoom Link" text for display
-                                                                        $display_location = preg_replace('/https?:\/\/[^\s]*zoom\.us[^\s]*/i', 'Zoom Link', $ev['location']);
-                                                                ?>
-                                                                        <div class="cc-event-second"><?= esc_html( $display_location ) ?></div>
-                                                                <?php endif; ?>
                                                                 <?php if ( $has_notes ): ?>
                                                                         <div class="cc-event-preview"><?= esc_html( $preview ) ?> <span class="cc-read-more">[Read More]</span></div>
                                                                 <?php endif; ?>
