@@ -136,23 +136,26 @@ em {
 }
 
 .what-to-expect-wrapper {
-  display: block;
+  display: flex;
+  gap: 2em;
+  align-items: flex-start;
 }
 
 .what-to-expect-content {
-  margin-bottom: 1em;
+  flex: 1;
 }
 
 .what-to-expect-image {
-  width: 100%;
-  margin: 1em 0;
+  width: 400px;
+  height: 300px;
+  flex-shrink: 0;
 }
 
 .what-to-expect-image img {
-  display: block;
-  margin: 0 auto;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 13px;
 }
 
 .hero-images-section {
@@ -431,8 +434,18 @@ em {
   
   .what-to-expect-image {
     width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
+    height: auto;
+    margin: 1em 0;
+  }
+  
+  .what-to-expect-image img {
+    height: auto;
+    border-radius: 0;
+  }
+  
+  section:has(.what-to-expect-wrapper) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }
 </style>
@@ -443,22 +456,20 @@ em {
     <h1>Services</h1>
     <h2>What to Expect</h2>
     
-    <div class="what-to-expect-content">
-      <p>Each service contains instrumental and vocal music, a 15- to 20-minute message, a joys, sorrows and concerns ritual, an offering, a story relating to the message, and a period of meditation or prayer. The Sunday service begins at 9:00 a.m. and lasts 60 minutes, followed by a period where people may respond to the message of the day.</p>
-      
-      <p>Each service begins with the lighting of our flaming chalice, a distinctive symbol of UU.</p>
-      
-      <p>The design originated during WWII as a symbol on documents given to refugees who fled without their identification papers.</p>
-      
-      <div class="note-box">
-        <p><strong>Note:</strong> Join us in person or on <a href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank">Zoom</a></p>
+    <div class="what-to-expect-wrapper">
+      <div class="what-to-expect-content">
+        <p>Each service contains instrumental and vocal music, a 15- to 20-minute message, a joys, sorrows and concerns ritual, an offering, a story relating to the message, and a period of meditation or prayer. The Sunday service begins at 9:00 a.m. and lasts 60 minutes, followed by a period where people may respond to the message of the day.</p>
+        
+        <p>Each service begins with the lighting of our flaming chalice, a distinctive symbol of UU.</p>
+        
+        <p>The design originated during WWII as a symbol on documents given to refugees who fled without their identification papers.</p>
+        
+        <div class="note-box">
+          <p><strong>Note:</strong> Join us in person or on <a href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank">Zoom</a></p>
+        </div>
       </div>
-    </div>
-  </section>
-
-  <section class="hero-images-section">
-    <div class="hero-images-grid">
-      <div>
+      
+      <div class="what-to-expect-image">
         <img src="/wp-content/uploads/2025/triuu-gathering.jpg" alt="TRIUU Gathering">
       </div>
     </div>
