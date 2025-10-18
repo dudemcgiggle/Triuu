@@ -225,6 +225,12 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
                                                 <?php foreach ( $events[ $key ] ?? [] as $ev ): 
                                                         // Create preview text (first 120 chars of plain text)
                                                         $plain_notes = wp_strip_all_tags( $ev['notes_html'] );
+                                                        // Replace Zoom URLs with "Zoom Link" - match full URL with all params
+                                                        $plain_notes = preg_replace(
+                                                                '/https?:\/\/(?:www\.)?(?:[a-zA-Z0-9\-]+\.)?zoom\.us\/[^\s\r\n]*/i',
+                                                                'Zoom Link',
+                                                                $plain_notes
+                                                        );
                                                         $has_notes = !empty( trim( $plain_notes ) );
                                                         $preview = $has_notes ? mb_substr( $plain_notes, 0, 120 ) : '';
                                                         if ( $has_notes && mb_strlen( $plain_notes ) > 120 ) {
