@@ -197,42 +197,51 @@ em {
 
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1em;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.2em;
   margin: 1.5em 0;
 }
 
 .video-card {
   background: #fff;
-  border: 1px solid var(--card-border);
-  border-radius: 4px;
+  border: 2px solid #e8e8e8;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .video-card:hover {
-  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 12px rgba(97, 78, 107, 0.15);
+  transform: translateY(-2px);
 }
 
 .video-card a {
   text-decoration: none;
-  display: block;
-}
-
-.video-card img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  height: 160px;
-  object-fit: cover;
-  display: block;
+  height: 100%;
+  padding: 1.5em;
+  text-align: center;
 }
 
 .video-card .video-title {
-  padding: 0.8em;
-  color: #333;
-  font-weight: 600;
-  text-align: center;
-  font-size: 0.9em;
+  color: var(--accent-color);
+  font-weight: 400;
+  font-size: 1em;
+  line-height: 1.3;
+  transition: color 0.3s ease;
+}
+
+.video-card:hover .video-title {
+  color: var(--hover-color);
 }
 
 .choir-photos {
@@ -338,7 +347,16 @@ em {
   }
   
   .video-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1em;
+  }
+  
+  .video-card {
+    height: 120px;
+  }
+  
+  .video-card .video-title {
+    font-size: 0.9em;
   }
   
   .social-links {
@@ -445,126 +463,108 @@ em {
     <div class="video-grid">
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_509c65ee786f4e129f758f2f8795259c/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_4669d4024e1041519eaa5308c978e472~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Peaceful%20River%20-%20title.jpg" alt="Peaceful River">
           <div class="video-title">Peaceful River</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_00e1ccf325544997a383a8475ad9e8d8/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_d2c1ddf8efd24b90afcff76d3687c7da~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/At%20this%20table%20-%20title.jpg" alt="At This Table">
           <div class="video-title">At This Table</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_3c4ef2c658fa4226879308a7f0f924a5/480p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_3ca4ffee08ae4e99b9e94a2389c7a5c7~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/One-little-star-v2_JPG.jpg" alt="One Little Star">
           <div class="video-title">One Little Star</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_84b270a2908f4933ad3716be7961b144/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_7341d1b15ba147d6b5ef7f79ff436d6c~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Festival%20Madrigal%20-%20Title.jpg" alt="Festival Madrigal">
           <div class="video-title">Festival Madrigal</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_ae0d6a59c6104623981e48d87434c9b7/480p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_77735b20c7254b4286e948fb54c421e3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Hands%20'cross-title_JPG.jpg" alt="Hands Across the Water">
           <div class="video-title">Hands Across the Water</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_2148d1814bce4925a008f0b0a57d5bc1/480p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_a6bff9d1fccd4f70a0e98b78b24b000d~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Change_the-World-v2_JPG.jpg" alt="Change the World">
           <div class="video-title">Change the World</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_8fb70be61a5a4563b30fb35235183ebe/480p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_dbe90dd660bb486f8fa733e2554e94a8~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Each%20of%20Us-title_JPG.jpg" alt="Each of Us">
           <div class="video-title">Each of Us</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_9b6e0e41608e47b2b681996c480767d4/480p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_d5213b9de9f64d13a7087ff65be17067~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Peace-Peace-v2_JPG.jpg" alt="Peace Peace">
           <div class="video-title">Peace Peace</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_a37e58dc737446f1a79cde125976f258/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_f2b689b7ceb8497bbbd6ffe2fe4792c5~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Glory-Saints%20-title.jpg" alt="Glory of the Saints">
           <div class="video-title">Glory of the Saints</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_c845c3da9233416c8db3a492071ef897/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_6c5be044880b429cb50aca52954a5676~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Sing%20Your%20Song%20Be%20Yourself%20-%20title.jpg" alt="Sing Your Song Be Yourself">
           <div class="video-title">Sing Your Song, Be Yourself</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_c7d4ee45877248b28e3efd74c255912b/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_b4e9ffcc45654aa38dc34e8562b100d3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Make%20a%20Difference%20-%20title.jpg" alt="Make a Difference">
           <div class="video-title">Make a Difference</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_1ec9cb7f224c487fb934c31963352d9a/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_2ebca9b21bca49a49bc0750cd935b01f~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Joy%20in%20My%20Heart%20-%20title.jpg" alt="Joy in My Heart">
           <div class="video-title">Joy in My Heart</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_de58e3f96f3e4d73900a40c1cc433c49/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_8fae3a43de88471291227ea8353db4cd~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/We%203%20Kings%20-%20title%20(rev).jpg" alt="We 3 Kings">
           <div class="video-title">We 3 Kings</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_0f9a891608344ce3bfe1a8844719bb1b/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_b395453e8c3542ba98265c7c26fb00df~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/It's%20Wintertime%20-%20title%20(rev).jpg" alt="It's Wintertime">
           <div class="video-title">It's Wintertime</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_2062e42ea28c40d5ba6528d1c999109c/480p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_f59ffe84208d422892d47a8d5458acb3~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Shine%20on%20Me-title_JPG.jpg" alt="Shine on Me">
           <div class="video-title">Shine on Me</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_d365b2f13bdb4f0aa0223eddd42b5786/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_c49acf9dbbef4307858c3ade5a7c3872~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/The-Journey-v2_JPG.jpg" alt="The Journey">
           <div class="video-title">The Journey</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_58e7e7ae659f4ec6b22ea81fa4f1af9a/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_a9fa1b2f193845199503b44ba2c833e7~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Time%20and%20Seasons%20-%20title.jpg" alt="Time and Seasons">
           <div class="video-title">Time and Seasons</div>
         </a>
       </div>
       
       <div class="video-card">
         <a href="https://video.wixstatic.com/video/93e23e_a4feebc84f404859940d5814a7b0560b/720p/mp4/file.mp4" target="_blank">
-          <img src="https://static.wixstatic.com/media/93e23e_d346372069b6483ebda5d5286f8dae68~mv2.jpg/v1/fill/w_280,h_210,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Ashokan%20Farewell%20-%20title.jpg" alt="Ashokan Farewell">
           <div class="video-title">Ashokan Farewell</div>
         </a>
       </div>
