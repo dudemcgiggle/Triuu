@@ -349,7 +349,7 @@ add_shortcode( 'custom_calendar', function ( $atts ) {
 .cc-modal-description a{color:#5A2B80;text-decoration:underline;}
 .cc-modal-description a:hover{color:#6E4A81;}
 /* Event preview with [Read More] */
-.cc-event-preview{font-size:0.78rem;color:#555;line-height:1.3;margin-top:3px;padding:2px 4px 0;white-space:pre-line;}
+.cc-event-preview{font-size:0.88rem;color:#555;line-height:1.3;margin-top:3px;padding:2px 4px 0;white-space:pre-line;font-weight:500;}
 .cc-read-more{color:#5A2B80;font-weight:600;white-space:nowrap;}
 /* Make desktop events clickable */
 @media (min-width:801px){
