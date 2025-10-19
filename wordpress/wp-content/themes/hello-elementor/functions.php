@@ -158,9 +158,18 @@ if ( ! function_exists( 'hello_elementor_body_open' ) ) {
  */
 function triuu_add_custom_shadow_styles() {
         echo "\n<style id=\"triuu-custom-styles\">\n";
-        echo "/* TRI-UU: Menu spacing & drop shadows */\n\n";
+        echo "/* TRI-UU: Global Custom Styles */\n\n";
         
-        echo "/* HEADER: One source of truth for menu spacing */\n";
+        echo "/* HEADER: Global header styling (all pages) */\n";
+        echo "header {\n";
+        echo "    background: var(--accent-color);\n";
+        echo "    color: #666666;\n";
+        echo "    padding: 0;\n";
+        echo "    text-align: center;\n";
+        echo "    margin-bottom: 1em;\n";
+        echo "}\n\n";
+        
+        echo "/* ELEMENTOR HEADER: Menu spacing */\n";
         echo ".elementor-location-header { padding-bottom: 20px !important; }\n\n";
         
         echo "/* SECTION WIDTH: Constrain sections to 1200px to make drop shadows visible */\n";
