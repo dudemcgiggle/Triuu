@@ -76,6 +76,13 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Services page now pulls sermon data dynamically from database
   - Full security implementation: nonces, sanitization, capability checks
   - Plugin location: wordpress/wp-content/plugins/triuu-sermons-manager/
+- 2025-10-19: **Fixed menu inconsistency and drop shadows across all pages**
+  - Identified root cause: Custom HTML pages (Services ID 1460) had negative top margin pulling content upward
+  - Removed negative margin from Services page .page-wrapper (changed from `margin: -1em auto 0 auto` to `margin: 0 auto`)
+  - Added consistent drop shadows to all pages using stable page-id CSS selectors in post-17.css
+  - Selectors use `.page-id-*` classes (survive Elementor cache regeneration) instead of brittle auto-generated element IDs
+  - All four pages (Home, About Us, Our Organization, Services) now have consistent menu positioning and drop shadows
+  - Header sections properly excluded from shadows using `.elementor-location-header` selector
 
 ## Architecture
 **WordPress Setup:**
