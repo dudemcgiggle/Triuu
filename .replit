@@ -39,9 +39,13 @@ localPort = 41435
 externalPort = 3000
 
 [[ports]]
+localPort = 44197
+externalPort = 3002
+
+[[ports]]
 localPort = 46801
 externalPort = 3001
 
 [deployment]
 deploymentTarget = "vm"
-run = ["php", "-S", "0.0.0.0:5000", "-t", "wordpress", "router.php"]
+run = ["sh", "-c", "cd /home/runner/$REPL_SLUG && php -S 0.0.0.0:5000 -t wordpress router.php"]

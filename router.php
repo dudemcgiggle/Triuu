@@ -4,6 +4,14 @@
  * This handles routing for WordPress when using PHP's built-in web server
  */
 
+// Simple health check endpoint for deployment
+if ($_SERVER['REQUEST_URI'] === '/health' || $_SERVER['REQUEST_URI'] === '/health.php') {
+    http_response_code(200);
+    header('Content-Type: text/plain');
+    echo 'OK';
+    exit;
+}
+
 // Get the requested URI
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
