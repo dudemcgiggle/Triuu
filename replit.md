@@ -99,6 +99,12 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Applied via wp_head hook to ensure rule applies to ALL pages site-wide
   - Header now has: `padding: 0`, purple background (`var(--accent-color)`), centered text
   - CSS injected in `<style id="triuu-custom-styles">` for all pages
+- 2025-10-19: **Moved custom styles to child theme (proper WordPress architecture)**
+  - Moved all TRI-UU custom CSS from parent theme (hello-elementor) to child theme (triuu)
+  - Child theme customizations are now safe from parent theme updates
+  - Removed duplicate custom style functions from parent theme
+  - Cleaned up 3 unnecessary functions.php copies (Triuu/, wp-content/, attached_assets/)
+  - **Note:** Triuu child theme exists but needs to be activated in WordPress admin (Appearance → Themes)
 
 ## Architecture
 **WordPress Setup:**
