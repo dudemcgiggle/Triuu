@@ -148,22 +148,43 @@ function hello_elementor_enqueue_styles_clean() {
 add_action( 'wp_enqueue_scripts', 'hello_elementor_enqueue_styles_clean', 20 );
 
 /**
- * TRI-UU Custom Styles: Consistent menu spacing & drop shadows
+ * TRI-UU Custom Styles: Global header styling, menu spacing & drop shadows
  * Added 2025-10-19
- * Output directly in head for maximum compatibility
+ * Updated to include all custom CSS in child theme (safe from parent theme updates)
  */
 function triuu_add_custom_shadow_styles() {
         echo "\n<style id=\"triuu-custom-styles\">\n";
         echo "/* ===================================== */\n";
-        echo "/* TRI-UU: Menu spacing & drop shadows  */\n";
+        echo "/* TRI-UU: Global Custom Styles         */\n";
         echo "/* ===================================== */\n\n";
-        echo "/* HEADER: One source of truth for menu spacing */\n";
+        
+        echo "/* HEADER: Global header styling (all pages) */\n";
+        echo "header {\n";
+        echo "    background: var(--accent-color);\n";
+        echo "    color: #666666;\n";
+        echo "    padding: 0;\n";
+        echo "    text-align: center;\n";
+        echo "    margin-bottom: 1em;\n";
+        echo "}\n\n";
+        
+        echo "/* ELEMENTOR HEADER: Menu spacing */\n";
         echo ".elementor-location-header { padding-bottom: 20px !important; }\n\n";
-        echo "/* DROP SHADOWS: Main content sections */\n";
+        
+        echo "/* SECTION WIDTH: Constrain sections to 1200px to make drop shadows visible */\n";
+        echo ".page-id-11 .elementor-section:first-of-type:not(.elementor-location-header .elementor-section),\n";
+        echo ".page-id-591 .elementor-section:not(.elementor-location-header .elementor-section),\n";
+        echo ".page-id-300 .elementor-section:not(.elementor-location-header .elementor-section) {\n";
+        echo "    max-width: 1200px !important;\n";
+        echo "    margin-left: auto !important;\n";
+        echo "    margin-right: auto !important;\n";
+        echo "}\n\n";
+        
+        echo "/* DROP SHADOWS: Apply to constrained sections */\n";
         echo ".page-id-11 .elementor-section:first-of-type { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
         echo ".page-id-591 .elementor-section { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
         echo ".page-id-300 .elementor-section { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
         echo ".page-id-1460 .page-wrapper { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n\n";
+        
         echo "/* Exclude header from shadows */\n";
         echo ".elementor-location-header .elementor-section { box-shadow: none !important; }\n";
         echo "</style>\n";
