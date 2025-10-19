@@ -87,6 +87,13 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - All four pages (Home, About Us, Our Organization, Services) now have consistent menu positioning and visible drop shadows
   - Implementation: CSS permanently applied via `wp_head` hook in hello-elementor theme's functions.php
   - CSS output: `<style id="triuu-custom-styles">` in page `<head>` section
+- 2025-10-19: **Fixed large white gap on Services page mobile view**
+  - Issue: `.congregation-gathering-container` had fixed height of 450px creating excessive whitespace on mobile
+  - Solution: Added mobile-specific CSS (@media max-width: 768px) to make container height auto
+  - Container now adapts to image size: `height: auto` instead of `height: 450px`
+  - Reduced bottom padding on `.hero-images-section` from `1em` to `0` on mobile
+  - Image now properly responsive: `width: 100%; height: auto; display: block;`
+  - Gap between congregation image and "Upcoming Services" section eliminated on mobile devices
 
 ## Architecture
 **WordPress Setup:**
