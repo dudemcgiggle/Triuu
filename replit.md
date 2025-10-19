@@ -80,10 +80,12 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Identified root cause: Custom HTML pages (Services ID 1460) had negative top margin pulling content upward
   - Removed negative margin from Services page .page-wrapper (changed from `margin: -1em auto 0 auto` to `margin: 0 auto`)
   - **Created ONE source of truth for menu spacing**: Added `padding-bottom: 20px` to `.elementor-location-header` in theme functions.php
-  - Added consistent drop shadows to all pages using stable page-id CSS selectors
+  - **Added visible drop shadows to all pages**: Constrained Elementor sections to 1200px max-width (matching Services page)
+  - Sections on Home (ID 11), About Us (ID 591), and Our Organization (ID 300) now have `max-width: 1200px` with centered margins
+  - Drop shadow CSS (`box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15)`) applied to all constrained sections
   - Selectors use `.page-id-*` classes (survive Elementor cache regeneration) instead of brittle auto-generated element IDs
-  - All four pages (Home, About Us, Our Organization, Services) now have consistent menu positioning
-  - Drop shadow CSS applied permanently via `wp_head` hook in hello-elementor theme's functions.php
+  - All four pages (Home, About Us, Our Organization, Services) now have consistent menu positioning and visible drop shadows
+  - Implementation: CSS permanently applied via `wp_head` hook in hello-elementor theme's functions.php
   - CSS output: `<style id="triuu-custom-styles">` in page `<head>` section
 
 ## Architecture

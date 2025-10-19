@@ -158,12 +158,27 @@ if ( ! function_exists( 'hello_elementor_body_open' ) ) {
  */
 function triuu_add_custom_shadow_styles() {
         echo "\n<style id=\"triuu-custom-styles\">\n";
-        echo "/* TRI-UU: Menu spacing & drop shadows */\n";
-        echo ".elementor-location-header { padding-bottom: 20px !important; }\n";
+        echo "/* TRI-UU: Menu spacing & drop shadows */\n\n";
+        
+        echo "/* HEADER: One source of truth for menu spacing */\n";
+        echo ".elementor-location-header { padding-bottom: 20px !important; }\n\n";
+        
+        echo "/* SECTION WIDTH: Constrain sections to 1200px to make drop shadows visible */\n";
+        echo ".page-id-11 .elementor-section:first-of-type:not(.elementor-location-header .elementor-section),\n";
+        echo ".page-id-591 .elementor-section:not(.elementor-location-header .elementor-section),\n";
+        echo ".page-id-300 .elementor-section:not(.elementor-location-header .elementor-section) {\n";
+        echo "    max-width: 1200px !important;\n";
+        echo "    margin-left: auto !important;\n";
+        echo "    margin-right: auto !important;\n";
+        echo "}\n\n";
+        
+        echo "/* DROP SHADOWS: Apply to constrained sections */\n";
         echo ".page-id-11 .elementor-section:first-of-type { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
         echo ".page-id-591 .elementor-section { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
         echo ".page-id-300 .elementor-section { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
-        echo ".page-id-1460 .page-wrapper { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
+        echo ".page-id-1460 .page-wrapper { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n\n";
+        
+        echo "/* Exclude header from shadows */\n";
         echo ".elementor-location-header .elementor-section { box-shadow: none !important; }\n";
         echo "</style>\n";
 }
