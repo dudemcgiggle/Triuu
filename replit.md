@@ -94,6 +94,11 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Reduced bottom padding on `.hero-images-section` from `1em` to `0` on mobile
   - Image now properly responsive: `width: 100%; height: auto; display: block;`
   - Gap between congregation image and "Upcoming Services" section eliminated on mobile devices
+- 2025-10-19: **Added global header styling across all pages**
+  - Added header CSS rule to global styles in hello-elementor/functions.php
+  - Applied via wp_head hook to ensure rule applies to ALL pages site-wide
+  - Header now has: `padding: 0`, purple background (`var(--accent-color)`), centered text
+  - CSS injected in `<style id="triuu-custom-styles">` for all pages
 
 ## Architecture
 **WordPress Setup:**
