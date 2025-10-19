@@ -109,8 +109,8 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
 - Dynamic URL configuration for Replit proxy environment
 
 **Themes:**
-- Triuu theme: `wordpress/wp-content/themes/triuu/` (main theme)
-- Hello Elementor: `wordpress/wp-content/themes/hello-elementor/` (parent theme)
+- Triuu theme: `wordpress/wp-content/themes/triuu/` (child theme - **NEEDS TO BE ACTIVATED**)
+- Hello Elementor: `wordpress/wp-content/themes/hello-elementor/` (parent theme - currently active)
 
 **Key Configuration:**
 - Database: SQLite (file-based) at `wordpress/wp-content/database/wordpress.db`
