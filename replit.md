@@ -141,7 +141,18 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
 
 ## Deployment
 - Type: VM (always-on for WordPress state management)
-- Command: `php -S 0.0.0.0:5000 -t wordpress router.php`
+- Command: `sh -c "cd /home/runner/$REPL_SLUG && php -S 0.0.0.0:5000 -t wordpress router.php"`
 - Port: 5000
+- Health Check: `/health` endpoint responds with "OK" for deployment monitoring
+- Database: SQLite (file-based, no MySQL/PostgreSQL needed)
 
-**Note:** Deployment configuration is stored in Replit's internal metadata (not tracked in git due to `.gitignore`). The deployment settings are configured through Replit's deployment tools and use the same command as the development workflow.
+**Important Notes:**
+- WordPress uses SQLite database (`wordpress/wp-content/database/wordpress.db`)
+- PostgreSQL secrets exist in environment but are NOT used by WordPress
+- Health check endpoint added to `router.php` for deployment verification
+- Deployment configuration stored in `.replit` file
+
+**Deployment Fix (2025-10-19):**
+- Added health check endpoint at `/health` in router.php
+- Updated deployment command to ensure correct working directory
+- Clarified that SQLite is used (not MySQL/PostgreSQL)
