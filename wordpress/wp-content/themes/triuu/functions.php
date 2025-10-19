@@ -147,6 +147,29 @@ function hello_elementor_enqueue_styles_clean() {
 }
 add_action( 'wp_enqueue_scripts', 'hello_elementor_enqueue_styles_clean', 20 );
 
+/**
+ * TRI-UU Custom Styles: Consistent menu spacing & drop shadows
+ * Added 2025-10-19
+ * Output directly in head for maximum compatibility
+ */
+function triuu_add_custom_shadow_styles() {
+        echo "\n<style id=\"triuu-custom-styles\">\n";
+        echo "/* ===================================== */\n";
+        echo "/* TRI-UU: Menu spacing & drop shadows  */\n";
+        echo "/* ===================================== */\n\n";
+        echo "/* HEADER: One source of truth for menu spacing */\n";
+        echo ".elementor-location-header { padding-bottom: 20px !important; }\n\n";
+        echo "/* DROP SHADOWS: Main content sections */\n";
+        echo ".page-id-11 .elementor-section:first-of-type { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
+        echo ".page-id-591 .elementor-section { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
+        echo ".page-id-300 .elementor-section { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n";
+        echo ".page-id-1460 .page-wrapper { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important; }\n\n";
+        echo "/* Exclude header from shadows */\n";
+        echo ".elementor-location-header .elementor-section { box-shadow: none !important; }\n";
+        echo "</style>\n";
+}
+add_action( 'wp_head', 'triuu_add_custom_shadow_styles', 999 );
+
 // Resource hints for Typekit removed - using self-hosted fonts
 
 /* ------------------------------------------------------------------------- *
