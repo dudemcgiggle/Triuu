@@ -20,3 +20,13 @@
 .page-id-1460 {
     background-color: #ffffff !important;
 }
+
+.page-id-1460 .elementor-widget-container {
+    padding-bottom: 20px; /* Adjust the value as needed */
+}
+
+.page-id-591 .elementor-container {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.page-id-300 { background-color: #ffffff !important; }
