@@ -1,0 +1,293 @@
+Tri-UU / WP — Authoritative Change Report (for GhostWriter)
+Scope of this brief
+
+This document describes the current, authoritative behavior and constraints for:
+
+Elementor widget structure and CSS scoping
+
+Widget-local modal UX/a11y enhancer
+
+Elementor ScopeFixer (MU plugin) intent and current status
+
+AI PatchRunner intent (change orchestration)
+
+OpenAI Content Editor + OpenAI WP Service intent (safe AI helpers)
+
+Operational guardrails for Local (by Flywheel) / WP-CLI
+
+GhostWriter should treat the contents below as the source of truth when proposing code or edits.
+
+1) Elementor widget structure & scoping (locked)
+Rules (do not “optimize” away)
+
+All widget CSS selectors start with .triuu-our-organization only.
+
+Never include .tri-county-widget in widget CSS selectors; upstream scoping adds it.
+
+No @import inside widget <style> blocks (fonts configured via Theme/Site Settings).
+
+No XML declarations inside widget HTML (e.g., <?xml …?>).
+
+Use a local header wrapper .local-page-header (do not style bare header).
+
+Canonical shape GhostWriter should follow
+<div class="tri-county-widget" data-ai-scoped="1">
+  <div class="triuu-our-organization">
+    <style>
+      .triuu-our-organization {
+        --accent-color: #614E6B;
+        --hover-color: #A5849F;
+        --body-bg: #f5f5f5;
+        --container-bg: #ffffff;
+        --placeholder-bg: #dddddd;
+        --card-border: #dddddd;
+        font-family: 'Barlow', sans-serif;
+        line-height: 1.5;
+        color: #333333;
+        font-weight: 300;
+        background: var(--body-bg);
+      }
+      .triuu-our-organization * { margin: 0; padding: 0; box-sizing: border-box; }
+      .triuu-our-organization .page-wrapper { max-width: 1200px; margin: 1em auto; padding: 1em; background: var(--container-bg); }
+      .triuu-our-organization .local-page-header { background: var(--accent-color); color:#fff; padding:1em; text-align:center; margin-bottom:1em; }
+    </style>
+
+    <div class="page-wrapper">
+      <header class="local-page-header">
+        <h1>Tri-County UU — Our Organization</h1>
+      </header>
+
+      <!-- Content/sections here… -->
+    </div>
+
+    <!-- Optional: modal enhancer (Section 2) -->
+  </div>
+</div>
+
+
+Good selector examples
+
+.triuu-our-organization .card-grid { /* … */ }
+.triuu-our-organization .read-more-btn { /* … */ }
+
+
+Fragile/forbidden in widgets
+
+/* Over-scoped — don’t do this */
+.triuu-our-organization .tri-county-widget .card-grid { /* … */ }
+.tri-county-widget .triuu-our-organization .card-grid { /* … */ }
+
+2) Widget-local modal enhancer (keep it inline, scoped)
+
+Purpose: add ESC close, focus trap, focus restore to trigger, backdrop click to close, and lazy images — without touching global CSS/JS or the MU plugin.
+
+Paste this at the bottom of the widget that uses modals.
+
+<script>
+/*
+  Widget-Local Modal Enhancer (scoped to nearest .tri-county-widget)
+  Adds: ESC close, focus trap, restore focus, backdrop-click close, lazy images
+*/
+(function () {
+  function root(el){while(el&&el.parentElement&&!el.classList.contains('tri-county-widget'))el=el.parentElement;return(el&&el.classList&&el.classList.contains('tri-county-widget'))?el:document.querySelector('.tri-county-widget')}
+  var ROOT=root(document.currentScript||document.body); if(!ROOT) return;
+
+  function focusables(c){return Array.prototype.slice.call(c.querySelectorAll(['a[href]','area[href]','button:not([disabled])','input:not([disabled]):not([type="hidden"])','select:not([disabled])','textarea:not([disabled])','iframe','[tabindex]:not([tabindex="-1"])','[contenteditable="true"]'].join(','))).filter(function(el){return el.offsetParent!==null||el===document.activeElement})}
+
+  var lastTriggerById=Object.create(null), trap=Object.create(null);
+
+  function on(modal){
+    if(trap[modal.id]) return;
+    function kd(e){
+      if(e.key==='Escape'){e.preventDefault(); close(modal.id); return;}
+      if(e.key==='Tab'){var L=focusables(modal); if(!L.length) return; var f=L[0], l=L[L.length-1];
+        if(e.shiftKey&&document.activeElement===f){e.preventDefault(); l.focus();}
+        else if(!e.shiftKey&&document.activeElement===l){e.preventDefault(); f.focus();}
+      }
+    }
+    function clickBg(e){ if(e.target===modal){ close(modal.id); } }
+    modal.addEventListener('keydown', kd);
+    modal.addEventListener('click', clickBg);
+    trap[modal.id]={kd:kd, clickBg:clickBg};
+  }
+
+  function off(modal){
+    var r=trap[modal.id]; if(!r) return;
+    modal.removeEventListener('keydown', r.kd);
+    modal.removeEventListener('click', r.clickBg);
+    delete trap[modal.id];
+  }
+
+  function open(id, trigger){
+    var m=document.getElementById(id); if(!m) return;
+    m.setAttribute('aria-modal','true'); m.setAttribute('role', m.getAttribute('role')||'dialog');
+    m.removeAttribute('aria-hidden'); m.style.display='flex';
+    if(trigger) lastTriggerById[id]=trigger;
+    var L=focusables(m); if(L.length){ L[0].focus(); } else { var x=m.querySelector('.close-btn')||m; x.setAttribute('tabindex','-1'); x.focus(); }
+    on(m);
+  }
+
+  function close(id){
+    var m=document.getElementById(id); if(!m) return;
+    m.style.display='none'; m.setAttribute('aria-hidden','true');
+    off(m);
+    var t=lastTriggerById[id]; if(t&&document.body.contains(t)){try{t.focus();}catch(e){}}
+  }
+
+  window.openModal=function(id){ open(id); };
+  window.closeModal=function(id){ close(id); };
+
+  function isOpenCall(el){ var oc=(el.getAttribute('onclick')||'').replace(/\s+/g,''); return /^openModal\(['"]/.test(oc); }
+
+  ROOT.addEventListener('click', function(e){
+    var t=e.target, opener=t.closest('[data-modal-open]');
+    if(opener){ e.preventDefault(); open(opener.getAttribute('data-modal-open'), opener); return; }
+    var c=t.closest('[onclick]'); if(c&&isOpenCall(c)){ var m=c.getAttribute('onclick').match(/openModal\(['"]([^'"]+)['"]\)/); if(m&&m[1]){ lastTriggerById[m[1]]=c; } }
+  });
+
+  ROOT.querySelectorAll('[data-modal-open], a[onclick], button[onclick]').forEach(function(el){
+    el.addEventListener('keydown', function(e){
+      if(e.key==='Enter'||e.key===' '){
+        var id=el.getAttribute('data-modal-open'); if(!id){ var m=(el.getAttribute('onclick')||'').match(/openModal\(['"]([^'"]+)['"]\)/); id=m&&m[1]; }
+        if(id){ e.preventDefault(); open(id, el); }
+      }
+    });
+  });
+
+  ROOT.querySelectorAll('img:not([loading])').forEach(function(img){ img.setAttribute('loading','lazy'); });
+})();
+</script>
+
+
+A11y expectations GhostWriter must preserve
+
+role="dialog", aria-modal="true" while open, aria-hidden="true" when closed
+
+ESC to close, focus trapped inside, focus returns to opener, backdrop click closes
+
+3) Elementor ScopeFixer (MU plugin) — current status & intent
+
+We tested an updated MU plugin (“Elementor ScopeFixer”) that:
+
+strips XML declarations from HTML (<?xml …?>)
+
+removes @import from <style> safely (handles Google Fonts’ semicolons)
+
+scopes CSS to avoid double prefixing and header bleed
+
+Regression note: deploying the updated file via Repl.it broke CSS on three pages. We rolled back the plan to edit the MU plugin for now.
+
+Authoritative decision: do not modify the MU plugin further right now. Treat the existing MU plugin as unchanged and a black box for GhostWriter.
+Widget-side rules (Section 1) and the modal enhancer (Section 2) are the path forward.
+
+If GhostWriter proposes changes to MU plugin code → decline.
+
+4) AI PatchRunner — intent & interface (keep behavior stable)
+
+Purpose: run controlled, scripted transformations (e.g., fixing scoping remnants, HTML hygiene) with dry-run → apply flow.
+
+Truth sources present in this project’s context:
+
+STRICT_TASK_WALKTHROUGH_ENGINE.json (spec/engine for stepwise, safe transforms)
+
+“WP AI Scope + Patch — Phase 2” (human guidance/spec notes)
+
+Operational stance: PatchRunner exists to perform repeatable, idempotent edits with explicit previews. It should not be auto-invoked by GhostWriter; instead, proposals must be staged and reviewed.
+
+GhostWriter guidance
+
+When suggesting multi-file/regex refactors, emit them as PatchRunner tasks (dry-run first), never as ad-hoc “search and replace” across the repo.
+
+Preserve idempotence, ASCII-only, and log each transformation with a diff summary.
+
+5) OpenAI Content Editor — intent (do not refactor internals)
+
+Purpose: an admin-side helper used to assist human editors with content shaping (summaries, rewrites, tone alignment) within WordPress.
+
+Constraints GhostWriter must respect:
+
+Treat as a tooling surface, not a theme/plugin coupling point.
+
+No PII or secrets should be stored in code; config via env or WP constants.
+
+All AI calls should be opt-in and reviewed; never auto-modify live content.
+
+GhostWriter guidance
+
+Do not re-architect it or “integrate deeper” with theme rendering.
+
+If adding utilities, keep them admin-only, non-destructive, with clear preview-before-apply workflows.
+
+6) OpenAI WP Service — intent (service layer, stable API boundaries)
+
+Purpose: thin service layer for outbound AI calls (rate limit, retries, safe defaults).
+
+Constraints GhostWriter must respect:
+
+Centralize outbound calls here; no direct AI API calls scattered in templates/widgets.
+
+Use environment-driven config (keys, endpoints), safe timeouts, exponential backoff.
+
+Sanitize inputs/outputs; never store keys in repo.
+
+GhostWriter guidance
+
+If a feature needs AI, call the service; do not add new HTTP clients elsewhere.
+
+Keep responses auditable (log job id, duration, truncated payloads), avoid logging secrets.
+
+7) Operational guardrails (Local / WP-CLI / PowerShell)
+
+Local (by Flywheel): when terminal steps are required on Windows, use Open Site Shell → PowerShell.
+
+Sanity checks for any automation GhostWriter proposes:
+
+ASCII-only code output (no smart quotes, no NBSP).
+
+Idempotent scripts; explicit progress messages.
+
+No user-specific absolute paths (prefer $PSScriptRoot, relative paths).
+
+WP-CLI usage (dry-run vs apply) pattern GhostWriter should follow:
+
+# Dry-run a content transform (example pattern)
+wp eval '/* run a read-only pass, echo findings */'
+
+# Apply step (only after a successful dry-run):
+wp eval '/* apply the change transactionally and report counts */'
+
+8) Known pitfalls GhostWriter must avoid proposing
+
+Adding .tri-county-widget into widget CSS selectors (double-scoping risk).
+
+Styling a bare header (must use .local-page-header).
+
+Pasting @import in widget <style> or leaving partial @import tails.
+
+Inserting XML declarations into widget HTML.
+
+“Helpful” refactors to MU plugin, OpenAI service internals, or PatchRunner core without an explicit task request.
+
+9) Acceptance checklist for any PR GhostWriter helps with
+
+ Widget CSS selectors all begin with .triuu-our-organization
+
+ .tri-county-widget appears only as the outer wrapper in markup, not inside CSS
+
+ No @import found in widget <style>; no XML declarations in HTML
+
+ If modals present: inline modal enhancer is included and a11y works (ESC, trap, restore)
+
+ AI-related code calls the OpenAI WP Service, not raw HTTP clients
+
+ Multi-file changes are expressed as PatchRunner tasks with dry-run first
+
+ Scripts/code blocks are ASCII-only and idempotent
+
+10) One-liner summary for GhostWriter’s memory
+
+Widgets: page-scoped CSS (.triuu-our-organization), no house-scope in CSS, local header wrapper, no @import or XML.
+
+UX: inline, widget-local modal enhancer (ESC, trap, restore, backdrop close, lazy images).
+
+Infra: leave MU plugin as-is for now; use PatchRunner for orchestrated changes; route AI use through OpenAI WP Service; treat OpenAI Content Editor as an admin tool with preview-before-apply.
