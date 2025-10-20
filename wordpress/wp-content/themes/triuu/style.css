@@ -15,3 +15,8 @@
 .page-id-XX {
     background-color: #ffffff;
 }
+
+/* Change background color of Services page to white */
+.page-id-1460 {
+    background-color: #ffffff !important;
+}

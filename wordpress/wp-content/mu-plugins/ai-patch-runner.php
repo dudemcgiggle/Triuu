@@ -1,37 +1,29 @@
 <?php
 /**
- * Plugin Name: AI Website Styler (MU) — v3.0.0
- * Description: User-friendly AI-powered website styling tool. Make design changes in plain English with automatic snapshots and easy rollback.
+ * Plugin Name: AI Website Styler (MU)
+ * Description: User-friendly AI-powered website styling assistant with visual preview and one-click apply. Helps non-technical users style their WordPress site using plain English.
  * Author: Ken + Helper
  * Version: 3.0.0
  *
- * WHAT THIS DOES:
- * This plugin helps you style your WordPress website using simple, plain English commands.
- * Just describe what you want (like "make the header purple" or "add more spacing"), 
- * and it will show you a preview before making any changes. Every change is saved automatically 
- * so you can undo it with one click if you don't like it.
- *
- * SECURITY:
- * - Only administrators can use this tool
- * - All changes are previewed before being applied
- * - Every change creates an automatic backup (snapshot)
- * - Changes are limited to your theme and plugin files (not WordPress core)
- * - All operations are logged for safety
+ * SECURITY MODEL:
+ * - Edits are constrained to WP_CONTENT_DIR (themes, plugins, mu-plugins, uploads)
+ * - Every change creates a timestamped snapshot under uploads/ai-patch-runner/snapshots/<id>/
+ * - Snapshots include manifest.json and before-blobs for rollback capability
+ * - Preview uses transients to avoid duplicate AI calls
+ * - Admin UI uses nonces + capability checks
  */
 
 if (!defined('ABSPATH')) exit;
 
 define('AI_PR_VERSION', '3.0.0');
-define('AI_PR_PLUGIN_SLUG', 'ai-patch-runner');
+define('AI_PR_PLUGIN_SLUG', 'ai-website-styler');
 define('AI_PR_SNAP_ROOT', 'ai-patch-runner/snapshots');
 define('AI_PR_LOG_ROOT',  'ai-patch-runner/logs');
 define('AI_PR_DEFAULT_EXT_REGEX', '/\.(php|js|css|scss|sass|ts|tsx|json|yml|yaml|xml|html?|txt|md|ini|conf|htaccess)$/i');
 
-/* ========================
- * Core Helper Functions
- * (Path validation, security, snapshots)
- * ======================== */
-
+/* =========================
+ * Config/Allowlists (filters)
+ * ========================= */
 function ai_pr_allowed_ext_regex() {
     return apply_filters('ai_pr_allowed_ext_regex', AI_PR_DEFAULT_EXT_REGEX);
 }
@@ -43,11 +35,18 @@ function ai_pr_allowed_roots() {
         'plugins'      => ['path' => defined('WP_PLUGIN_DIR') ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins',  'enabled' => true],
         'themes'       => ['path' => function_exists('get_theme_root') ? get_theme_root() : WP_CONTENT_DIR . '/themes', 'enabled' => true],
         'uploads'      => ['path' => wp_upload_dir()['basedir'], 'enabled' => true],
-        'wordpress-root (core-sensitive)' => ['path' => ABSPATH, 'enabled' => false],
     ];
+    foreach ($roots as $k => $r) {
+        if (is_array($r) && is_callable($r['path'])) {
+            $roots[$k]['path'] = call_user_func($r['path']);
+        }
+    }
     return apply_filters('ai_pr_allowed_roots', $roots);
 }
 
+/* ===============
+ * Path + IO utils
+ * =============== */
 function ai_pr_uploads_paths() {
     $uploads = wp_upload_dir();
     $snapRoot = trailingslashit($uploads['basedir']) . AI_PR_SNAP_ROOT;
@@ -115,6 +114,9 @@ function ai_pr_log($message, $context = []) {
     file_put_contents($file, $entry, FILE_APPEND | LOCK_EX);
 }
 
+/* ===========
+ * Diff helper
+ * =========== */
 function ai_pr_text_diff($old, $new, $title = 'Diff') {
     if (function_exists('wp_text_diff')) {
         return wp_text_diff($old, $new, ['title' => $title]);
@@ -123,10 +125,9 @@ function ai_pr_text_diff($old, $new, $title = 'Diff') {
     return '<h3>'.esc_html($title).'</h3><div class="ai-pr-diff">'.$esc($old).'<hr/>'.$esc($new).'</div>';
 }
 
-/* ================
- * Snapshot System
- * ================ */
-
+/* =================
+ * Snapshot manager
+ * ================= */
 function ai_pr_start_snapshot($label = '') {
     list($snapRoot) = ai_pr_uploads_paths();
     $id = ai_pr_now_id();
@@ -198,10 +199,9 @@ function ai_pr_load_snapshot($id) {
     return $m;
 }
 
-/* ================
- * File Operations
- * ================ */
-
+/* =================
+ * File operations
+ * ================= */
 function ai_pr_write_file($abs, $content) {
     wp_mkdir_p(dirname($abs));
     return file_put_contents($abs, $content, LOCK_EX);
@@ -217,10 +217,9 @@ function ai_pr_rename_file($absFrom, $absTo) {
     return @rename($absFrom, $absTo);
 }
 
-/* =============
- * Block Parsing
- * ============= */
-
+/* =======================
+ * Block parsing
+ * ======================= */
 function ai_pr_parse_blocks($text) {
     $lines = preg_split("/\r\n|\n|\r/", $text);
     $blocks = [];
@@ -247,301 +246,150 @@ function ai_pr_parse_blocks($text) {
     return $blocks;
 }
 
-function ai_pr_apply_token_region($original, $tokenName, $replacement) {
-    $start = "<!-- AI:start:$tokenName -->";
-    $end   = "<!-- AI:end:$tokenName -->";
-    $p1 = strpos($original, $start);
-    $p2 = strpos($original, $end);
-    if ($p1 !== false && $p2 !== false && $p2 > $p1) {
-        $before = substr($original, 0, $p1 + strlen($start));
-        $after  = substr($original, $p2);
-        return $before . "\n" . rtrim($replacement) . "\n" . $after;
-    }
-    $block = "\n$start\n" . rtrim($replacement) . "\n$end\n";
-    return rtrim($original) . $block;
+/* =======================
+ * Preview Management (v3.0)
+ * ======================= */
+function ai_pr_generate_preview_key() {
+    return 'ai_pr_preview_' . get_current_user_id() . '_' . time();
 }
 
-/* =============================
- * WordPress Integration Helpers
- * ============================= */
+function ai_pr_store_preview($key, $ai_response, $metadata = []) {
+    set_transient($key, ['ai_response' => $ai_response, 'metadata' => $metadata], HOUR_IN_SECONDS);
+}
 
+function ai_pr_get_preview($key) {
+    $data = get_transient($key);
+    if (!$data) return null;
+    if (strpos($key, 'ai_pr_preview_' . get_current_user_id()) !== 0) return null;
+    return $data;
+}
+
+function ai_pr_delete_preview($key) {
+    delete_transient($key);
+}
+
+/* =======================
+ * Helper Functions (v3.0)
+ * ======================= */
 function ai_pr_get_pages_and_posts() {
+    $pages = get_pages(['numberposts' => 100]);
+    $posts = get_posts(['numberposts' => 100, 'post_type' => 'any']);
     $items = [];
-    
-    $pages = get_pages(['number' => 100]);
-    foreach ($pages as $page) {
-        $items[] = [
-            'id' => $page->ID,
-            'title' => $page->post_title,
-            'url' => get_permalink($page->ID),
-            'type' => 'page',
-        ];
+    foreach ($pages as $p) {
+        $items[] = ['id' => $p->ID, 'title' => $p->post_title, 'type' => 'Page', 'url' => get_permalink($p)];
     }
-    
-    $posts = get_posts(['numberposts' => 50, 'post_status' => 'publish']);
-    foreach ($posts as $post) {
-        $items[] = [
-            'id' => $post->ID,
-            'title' => $post->post_title,
-            'url' => get_permalink($post->ID),
-            'type' => 'post',
-        ];
+    foreach ($posts as $p) {
+        $items[] = ['id' => $p->ID, 'title' => $p->post_title, 'type' => ucfirst($p->post_type), 'url' => get_permalink($p)];
     }
-    
     return $items;
 }
 
 function ai_pr_detect_elementor($post_id = null) {
-    $info = [
-        'active' => false,
-        'post_uses_elementor' => false,
-        'custom_css_files' => [],
-    ];
-    
-    if (defined('ELEMENTOR_VERSION')) {
+    $info = ['active' => false, 'post_uses_elementor' => false];
+    if (did_action('elementor/loaded')) {
         $info['active'] = true;
-        
         if ($post_id && get_post_meta($post_id, '_elementor_edit_mode', true)) {
             $info['post_uses_elementor'] = true;
         }
-        
-        // Note: We intentionally DO NOT include Elementor's auto-generated CSS files
-        // from wp-content/uploads/elementor/css/ because they are regenerated
-        // by Elementor and any manual changes would be lost. Instead, we direct
-        // the AI to use the theme's style.css file for all styling changes.
     }
-    
     return $info;
 }
 
 function ai_pr_get_theme_files() {
     $theme = wp_get_theme();
     $stylesheet_dir = get_stylesheet_directory();
-    $template_dir = get_template_directory();
-    
-    $files = [];
-    
-    $key_files = [
-        'style.css' => 'Main Stylesheet',
-        'functions.php' => 'Theme Functions',
-        'header.php' => 'Header Template',
-        'footer.php' => 'Footer Template',
-    ];
-    
-    foreach ($key_files as $filename => $description) {
-        $path = $stylesheet_dir . '/' . $filename;
-        if (file_exists($path)) {
-            $files[] = [
-                'path' => $path,
-                'relative' => 'themes/' . $theme->get_stylesheet() . '/' . $filename,
-                'description' => $description,
-            ];
-        }
-    }
-    
-    return $files;
-}
-
-/* ===============================
- * AI Integration & Task Templates
- * =============================== */
-
-function ai_pr_get_quick_task_templates() {
-    return [
-        'colors' => [
-            'label' => 'Change Colors',
-            'fields' => [
-                ['name' => 'element', 'label' => 'What to change', 'type' => 'select', 'options' => [
-                    'background' => 'Page Background',
-                    'header' => 'Header/Navigation',
-                    'footer' => 'Footer',
-                    'buttons' => 'Buttons',
-                    'links' => 'Links',
-                    'headings' => 'Headings',
-                ]],
-                ['name' => 'color', 'label' => 'New Color', 'type' => 'color', 'default' => '#3498db'],
-            ],
-        ],
-        'fonts' => [
-            'label' => 'Change Fonts',
-            'fields' => [
-                ['name' => 'element', 'label' => 'What to change', 'type' => 'select', 'options' => [
-                    'body' => 'Body Text',
-                    'headings' => 'All Headings',
-                    'h1' => 'H1 Only',
-                    'navigation' => 'Navigation Menu',
-                ]],
-                ['name' => 'font', 'label' => 'Font Name', 'type' => 'text', 'default' => 'Arial, sans-serif'],
-                ['name' => 'size', 'label' => 'Size (optional)', 'type' => 'text', 'placeholder' => 'e.g., 16px'],
-            ],
-        ],
-        'spacing' => [
-            'label' => 'Adjust Spacing',
-            'fields' => [
-                ['name' => 'element', 'label' => 'What to adjust', 'type' => 'select', 'options' => [
-                    'sections' => 'Between Sections',
-                    'paragraphs' => 'Between Paragraphs',
-                    'header' => 'Header Padding',
-                    'footer' => 'Footer Padding',
-                ]],
-                ['name' => 'amount', 'label' => 'Amount', 'type' => 'select', 'options' => [
-                    'reduce' => 'Reduce Spacing',
-                    'increase' => 'Increase Spacing',
-                    'double' => 'Double Current Spacing',
-                    'half' => 'Half Current Spacing',
-                ]],
-            ],
-        ],
-    ];
+    return [[
+        'path' => $stylesheet_dir . '/style.css',
+        'relative' => 'themes/' . $theme->get_stylesheet() . '/style.css',
+        'description' => 'Main Stylesheet',
+    ]];
 }
 
 function ai_pr_build_ai_prompt($template_type, $params, $context = []) {
-    $system_prompt = "You are a WordPress styling assistant. You help users modify their website appearance safely and conservatively. 
-
-Your response MUST be valid JSON with this exact structure:
-{
-    \"summary\": \"A plain English explanation of what you will change (2-3 sentences)\",
-    \"operations\": \"Block syntax with file operations\"
-}
-
-The operations should use this block syntax:
-=== FILE: path/to/file.css ===
-complete file content here
-=== END FILE ===
-
-=== APPEND: path/to/file.css ===
-content to append
-=== END APPEND ===
+    $elementor_info = ai_pr_detect_elementor($context['post_id'] ?? null);
+    $theme_files = ai_pr_get_theme_files();
+    $stylesheet_path = $theme_files[0]['relative'];
+    
+    $system_prompt = "You are an expert WordPress CSS stylist. You help users style their websites by generating CSS changes.
 
 CRITICAL RULES:
 - NEVER modify files in wp-content/uploads/elementor/css/ - these are auto-generated and will be overwritten
-- NEVER modify files in wp-content/plugins/ - these get overwritten during updates
-- ALWAYS use the active child theme's style.css file for CSS changes
-- Append CSS rules to wp-content/themes/triuu/style.css (the active child theme)
-- Use specific CSS selectors with !important if needed to override Elementor styles
-- Make conservative, minimal changes
-- Always add CSS comments explaining what was changed and why
-- Never modify WordPress core files
-- For page-specific styling, use body classes like .page-id-1460 or .post-1460";
+- ALWAYS append CSS to the child theme stylesheet: {$stylesheet_path}
+- Use page-specific selectors like .page-id-{ID} or body.post-{ID} for page-specific changes
+- Use !important if needed to override Elementor styles
+- Generate clean, well-commented CSS
+- Return JSON format ONLY with this structure: {\"summary\": \"Brief description\", \"operations\": [{\"type\": \"APPEND\", \"path\": \"path/to/file\", \"content\": \"CSS code\"}]}
 
+CONTEXT:
+- Theme stylesheet: {$stylesheet_path}
+- Elementor active: " . ($elementor_info['active'] ? 'Yes' : 'No') . "
+- Current request type: {$template_type}";
 
     $user_prompt = '';
     
-    if ($template_type === 'colors') {
-        $element = $params['element'] ?? 'background';
-        $color = $params['color'] ?? '#3498db';
-        $user_prompt = "Change the {$element} color to {$color}. ";
-    } elseif ($template_type === 'fonts') {
-        $element = $params['element'] ?? 'body';
-        $font = $params['font'] ?? 'Arial';
-        $size = !empty($params['size']) ? " and size to {$params['size']}" : '';
-        $user_prompt = "Change the {$element} font to {$font}{$size}. ";
-    } elseif ($template_type === 'spacing') {
-        $element = $params['element'] ?? 'sections';
-        $amount = $params['amount'] ?? 'increase';
-        $user_prompt = "{$amount} spacing for {$element}. ";
-    } elseif ($template_type === 'custom') {
-        $user_prompt = $params['request'] ?? '';
+    switch ($template_type) {
+        case 'quick_colors':
+            $element = $params['element'] ?? 'background';
+            $color = $params['color'] ?? '#000000';
+            $user_prompt = "Change the {$element} color to {$color}. Generate appropriate CSS selectors for {$element} elements.";
+            break;
+            
+        case 'quick_fonts':
+            $element = $params['element'] ?? 'body';
+            $font = $params['font'] ?? 'Arial';
+            $size = $params['size'] ?? '';
+            $user_prompt = "Change the font for {$element} to {$font}" . ($size ? " with size {$size}" : "") . ". Generate appropriate CSS selectors.";
+            break;
+            
+        case 'quick_spacing':
+            $element = $params['element'] ?? 'sections';
+            $amount = $params['amount'] ?? 'increase';
+            $user_prompt = "Adjust spacing for {$element} - {$amount} the current spacing. Generate appropriate margin/padding CSS.";
+            break;
+            
+        case 'page_specific':
+            $page_id = $params['page_id'] ?? 0;
+            $request = $params['request'] ?? '';
+            $user_prompt = "For page ID {$page_id}: {$request}. Use .page-id-{$page_id} selector for page-specific styles.";
+            break;
+            
+        case 'custom':
+            $user_prompt = $params['request'] ?? '';
+            break;
     }
     
-    if (!empty($context['theme_files'])) {
-        $user_prompt .= "\n\nAvailable theme files:\n";
-        foreach ($context['theme_files'] as $file) {
-            $user_prompt .= "- {$file['relative']} ({$file['description']})\n";
-        }
-    }
-    
-    if (!empty($context['elementor'])) {
-        $user_prompt .= "\n\nElementor is active on this site.";
-        if ($context['elementor']['post_uses_elementor']) {
-            $user_prompt .= " The selected page uses Elementor.";
-        }
-    }
-    
-    if (!empty($context['page_info'])) {
-        $user_prompt .= "\n\nTarget: {$context['page_info']['title']} ({$context['page_info']['type']})";
-    }
-    
-    return [
-        'system' => $system_prompt,
-        'user' => $user_prompt,
-    ];
+    return ['system' => $system_prompt, 'user' => $user_prompt];
 }
 
-function ai_pr_call_ai($system_prompt, $user_prompt) {
+function ai_pr_call_ai($system, $user) {
     if (!function_exists('openai_wp_chat')) {
-        return new WP_Error('no_ai', 'AI integration not available. Install OpenAI integration to use AI features.');
+        return new WP_Error('no_ai', 'OpenAI integration not found. Please install the OpenAI plugin.');
     }
     
-    $messages = [
-        ['role' => 'system', 'content' => $system_prompt],
-        ['role' => 'user', 'content' => $user_prompt],
-    ];
-    
-    $result = openai_wp_chat($messages, [
-        'model' => 'gpt-4o-mini',
-        'max_tokens' => 3000,
-        'temperature' => 0.3,
+    $response = openai_wp_chat([
+        ['role' => 'system', 'content' => $system],
+        ['role' => 'user', 'content' => $user],
     ]);
     
-    if (is_wp_error($result)) {
-        return $result;
+    if (is_wp_error($response)) return $response;
+    
+    $content = $response['content'] ?? '';
+    
+    // Try to extract JSON from markdown code blocks if present
+    if (preg_match('/```(?:json)?\s*(\{.*\})\s*```/s', $content, $matches)) {
+        $content = $matches[1];
     }
     
-    $content = $result['content'] ?? '';
-    
-    $content = preg_replace('/```json\s*/', '', $content);
-    $content = preg_replace('/```\s*$/', '', $content);
-    $content = trim($content);
-    
-    $parsed = json_decode($content, true);
-    if (!$parsed || !isset($parsed['summary']) || !isset($parsed['operations'])) {
-        return new WP_Error('invalid_response', 'AI returned invalid format. Raw response: ' . substr($content, 0, 200));
+    $json = json_decode($content, true);
+    if (!$json || !isset($json['summary']) || !isset($json['operations'])) {
+        return new WP_Error('invalid_response', 'AI response not in expected format. Response: ' . substr($content, 0, 200));
     }
-    
-    return $parsed;
-}
-
-/* ============================
- * Preview Management Helpers
- * ============================ */
-
-function ai_pr_generate_preview_key() {
-    return 'ai_pr_preview_' . get_current_user_id() . '_' . time();
-}
-
-function ai_pr_store_preview($preview_key, $ai_response, $context = []) {
-    $preview_data = [
-        'ai_response' => $ai_response,
-        'context' => $context,
-        'created' => gmdate('c'),
-        'user_id' => get_current_user_id(),
-    ];
-    set_transient($preview_key, $preview_data, HOUR_IN_SECONDS);
-}
-
-function ai_pr_get_preview($preview_key) {
-    $preview_data = get_transient($preview_key);
-    if (!$preview_data || !is_array($preview_data)) {
-        return null;
-    }
-    if (!isset($preview_data['ai_response']) || !isset($preview_data['created'])) {
-        return null;
-    }
-    if (isset($preview_data['user_id']) && $preview_data['user_id'] != get_current_user_id()) {
-        return null;
-    }
-    return $preview_data;
-}
-
-function ai_pr_delete_preview($preview_key) {
-    delete_transient($preview_key);
+    return $json;
 }
 
 /* =========
  * Admin UI
  * ========= */
-
 add_action('admin_menu', function(){
     add_management_page(
         'AI Website Styler',
@@ -552,699 +400,425 @@ add_action('admin_menu', function(){
     );
 });
 
+/* Modern CSS Styling */
 add_action('admin_enqueue_scripts', function($hook){
     if ($hook !== 'tools_page_' . AI_PR_PLUGIN_SLUG) return;
     
-    wp_enqueue_style('ai-pr-admin', false, [], AI_PR_VERSION);
-    wp_add_inline_style('ai-pr-admin', '
-        .ai-pr-wrap { max-width: 1200px; margin: 20px 0; }
-        .ai-pr-card { background: #fff; border: 1px solid #ccd0d4; border-radius: 4px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 1px rgba(0,0,0,.04); }
-        .ai-pr-card h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .ai-pr-form-group { margin-bottom: 20px; }
-        .ai-pr-form-group label { display: block; font-weight: 600; margin-bottom: 8px; }
-        .ai-pr-form-group input[type="text"],
-        .ai-pr-form-group input[type="color"],
-        .ai-pr-form-group select,
-        .ai-pr-form-group textarea { width: 100%; max-width: 500px; }
-        .ai-pr-form-group textarea { max-width: 100%; min-height: 150px; }
-        .ai-pr-preview { background: #f8f9fa; border-left: 4px solid #00a0d2; padding: 15px; margin: 20px 0; }
-        .ai-pr-preview h4 { margin-top: 0; color: #00a0d2; }
-        .ai-pr-summary { font-size: 14px; line-height: 1.6; color: #555; }
-        .ai-pr-buttons { display: flex; gap: 10px; margin-top: 20px; }
-        .ai-pr-help { background: #fffbcc; border-left: 4px solid #ffb900; padding: 12px; margin: 15px 0; font-size: 13px; }
-        .ai-pr-snapshot-list { margin: 0; padding: 0; list-style: none; }
-        .ai-pr-snapshot-item { background: #fafafa; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 3px; }
-        .ai-pr-snapshot-header { display: flex; justify-content: space-between; align-items: center; }
-        .ai-pr-snapshot-title { font-weight: 600; color: #333; }
-        .ai-pr-snapshot-date { color: #666; font-size: 12px; }
-        .ai-pr-snapshot-meta { color: #888; font-size: 13px; margin-top: 8px; }
-        .ai-pr-diff-toggle { cursor: pointer; color: #0073aa; text-decoration: underline; font-size: 12px; }
-        .ai-pr-diff-content { display: none; margin-top: 15px; max-height: 400px; overflow: auto; }
-        .ai-pr-error { background: #f8d7da; border-left: 4px solid #dc3545; padding: 12px; margin: 15px 0; color: #721c24; }
-        .ai-pr-success { background: #d4edda; border-left: 4px solid #28a745; padding: 12px; margin: 15px 0; color: #155724; }
-    ');
+    wp_register_style('ai-pr-admin', false);
+    wp_enqueue_style('ai-pr-admin');
     
-    wp_enqueue_script('ai-pr-admin', false, [], AI_PR_VERSION, true);
-    wp_add_inline_script('ai-pr-admin', '
-        (function($) {
-            $(document).ready(function() {
-                $(".ai-pr-diff-toggle").on("click", function(e) {
-                    e.preventDefault();
-                    $(this).next(".ai-pr-diff-content").slideToggle();
-                });
-                
-                $("#ai_pr_task_template").on("change", function() {
-                    var val = $(this).val();
-                    $(".ai-pr-template-fields").hide();
-                    if (val) {
-                        $("#ai-pr-fields-" + val).show();
-                    }
-                });
+    $css = <<<'CSS'
+    .ai-styler-wrap { max-width: 1200px; margin: 20px 0; }
+    .ai-styler-card { background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); padding: 20px; margin: 20px 0; border-radius: 4px; }
+    .ai-styler-form-row { margin: 15px 0; }
+    .ai-styler-form-row label { display: block; font-weight: 600; margin-bottom: 5px; }
+    .ai-styler-form-row input[type="text"],
+    .ai-styler-form-row input[type="color"],
+    .ai-styler-form-row select,
+    .ai-styler-form-row textarea { width: 100%; max-width: 500px; }
+    .ai-styler-form-row textarea { min-height: 120px; }
+    .ai-styler-notice-success { background: #d4edda; border-left: 4px solid #28a745; padding: 12px; margin: 15px 0; color: #155724; }
+    .ai-styler-notice-error { background: #f8d7da; border-left: 4px solid #dc3545; padding: 12px; margin: 15px 0; color: #721c24; }
+    .ai-styler-notice-info { background: #d1ecf1; border-left: 4px solid #17a2b8; padding: 12px; margin: 15px 0; color: #0c5460; }
+    .ai-styler-notice-warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 15px 0; color: #856404; }
+    .ai-styler-diff-container { background: #f5f5f5; border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 4px; max-height: 500px; overflow: auto; }
+    .ai-styler-snapshot-list { list-style: none; padding: 0; margin: 0; }
+    .ai-styler-snapshot-item { background: #fafafa; border: 1px solid #e0e0e0; padding: 15px; margin: 10px 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+    .ai-styler-snapshot-meta { flex: 1; }
+    .ai-styler-snapshot-meta strong { display: block; margin-bottom: 5px; }
+    .ai-styler-snapshot-meta small { color: #666; }
+    .ai-styler-examples { background: #f9f9f9; border-left: 3px solid #0073aa; padding: 10px 15px; margin: 10px 0; font-size: 13px; }
+    .ai-styler-examples strong { display: block; margin-bottom: 5px; }
+    .ai-styler-button-group { margin-top: 20px; }
+    .ai-styler-hidden { display: none; }
+    .ai-styler-form-group { margin-bottom: 20px; }
+CSS;
+    wp_add_inline_style('ai-pr-admin', $css);
+    
+    // Dynamic form interactions
+    wp_register_script('ai-pr-admin', false, [], AI_PR_VERSION, true);
+    wp_enqueue_script('ai-pr-admin');
+    
+    $js = <<<'JS'
+    (function(){
+        function $(sel) { return document.querySelector(sel); }
+        function $$(sel) { return document.querySelectorAll(sel); }
+        
+        // Quick Tasks dynamic fields
+        var taskTypeSelect = $('#quick_task_type');
+        if (taskTypeSelect) {
+            taskTypeSelect.addEventListener('change', function() {
+                $$('.quick-task-fields').forEach(function(el) { el.classList.add('ai-styler-hidden'); });
+                var selected = this.value;
+                if (selected) {
+                    var target = $('#quick-fields-' + selected);
+                    if (target) target.classList.remove('ai-styler-hidden');
+                }
             });
-        })(jQuery);
-    ');
+        }
+        
+        // Confirmation for restore
+        $$('.ai-styler-restore-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to restore this snapshot? Current changes will be backed up first.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    })();
+JS;
+    wp_add_inline_script('ai-pr-admin', $js);
 });
 
+/* Main admin page */
 function ai_pr_admin_page() {
-    if (!current_user_can('manage_options')) {
-        echo '<div class="wrap"><h1>Access Denied</h1><p>You do not have permission to access this page.</p></div>';
-        return;
-    }
-    
+    if (!current_user_can('manage_options')) return;
     $nonce_action = 'ai_pr_action_' . get_current_user_id();
     $tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'quick';
-    
-    echo '<div class="wrap ai-pr-wrap">';
-    echo '<h1>🎨 AI Website Styler</h1>';
-    echo '<p class="description">Make your website look amazing using simple, plain English commands. Every change is previewed before being applied, and you can undo anything with one click.</p>';
+
+    echo '<div class="wrap ai-styler-wrap">';
+    echo '<h1>✨ AI Website Styler</h1>';
+    echo '<p class="description">Style your website using simple, plain-English requests. All changes are previewed before applying and can be rolled back.</p>';
     
     echo '<h2 class="nav-tab-wrapper">';
-    $tabs = [
-        'quick' => '⚡ Quick Tasks',
-        'page-styler' => '📄 Page Styler',
-        'custom' => '✍️ Custom Request',
-        'history' => '🕐 History',
-    ];
-    foreach ($tabs as $t => $label) {
-        $cls = $tab === $t ? 'nav-tab nav-tab-active' : 'nav-tab';
-        echo '<a class="' . $cls . '" href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=' . $t)) . '">' . esc_html($label) . '</a>';
+    foreach ([
+        'quick'   => '⚡ Quick Tasks',
+        'page'    => '📄 Page Styler',
+        'custom'  => '✏️ Custom Request',
+        'history' => '🕐 History'
+    ] as $t => $label) {
+        $cls = $tab === $t ? ' nav-tab nav-tab-active' : ' nav-tab';
+        echo '<a class="'.$cls.'" href="'.esc_url(admin_url('tools.php?page='.AI_PR_PLUGIN_SLUG.'&tab='.$t)).'">'.esc_html($label).'</a>';
     }
     echo '</h2>';
-    
+
     if ($tab === 'quick') {
         ai_pr_ui_quick_tasks($nonce_action);
-    } elseif ($tab === 'page-styler') {
+    } elseif ($tab === 'page') {
         ai_pr_ui_page_styler($nonce_action);
     } elseif ($tab === 'custom') {
         ai_pr_ui_custom_request($nonce_action);
-    } elseif ($tab === 'history') {
+    } else {
         ai_pr_ui_history($nonce_action);
     }
-    
     echo '</div>';
 }
 
-/* =================
- * UI: Quick Tasks
- * ================= */
-
+/* ==================
+ * Tab: Quick Tasks
+ * ================== */
 function ai_pr_ui_quick_tasks($nonce_action) {
     $do_preview = !empty($_POST['do_preview']);
     $do_apply = !empty($_POST['do_apply']);
+    $preview_key = isset($_POST['preview_key']) ? sanitize_text_field($_POST['preview_key']) : '';
     
-    if ($do_preview && check_admin_referer($nonce_action)) {
-        $template = isset($_POST['template']) ? sanitize_text_field($_POST['template']) : '';
-        $params = isset($_POST['params']) && is_array($_POST['params']) ? array_map('sanitize_text_field', $_POST['params']) : [];
-        
-        $theme_files = ai_pr_get_theme_files();
-        $elementor = ai_pr_detect_elementor();
-        
-        $prompts = ai_pr_build_ai_prompt($template, $params, [
-            'theme_files' => $theme_files,
-            'elementor' => $elementor,
-        ]);
-        
-        $ai_result = ai_pr_call_ai($prompts['system'], $prompts['user']);
-        
-        if (is_wp_error($ai_result)) {
-            echo '<div class="ai-pr-error"><strong>Error:</strong> ' . esc_html($ai_result->get_error_message()) . '</div>';
-        } else {
-            $preview_key = ai_pr_generate_preview_key();
-            ai_pr_store_preview($preview_key, $ai_result, [
-                'template' => $template,
-                'params' => $params,
-            ]);
-            
-            $summary = $ai_result['summary'];
-            $operations = $ai_result['operations'];
-            
-            $preview_time = date('g:i a');
-            echo '<div class="ai-pr-preview">';
-            echo '<h4>📋 Preview Generated (' . esc_html($preview_time) . ')</h4>';
-            echo '<div class="ai-pr-summary">' . nl2br(esc_html($summary)) . '</div>';
-            echo '<p style="font-size: 12px; color: #666; margin-top: 10px;">⏱ This preview will expire in 1 hour. Apply the changes before then.</p>';
-            echo '</div>';
-            
-            $blocks = ai_pr_parse_blocks($operations);
-            if (!$blocks) {
-                echo '<div class="ai-pr-error">AI did not generate valid file operations.</div>';
-            } else {
-                $diff_html = '';
-                foreach ($blocks as $b) {
-                    $abs = ai_pr_resolve_target($b['path'], false);
-                    if (!$abs) continue;
-                    
-                    $before = file_exists($abs) ? file_get_contents($abs) : '';
-                    
-                    if ($b['type'] === 'FILE') {
-                        $after = $b['content'];
-                        $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    } elseif ($b['type'] === 'APPEND') {
-                        $after = rtrim($before) . "\n\n" . rtrim($b['content']) . "\n";
-                        $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    }
-                }
-                
-                echo '<div class="ai-pr-card">';
-                echo '<a href="#" class="ai-pr-diff-toggle">👁️ Show code changes (for advanced users)</a>';
-                echo '<div class="ai-pr-diff-content">' . $diff_html . '</div>';
-                echo '</div>';
-                
-                echo '<form method="post" style="margin-top: 20px;">';
-                wp_nonce_field($nonce_action);
-                echo '<input type="hidden" name="preview_key" value="' . esc_attr($preview_key) . '">';
-                echo '<p><strong>Ready to apply these changes?</strong> You can undo this anytime from the History tab.</p>';
-                echo '<button type="submit" name="do_apply" value="1" class="button button-primary button-large">✅ Apply Changes Now</button> ';
-                echo '<a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=quick')) . '" class="button">Cancel</a>';
-                echo '</form>';
-            }
-        }
-        return;
-    }
-    
-    if ($do_apply && check_admin_referer($nonce_action)) {
-        $preview_key = isset($_POST['preview_key']) ? sanitize_text_field($_POST['preview_key']) : '';
-        
-        if (!$preview_key) {
-            echo '<div class="ai-pr-error"><strong>Error:</strong> No preview found. Please generate a preview first.</div>';
-            return;
-        }
-        
+    // Handle Apply from preview
+    if ($do_apply && $preview_key && check_admin_referer($nonce_action)) {
         $preview_data = ai_pr_get_preview($preview_key);
-        
         if (!$preview_data) {
-            echo '<div class="ai-pr-error"><strong>Preview Expired:</strong> Your preview has expired or is no longer valid. Please generate a new preview before applying changes.</div>';
-            echo '<p><a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=quick')) . '" class="button">← Go Back</a></p>';
-            return;
-        }
-        
-        $ai_result = $preview_data['ai_response'];
-        $template = $preview_data['context']['template'] ?? 'unknown';
-        
-        $summary = $ai_result['summary'];
-        $operations = $ai_result['operations'];
-        
-        $blocks = ai_pr_parse_blocks($operations);
-        if (!$blocks) {
-            echo '<div class="ai-pr-error">AI did not generate valid file operations.</div>';
+            echo '<div class="ai-styler-notice-error"><strong>Preview Expired</strong><br>Your preview has expired. Please regenerate the preview and try again.</div>';
         } else {
-            list($snapId, $snapDir) = ai_pr_start_snapshot('quick-task-' . $template);
-            
-            $diff_html = '';
-            foreach ($blocks as $b) {
-                $abs = ai_pr_resolve_target($b['path'], false);
-                if (!$abs) continue;
-                
-                $before = file_exists($abs) ? file_get_contents($abs) : '';
-                ai_pr_snapshot_add_file($snapDir, $abs, $before);
-                
-                if ($b['type'] === 'FILE') {
-                    $after = $b['content'];
-                    $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    ai_pr_write_file($abs, $after);
-                } elseif ($b['type'] === 'APPEND') {
-                    $after = rtrim($before) . "\n\n" . rtrim($b['content']) . "\n";
-                    $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    ai_pr_write_file($abs, $after);
-                }
-            }
-            
-            ai_pr_finalize_snapshot($snapDir);
+            ai_pr_apply_changes($preview_data['ai_response'], 'Quick Task');
             ai_pr_delete_preview($preview_key);
-            
-            echo '<div class="ai-pr-success"><strong>✅ Changes Applied!</strong> Snapshot ID: <code>' . esc_html($snapId) . '</code><br>';
-            echo 'Check your website to see the changes. If you don\'t like them, go to the History tab to undo.</div>';
-            
-            echo '<div class="ai-pr-card">';
-            echo '<a href="#" class="ai-pr-diff-toggle">👁️ Show what was changed</a>';
-            echo '<div class="ai-pr-diff-content">' . $diff_html . '</div>';
-            echo '</div>';
-            
-            echo '<p><a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=quick')) . '" class="button">← Make Another Change</a> ';
-            echo '<a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=history')) . '" class="button">View History</a></p>';
-            
-            ai_pr_log('quick_task_applied', ['template' => $template, 'snapshot' => $snapId]);
         }
-        return;
+    }
+    // Handle Preview generation
+    elseif ($do_preview && check_admin_referer($nonce_action)) {
+        $task_type = isset($_POST['task_type']) ? sanitize_text_field($_POST['task_type']) : '';
+        $params = [];
+        
+        if ($task_type === 'colors') {
+            $params = [
+                'element' => isset($_POST['color_element']) ? sanitize_text_field($_POST['color_element']) : 'background',
+                'color' => isset($_POST['color_value']) ? sanitize_hex_color($_POST['color_value']) : '#000000',
+            ];
+            $ai_response = ai_pr_call_ai(
+                ...array_values(ai_pr_build_ai_prompt('quick_colors', $params))
+            );
+        } elseif ($task_type === 'fonts') {
+            $params = [
+                'element' => isset($_POST['font_element']) ? sanitize_text_field($_POST['font_element']) : 'body',
+                'font' => isset($_POST['font_family']) ? sanitize_text_field($_POST['font_family']) : 'Arial',
+                'size' => isset($_POST['font_size']) ? sanitize_text_field($_POST['font_size']) : '',
+            ];
+            $ai_response = ai_pr_call_ai(
+                ...array_values(ai_pr_build_ai_prompt('quick_fonts', $params))
+            );
+        } elseif ($task_type === 'spacing') {
+            $params = [
+                'element' => isset($_POST['spacing_element']) ? sanitize_text_field($_POST['spacing_element']) : 'sections',
+                'amount' => isset($_POST['spacing_amount']) ? sanitize_text_field($_POST['spacing_amount']) : 'increase',
+            ];
+            $ai_response = ai_pr_call_ai(
+                ...array_values(ai_pr_build_ai_prompt('quick_spacing', $params))
+            );
+        } else {
+            echo '<div class="ai-styler-notice-error">Please select a task type.</div>';
+            $ai_response = null;
+        }
+        
+        if ($ai_response && !is_wp_error($ai_response)) {
+            $preview_key = ai_pr_generate_preview_key();
+            ai_pr_store_preview($preview_key, $ai_response, ['task_type' => $task_type, 'params' => $params]);
+            ai_pr_show_preview($ai_response, $preview_key, $nonce_action);
+        } elseif (is_wp_error($ai_response)) {
+            echo '<div class="ai-styler-notice-error"><strong>Error:</strong> ' . esc_html($ai_response->get_error_message()) . '</div>';
+        }
     }
     
-    echo '<div class="ai-pr-card">';
-    echo '<h3>⚡ Quick Styling Tasks</h3>';
-    echo '<p>Choose a common styling task below. The AI will make the changes for you and show a preview before applying.</p>';
-    
-    echo '<div class="ai-pr-help">💡 <strong>Tip:</strong> All changes create an automatic backup. You can undo any change from the History tab.</div>';
+    // Show form
+    echo '<div class="ai-styler-card">';
+    echo '<h2>⚡ Quick Tasks</h2>';
+    echo '<p>Choose from common styling tasks with simple controls.</p>';
     
     echo '<form method="post">';
     wp_nonce_field($nonce_action);
     
-    echo '<div class="ai-pr-form-group">';
-    echo '<label for="ai_pr_task_template">What would you like to change?</label>';
-    echo '<select name="template" id="ai_pr_task_template" required>';
-    echo '<option value="">-- Choose a task --</option>';
-    
-    $templates = ai_pr_get_quick_task_templates();
-    foreach ($templates as $key => $tmpl) {
-        echo '<option value="' . esc_attr($key) . '">' . esc_html($tmpl['label']) . '</option>';
-    }
+    echo '<div class="ai-styler-form-row">';
+    echo '<label for="quick_task_type">What would you like to change?</label>';
+    echo '<select id="quick_task_type" name="task_type" required>';
+    echo '<option value="">-- Select a task --</option>';
+    echo '<option value="colors">Change Colors</option>';
+    echo '<option value="fonts">Change Fonts</option>';
+    echo '<option value="spacing">Adjust Spacing</option>';
     echo '</select>';
     echo '</div>';
     
-    foreach ($templates as $key => $tmpl) {
-        echo '<div id="ai-pr-fields-' . esc_attr($key) . '" class="ai-pr-template-fields" style="display:none;">';
-        foreach ($tmpl['fields'] as $field) {
-            echo '<div class="ai-pr-form-group">';
-            echo '<label>' . esc_html($field['label']) . '</label>';
-            
-            if ($field['type'] === 'select') {
-                echo '<select name="params[' . esc_attr($field['name']) . ']">';
-                foreach ($field['options'] as $val => $label) {
-                    echo '<option value="' . esc_attr($val) . '">' . esc_html($label) . '</option>';
-                }
-                echo '</select>';
-            } elseif ($field['type'] === 'color') {
-                $default = $field['default'] ?? '#000000';
-                echo '<input type="color" name="params[' . esc_attr($field['name']) . ']" value="' . esc_attr($default) . '">';
-            } else {
-                $default = $field['default'] ?? '';
-                $placeholder = $field['placeholder'] ?? '';
-                echo '<input type="text" name="params[' . esc_attr($field['name']) . ']" value="' . esc_attr($default) . '" placeholder="' . esc_attr($placeholder) . '">';
-            }
-            echo '</div>';
-        }
-        echo '</div>';
-    }
+    // Color options
+    echo '<div id="quick-fields-colors" class="quick-task-fields ai-styler-hidden">';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label>What element?</label>';
+    echo '<select name="color_element">';
+    echo '<option value="background">Background</option>';
+    echo '<option value="header">Header</option>';
+    echo '<option value="footer">Footer</option>';
+    echo '<option value="buttons">Buttons</option>';
+    echo '<option value="links">Links</option>';
+    echo '<option value="headings">Headings</option>';
+    echo '</select>';
+    echo '</div>';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label>Pick a color</label>';
+    echo '<input type="color" name="color_value" value="#0073aa">';
+    echo '</div>';
+    echo '</div>';
     
-    echo '<div class="ai-pr-buttons">';
-    echo '<button type="submit" name="do_preview" value="1" class="button button-primary button-large">👁️ Preview Changes</button>';
+    // Font options
+    echo '<div id="quick-fields-fonts" class="quick-task-fields ai-styler-hidden">';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label>What element?</label>';
+    echo '<select name="font_element">';
+    echo '<option value="body">Body Text</option>';
+    echo '<option value="headings">All Headings</option>';
+    echo '<option value="h1">H1 Only</option>';
+    echo '<option value="navigation">Navigation Menu</option>';
+    echo '</select>';
+    echo '</div>';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label>Font Name</label>';
+    echo '<input type="text" name="font_family" placeholder="e.g., Arial, Roboto, Georgia">';
+    echo '</div>';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label>Font Size (optional)</label>';
+    echo '<input type="text" name="font_size" placeholder="e.g., 16px, 1.2em">';
+    echo '</div>';
+    echo '</div>';
+    
+    // Spacing options
+    echo '<div id="quick-fields-spacing" class="quick-task-fields ai-styler-hidden">';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label>What element?</label>';
+    echo '<select name="spacing_element">';
+    echo '<option value="sections">Sections</option>';
+    echo '<option value="paragraphs">Paragraphs</option>';
+    echo '<option value="header">Header</option>';
+    echo '<option value="footer">Footer</option>';
+    echo '</select>';
+    echo '</div>';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label>How much?</label>';
+    echo '<select name="spacing_amount">';
+    echo '<option value="reduce">Reduce spacing</option>';
+    echo '<option value="increase">Increase spacing</option>';
+    echo '<option value="double">Double spacing</option>';
+    echo '<option value="half">Half spacing</option>';
+    echo '</select>';
+    echo '</div>';
+    echo '</div>';
+    
+    echo '<div class="ai-styler-button-group">';
+    echo '<button type="submit" name="do_preview" value="1" class="button button-primary">Preview Changes</button>';
     echo '</div>';
     
     echo '</form>';
     echo '</div>';
 }
 
-/* =================
- * UI: Page Styler
- * ================= */
-
+/* ==================
+ * Tab: Page Styler
+ * ================== */
 function ai_pr_ui_page_styler($nonce_action) {
     $do_preview = !empty($_POST['do_preview']);
     $do_apply = !empty($_POST['do_apply']);
+    $preview_key = isset($_POST['preview_key']) ? sanitize_text_field($_POST['preview_key']) : '';
     
-    if ($do_preview && check_admin_referer($nonce_action)) {
-        $page_id = isset($_POST['page_id']) ? intval($_POST['page_id']) : 0;
-        $style_request = isset($_POST['style_request']) ? sanitize_textarea_field($_POST['style_request']) : '';
-        
-        if (!$page_id || !$style_request) {
-            echo '<div class="ai-pr-error">Please select a page and describe what you want to change.</div>';
-            return;
-        }
-        
-        $page = get_post($page_id);
-        if (!$page) {
-            echo '<div class="ai-pr-error">Page not found.</div>';
-            return;
-        }
-        
-        $page_info = [
-            'id' => $page->ID,
-            'title' => $page->post_title,
-            'type' => $page->post_type,
-            'url' => get_permalink($page->ID),
-        ];
-        
-        $elementor = ai_pr_detect_elementor($page_id);
-        $theme_files = ai_pr_get_theme_files();
-        
-        $custom_prompt = "For the page '{$page_info['title']}': {$style_request}";
-        
-        $prompts = ai_pr_build_ai_prompt('custom', ['request' => $custom_prompt], [
-            'page_info' => $page_info,
-            'elementor' => $elementor,
-            'theme_files' => $theme_files,
-        ]);
-        
-        $ai_result = ai_pr_call_ai($prompts['system'], $prompts['user']);
-        
-        if (is_wp_error($ai_result)) {
-            echo '<div class="ai-pr-error"><strong>Error:</strong> ' . esc_html($ai_result->get_error_message()) . '</div>';
-        } else {
-            $preview_key = ai_pr_generate_preview_key();
-            ai_pr_store_preview($preview_key, $ai_result, [
-                'page_id' => $page_id,
-                'style_request' => $style_request,
-                'page_info' => $page_info,
-            ]);
-            
-            $summary = $ai_result['summary'];
-            $operations = $ai_result['operations'];
-            
-            $preview_time = date('g:i a');
-            echo '<div class="ai-pr-preview">';
-            echo '<h4>📋 Preview Generated for "' . esc_html($page_info['title']) . '" (' . esc_html($preview_time) . ')</h4>';
-            echo '<div class="ai-pr-summary">' . nl2br(esc_html($summary)) . '</div>';
-            if ($elementor['post_uses_elementor']) {
-                echo '<p style="color:#666;font-size:12px;margin-top:10px;">ℹ️ This page uses Elementor. Changes will be made to the theme or custom CSS files.</p>';
-            }
-            echo '<p style="font-size: 12px; color: #666; margin-top: 10px;">⏱ This preview will expire in 1 hour. Apply the changes before then.</p>';
-            echo '</div>';
-            
-            $blocks = ai_pr_parse_blocks($operations);
-            if (!$blocks) {
-                echo '<div class="ai-pr-error">AI did not generate valid file operations.</div>';
-            } else {
-                $diff_html = '';
-                foreach ($blocks as $b) {
-                    $abs = ai_pr_resolve_target($b['path'], false);
-                    if (!$abs) continue;
-                    
-                    $before = file_exists($abs) ? file_get_contents($abs) : '';
-                    
-                    if ($b['type'] === 'FILE') {
-                        $after = $b['content'];
-                        $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    } elseif ($b['type'] === 'APPEND') {
-                        $after = rtrim($before) . "\n\n" . rtrim($b['content']) . "\n";
-                        $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    }
-                }
-                
-                echo '<div class="ai-pr-card">';
-                echo '<a href="#" class="ai-pr-diff-toggle">👁️ Show code changes</a>';
-                echo '<div class="ai-pr-diff-content">' . $diff_html . '</div>';
-                echo '</div>';
-                
-                echo '<form method="post" style="margin-top: 20px;">';
-                wp_nonce_field($nonce_action);
-                echo '<input type="hidden" name="preview_key" value="' . esc_attr($preview_key) . '">';
-                echo '<p><strong>Ready to apply?</strong></p>';
-                echo '<button type="submit" name="do_apply" value="1" class="button button-primary button-large">✅ Apply Changes</button> ';
-                echo '<a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=page-styler')) . '" class="button">Cancel</a>';
-                echo '</form>';
-            }
-        }
-        return;
-    }
-    
-    if ($do_apply && check_admin_referer($nonce_action)) {
-        $preview_key = isset($_POST['preview_key']) ? sanitize_text_field($_POST['preview_key']) : '';
-        
-        if (!$preview_key) {
-            echo '<div class="ai-pr-error"><strong>Error:</strong> No preview found. Please generate a preview first.</div>';
-            return;
-        }
-        
+    if ($do_apply && $preview_key && check_admin_referer($nonce_action)) {
         $preview_data = ai_pr_get_preview($preview_key);
-        
         if (!$preview_data) {
-            echo '<div class="ai-pr-error"><strong>Preview Expired:</strong> Your preview has expired or is no longer valid. Please generate a new preview before applying changes.</div>';
-            echo '<p><a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=page-styler')) . '" class="button">← Go Back</a></p>';
-            return;
-        }
-        
-        $ai_result = $preview_data['ai_response'];
-        $page_id = $preview_data['context']['page_id'] ?? 0;
-        $page_info = $preview_data['context']['page_info'] ?? [];
-        
-        $page = get_post($page_id);
-        if (!$page) {
-            echo '<div class="ai-pr-error">Page not found.</div>';
-            return;
-        }
-        
-        $summary = $ai_result['summary'];
-        $operations = $ai_result['operations'];
-        
-        $blocks = ai_pr_parse_blocks($operations);
-        if (!$blocks) {
-            echo '<div class="ai-pr-error">AI did not generate valid file operations.</div>';
+            echo '<div class="ai-styler-notice-error"><strong>Preview Expired</strong><br>Your preview has expired. Please regenerate the preview and try again.</div>';
         } else {
-            list($snapId, $snapDir) = ai_pr_start_snapshot('page-styler-' . $page->post_name);
-            
-            $diff_html = '';
-            foreach ($blocks as $b) {
-                $abs = ai_pr_resolve_target($b['path'], false);
-                if (!$abs) continue;
-                
-                $before = file_exists($abs) ? file_get_contents($abs) : '';
-                ai_pr_snapshot_add_file($snapDir, $abs, $before);
-                
-                if ($b['type'] === 'FILE') {
-                    $after = $b['content'];
-                    $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    ai_pr_write_file($abs, $after);
-                } elseif ($b['type'] === 'APPEND') {
-                    $after = rtrim($before) . "\n\n" . rtrim($b['content']) . "\n";
-                    $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    ai_pr_write_file($abs, $after);
-                }
-            }
-            
-            ai_pr_finalize_snapshot($snapDir);
+            ai_pr_apply_changes($preview_data['ai_response'], 'Page Styling');
             ai_pr_delete_preview($preview_key);
-            
-            echo '<div class="ai-pr-success"><strong>✅ Changes Applied!</strong> Snapshot: <code>' . esc_html($snapId) . '</code></div>';
-            echo '<p><a href="' . esc_url($page_info['url']) . '" target="_blank" class="button">View Page</a> ';
-            echo '<a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=history')) . '" class="button">History</a></p>';
-            
-            ai_pr_log('page_styler_applied', ['page_id' => $page_id, 'snapshot' => $snapId]);
         }
-        return;
+    }
+    elseif ($do_preview && check_admin_referer($nonce_action)) {
+        $page_id = isset($_POST['page_id']) ? intval($_POST['page_id']) : 0;
+        $request = isset($_POST['styling_request']) ? wp_unslash($_POST['styling_request']) : '';
+        
+        if (!$page_id || !$request) {
+            echo '<div class="ai-styler-notice-error">Please select a page and describe your styling request.</div>';
+        } else {
+            $params = ['page_id' => $page_id, 'request' => $request];
+            $ai_response = ai_pr_call_ai(
+                ...array_values(ai_pr_build_ai_prompt('page_specific', $params, ['post_id' => $page_id]))
+            );
+            
+            if ($ai_response && !is_wp_error($ai_response)) {
+                $preview_key = ai_pr_generate_preview_key();
+                ai_pr_store_preview($preview_key, $ai_response, ['page_id' => $page_id, 'request' => $request]);
+                ai_pr_show_preview($ai_response, $preview_key, $nonce_action);
+            } elseif (is_wp_error($ai_response)) {
+                echo '<div class="ai-styler-notice-error"><strong>Error:</strong> ' . esc_html($ai_response->get_error_message()) . '</div>';
+            }
+        }
     }
     
-    echo '<div class="ai-pr-card">';
-    echo '<h3>📄 Style a Specific Page or Post</h3>';
-    echo '<p>Select a page or post, then describe the styling changes you want to make. The AI will focus changes on just that page.</p>';
+    $pages_and_posts = ai_pr_get_pages_and_posts();
+    
+    echo '<div class="ai-styler-card">';
+    echo '<h2>📄 Page Styler</h2>';
+    echo '<p>Style a specific page or post using plain English.</p>';
     
     echo '<form method="post">';
     wp_nonce_field($nonce_action);
     
-    $pages = ai_pr_get_pages_and_posts();
-    
-    echo '<div class="ai-pr-form-group">';
-    echo '<label for="ai_pr_page_select">Select Page or Post</label>';
-    echo '<select name="page_id" id="ai_pr_page_select" required>';
-    echo '<option value="">-- Choose a page or post --</option>';
-    
-    $current_type = '';
-    foreach ($pages as $item) {
-        if ($current_type !== $item['type']) {
-            if ($current_type) echo '</optgroup>';
-            echo '<optgroup label="' . esc_attr(ucfirst($item['type']) . 's') . '">';
-            $current_type = $item['type'];
-        }
-        echo '<option value="' . esc_attr($item['id']) . '">' . esc_html($item['title']) . '</option>';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label for="page_id">Select Page/Post</label>';
+    echo '<select id="page_id" name="page_id" required>';
+    echo '<option value="">-- Select a page or post --</option>';
+    foreach ($pages_and_posts as $item) {
+        echo '<option value="' . esc_attr($item['id']) . '">' . esc_html($item['title']) . ' (' . esc_html($item['type']) . ')</option>';
     }
-    if ($current_type) echo '</optgroup>';
-    
     echo '</select>';
     echo '</div>';
     
-    echo '<div class="ai-pr-form-group">';
-    echo '<label for="ai_pr_style_request">What would you like to change?</label>';
-    echo '<textarea name="style_request" id="ai_pr_style_request" rows="4" placeholder="Example: Make the header background blue and increase the font size of the title" required></textarea>';
-    echo '<p class="description">Describe the styling changes in plain English. Be as specific as you can.</p>';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label for="styling_request">What would you like to change?</label>';
+    echo '<textarea id="styling_request" name="styling_request" required placeholder="Describe your styling request in plain English..."></textarea>';
     echo '</div>';
     
-    $elementor_info = ai_pr_detect_elementor();
-    if ($elementor_info['active']) {
-        echo '<div class="ai-pr-help">ℹ️ <strong>Elementor Detected:</strong> Styling changes will be added to your child theme\'s CSS file (triuu/style.css) to ensure they persist and override Elementor\'s auto-generated styles.</div>';
-    }
+    echo '<div class="ai-styler-examples">';
+    echo '<strong>Examples:</strong>';
+    echo '<ul style="margin: 5px 0 0 20px;">';
+    echo '<li>"Make the header purple with white text"</li>';
+    echo '<li>"Add more spacing between sections"</li>';
+    echo '<li>"Change all buttons to green"</li>';
+    echo '<li>"Make the title font larger and bold"</li>';
+    echo '</ul>';
+    echo '</div>';
     
-    echo '<div class="ai-pr-buttons">';
-    echo '<button type="submit" name="do_preview" value="1" class="button button-primary button-large">👁️ Preview Changes</button>';
+    echo '<div class="ai-styler-button-group">';
+    echo '<button type="submit" name="do_preview" value="1" class="button button-primary">Preview Changes</button>';
     echo '</div>';
     
     echo '</form>';
     echo '</div>';
 }
 
-/* ====================
- * UI: Custom Request
- * ==================== */
-
+/* =====================
+ * Tab: Custom Request
+ * ===================== */
 function ai_pr_ui_custom_request($nonce_action) {
     $do_preview = !empty($_POST['do_preview']);
     $do_apply = !empty($_POST['do_apply']);
+    $preview_key = isset($_POST['preview_key']) ? sanitize_text_field($_POST['preview_key']) : '';
     
-    if ($do_preview && check_admin_referer($nonce_action)) {
-        $request = isset($_POST['custom_request']) ? sanitize_textarea_field($_POST['custom_request']) : '';
+    if ($do_apply && $preview_key && check_admin_referer($nonce_action)) {
+        $preview_data = ai_pr_get_preview($preview_key);
+        if (!$preview_data) {
+            echo '<div class="ai-styler-notice-error"><strong>Preview Expired</strong><br>Your preview has expired. Please regenerate the preview and try again.</div>';
+        } else {
+            ai_pr_apply_changes($preview_data['ai_response'], 'Custom Request');
+            ai_pr_delete_preview($preview_key);
+        }
+    }
+    elseif ($do_preview && check_admin_referer($nonce_action)) {
+        $request = isset($_POST['custom_request']) ? wp_unslash($_POST['custom_request']) : '';
         
         if (!$request) {
-            echo '<div class="ai-pr-error">Please describe what you want to change.</div>';
-            return;
-        }
-        
-        $theme_files = ai_pr_get_theme_files();
-        $elementor = ai_pr_detect_elementor();
-        
-        $prompts = ai_pr_build_ai_prompt('custom', ['request' => $request], [
-            'theme_files' => $theme_files,
-            'elementor' => $elementor,
-        ]);
-        
-        $ai_result = ai_pr_call_ai($prompts['system'], $prompts['user']);
-        
-        if (is_wp_error($ai_result)) {
-            echo '<div class="ai-pr-error"><strong>Error:</strong> ' . esc_html($ai_result->get_error_message()) . '</div>';
+            echo '<div class="ai-styler-notice-error">Please describe what you would like to change.</div>';
         } else {
-            $preview_key = ai_pr_generate_preview_key();
-            ai_pr_store_preview($preview_key, $ai_result, [
-                'custom_request' => $request,
-            ]);
+            $params = ['request' => $request];
+            $ai_response = ai_pr_call_ai(
+                ...array_values(ai_pr_build_ai_prompt('custom', $params))
+            );
             
-            $summary = $ai_result['summary'];
-            $operations = $ai_result['operations'];
-            
-            $preview_time = date('g:i a');
-            echo '<div class="ai-pr-preview">';
-            echo '<h4>📋 Preview Generated (' . esc_html($preview_time) . ')</h4>';
-            echo '<div class="ai-pr-summary">' . nl2br(esc_html($summary)) . '</div>';
-            echo '<p style="font-size: 12px; color: #666; margin-top: 10px;">⏱ This preview will expire in 1 hour. Apply the changes before then.</p>';
-            echo '</div>';
-            
-            $blocks = ai_pr_parse_blocks($operations);
-            if (!$blocks) {
-                echo '<div class="ai-pr-error">AI did not generate valid file operations.</div>';
-            } else {
-                $diff_html = '';
-                foreach ($blocks as $b) {
-                    $abs = ai_pr_resolve_target($b['path'], false);
-                    if (!$abs) continue;
-                    
-                    $before = file_exists($abs) ? file_get_contents($abs) : '';
-                    
-                    if ($b['type'] === 'FILE') {
-                        $after = $b['content'];
-                        $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    } elseif ($b['type'] === 'APPEND') {
-                        $after = rtrim($before) . "\n\n" . rtrim($b['content']) . "\n";
-                        $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    }
-                }
-                
-                echo '<div class="ai-pr-card">';
-                echo '<a href="#" class="ai-pr-diff-toggle">👁️ Show code changes</a>';
-                echo '<div class="ai-pr-diff-content">' . $diff_html . '</div>';
-                echo '</div>';
-                
-                echo '<form method="post" style="margin-top: 20px;">';
-                wp_nonce_field($nonce_action);
-                echo '<input type="hidden" name="preview_key" value="' . esc_attr($preview_key) . '">';
-                echo '<p><strong>Ready to apply?</strong></p>';
-                echo '<button type="submit" name="do_apply" value="1" class="button button-primary button-large">✅ Apply Changes</button> ';
-                echo '<a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=custom')) . '" class="button">Cancel</a>';
-                echo '</form>';
+            if ($ai_response && !is_wp_error($ai_response)) {
+                $preview_key = ai_pr_generate_preview_key();
+                ai_pr_store_preview($preview_key, $ai_response, ['request' => $request]);
+                ai_pr_show_preview($ai_response, $preview_key, $nonce_action);
+            } elseif (is_wp_error($ai_response)) {
+                echo '<div class="ai-styler-notice-error"><strong>Error:</strong> ' . esc_html($ai_response->get_error_message()) . '</div>';
             }
         }
-        return;
     }
     
-    if ($do_apply && check_admin_referer($nonce_action)) {
-        $preview_key = isset($_POST['preview_key']) ? sanitize_text_field($_POST['preview_key']) : '';
-        
-        if (!$preview_key) {
-            echo '<div class="ai-pr-error"><strong>Error:</strong> No preview found. Please generate a preview first.</div>';
-            return;
-        }
-        
-        $preview_data = ai_pr_get_preview($preview_key);
-        
-        if (!$preview_data) {
-            echo '<div class="ai-pr-error"><strong>Preview Expired:</strong> Your preview has expired or is no longer valid. Please generate a new preview before applying changes.</div>';
-            echo '<p><a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=custom')) . '" class="button">← Go Back</a></p>';
-            return;
-        }
-        
-        $ai_result = $preview_data['ai_response'];
-        
-        $summary = $ai_result['summary'];
-        $operations = $ai_result['operations'];
-        
-        $blocks = ai_pr_parse_blocks($operations);
-        if (!$blocks) {
-            echo '<div class="ai-pr-error">AI did not generate valid file operations.</div>';
-        } else {
-            list($snapId, $snapDir) = ai_pr_start_snapshot('custom-request');
-            
-            $diff_html = '';
-            foreach ($blocks as $b) {
-                $abs = ai_pr_resolve_target($b['path'], false);
-                if (!$abs) continue;
-                
-                $before = file_exists($abs) ? file_get_contents($abs) : '';
-                ai_pr_snapshot_add_file($snapDir, $abs, $before);
-                
-                if ($b['type'] === 'FILE') {
-                    $after = $b['content'];
-                    $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    ai_pr_write_file($abs, $after);
-                } elseif ($b['type'] === 'APPEND') {
-                    $after = rtrim($before) . "\n\n" . rtrim($b['content']) . "\n";
-                    $diff_html .= ai_pr_text_diff($before, $after, $b['path']);
-                    ai_pr_write_file($abs, $after);
-                }
-            }
-            
-            ai_pr_finalize_snapshot($snapDir);
-            ai_pr_delete_preview($preview_key);
-            
-            echo '<div class="ai-pr-success"><strong>✅ Changes Applied!</strong> Snapshot: <code>' . esc_html($snapId) . '</code></div>';
-            echo '<p><a href="' . esc_url(home_url()) . '" target="_blank" class="button">View Website</a> ';
-            echo '<a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG . '&tab=history')) . '" class="button">History</a></p>';
-            
-            ai_pr_log('custom_request_applied', ['snapshot' => $snapId]);
-        }
-        return;
-    }
-    
-    echo '<div class="ai-pr-card">';
-    echo '<h3>✍️ Custom Styling Request</h3>';
-    echo '<p>Describe any styling change you want in plain English. The AI will figure out what files need to be modified.</p>';
+    echo '<div class="ai-styler-card">';
+    echo '<h2>✏️ Custom Request</h2>';
+    echo '<p>Describe any styling change you want in plain English. Our AI will figure out the best way to make it happen.</p>';
     
     echo '<form method="post">';
     wp_nonce_field($nonce_action);
     
-    echo '<div class="ai-pr-form-group">';
-    echo '<label for="ai_pr_custom_request">What would you like to change?</label>';
-    echo '<textarea name="custom_request" id="ai_pr_custom_request" rows="6" placeholder="Examples:
-- Make the homepage header purple with white text
-- Add more spacing between sections on all pages  
-- Change all buttons to have rounded corners
-- Make the footer background darker
-- Increase the font size of all headings" required></textarea>';
-    echo '<p class="description">Be as specific as possible. Mention colors, sizes, or specific elements you want to change.</p>';
+    echo '<div class="ai-styler-form-row">';
+    echo '<label for="custom_request">Describe your styling request</label>';
+    echo '<textarea id="custom_request" name="custom_request" required style="min-height: 200px;" placeholder="Tell us what you want to change..."></textarea>';
     echo '</div>';
     
-    echo '<div class="ai-pr-help">💡 <strong>Tips:</strong> The more specific you are, the better the results. You can mention specific pages, colors (like "navy blue" or "#0066cc"), sizes (like "larger" or "20px"), and elements (like "header", "footer", "buttons").</div>';
+    echo '<div class="ai-styler-examples">';
+    echo '<strong>Examples:</strong>';
+    echo '<ul style="margin: 5px 0 0 20px;">';
+    echo '<li>"Make the homepage header purple with a gradient"</li>';
+    echo '<li>"Add more spacing between all sections on the site"</li>';
+    echo '<li>"Change all blue buttons to green"</li>';
+    echo '<li>"Make the footer darker and increase the font size"</li>';
+    echo '<li>"Add rounded corners to all images"</li>';
+    echo '</ul>';
+    echo '</div>';
     
-    $elementor_info = ai_pr_detect_elementor();
-    if ($elementor_info['active']) {
-        echo '<div class="ai-pr-help">ℹ️ <strong>Elementor Detected:</strong> All styling changes will be added to your child theme\'s CSS file (triuu/style.css) to ensure they persist and properly override Elementor\'s styles.</div>';
-    }
-    
-    echo '<div class="ai-pr-buttons">';
-    echo '<button type="submit" name="do_preview" value="1" class="button button-primary button-large">👁️ Preview Changes</button>';
+    echo '<div class="ai-styler-button-group">';
+    echo '<button type="submit" name="do_preview" value="1" class="button button-primary button-large">Preview Changes</button>';
     echo '</div>';
     
     echo '</form>';
     echo '</div>';
 }
 
-/* =============
- * UI: History
- * ============= */
-
+/* ==============
+ * Tab: History
+ * ============== */
 function ai_pr_ui_history($nonce_action) {
-    if (!empty($_POST['do_restore']) && check_admin_referer($nonce_action)) {
-        $snapshot_id = isset($_POST['snapshot_id']) ? sanitize_text_field($_POST['snapshot_id']) : '';
-        
+    $do_restore = !empty($_POST['do_restore']);
+    $snapshot_id = isset($_POST['snapshot_id']) ? sanitize_text_field($_POST['snapshot_id']) : '';
+    
+    if ($do_restore && $snapshot_id && check_admin_referer($nonce_action)) {
         $snap = ai_pr_load_snapshot($snapshot_id);
         if (!$snap) {
-            echo '<div class="ai-pr-error">Snapshot not found.</div>';
+            echo '<div class="ai-styler-notice-error">Snapshot not found.</div>';
         } else {
             list($newId, $newDir) = ai_pr_start_snapshot('restore-of-' . $snapshot_id);
+            $restored = 0;
             
-            $restored_count = 0;
             foreach ($snap['files'] as $abs => $meta) {
                 $absAllowed = ai_pr_resolve_target($abs, false);
                 if (!$absAllowed) continue;
@@ -1260,51 +834,47 @@ function ai_pr_ui_history($nonce_action) {
                 } else {
                     ai_pr_delete_file($abs);
                 }
-                $restored_count++;
+                $restored++;
             }
             
             ai_pr_finalize_snapshot($newDir);
+            ai_pr_log('restore', ['restored' => $snapshot_id, 'snapshot' => $newId]);
             
-            echo '<div class="ai-pr-success"><strong>✅ Restored Successfully!</strong><br>';
-            echo 'Restored ' . $restored_count . ' file(s) from snapshot <code>' . esc_html($snapshot_id) . '</code>.<br>';
-            echo 'A new snapshot was created in case you want to undo this restore: <code>' . esc_html($newId) . '</code></div>';
-            echo '<p><a href="' . esc_url(home_url()) . '" target="_blank" class="button">View Website</a></p>';
-            
-            ai_pr_log('snapshot_restored', ['restored' => $snapshot_id, 'new_snapshot' => $newId]);
+            echo '<div class="ai-styler-notice-success">';
+            echo '<strong>✓ Restored Successfully</strong><br>';
+            echo 'Snapshot <code>' . esc_html($snapshot_id) . '</code> has been restored. ';
+            echo 'Files restored: ' . intval($restored) . '. ';
+            echo 'New backup created: <code>' . esc_html($newId) . '</code>';
+            echo '</div>';
         }
     }
     
-    echo '<div class="ai-pr-card">';
-    echo '<h3>🕐 Change History</h3>';
-    echo '<p>Every change you make is automatically saved. Click "Restore" to undo any change.</p>';
-    
     $snapshots = ai_pr_list_snapshots(50);
     
-    if (!$snapshots) {
-        echo '<div class="ai-pr-help">No changes have been made yet. Make your first styling change from one of the other tabs!</div>';
+    echo '<div class="ai-styler-card">';
+    echo '<h2>🕐 History</h2>';
+    echo '<p>View and restore previous styling changes. Each change is automatically backed up before applying.</p>';
+    
+    if (empty($snapshots)) {
+        echo '<div class="ai-styler-notice-info">No styling history yet. Make your first styling change to get started!</div>';
     } else {
-        echo '<ul class="ai-pr-snapshot-list">';
+        echo '<ul class="ai-styler-snapshot-list">';
         foreach ($snapshots as $snap) {
-            $label = !empty($snap['label']) ? $snap['label'] : 'Untitled Change';
-            $file_count = count($snap['files']);
-            $created = date('F j, Y \a\t g:i a', strtotime($snap['created']));
-            
-            echo '<li class="ai-pr-snapshot-item">';
-            echo '<div class="ai-pr-snapshot-header">';
-            echo '<div>';
-            echo '<div class="ai-pr-snapshot-title">' . esc_html($label) . '</div>';
-            echo '<div class="ai-pr-snapshot-date">' . esc_html($created) . '</div>';
+            echo '<li class="ai-styler-snapshot-item">';
+            echo '<div class="ai-styler-snapshot-meta">';
+            echo '<strong>' . esc_html($snap['label'] ?: $snap['id']) . '</strong>';
+            echo '<small>';
+            echo 'Date: ' . esc_html(date('F j, Y g:i a', strtotime($snap['created']))) . ' | ';
+            echo 'Files: ' . count($snap['files']) . ' | ';
+            echo 'ID: ' . esc_html($snap['id']);
+            echo '</small>';
             echo '</div>';
             echo '<div>';
             echo '<form method="post" style="display:inline;">';
             wp_nonce_field($nonce_action);
             echo '<input type="hidden" name="snapshot_id" value="' . esc_attr($snap['id']) . '">';
-            echo '<button type="submit" name="do_restore" value="1" class="button" onclick="return confirm(\'Are you sure you want to restore this snapshot? This will undo your current changes.\')">🔄 Restore</button>';
+            echo '<button type="submit" name="do_restore" value="1" class="button ai-styler-restore-btn">Restore</button>';
             echo '</form>';
-            echo '</div>';
-            echo '</div>';
-            echo '<div class="ai-pr-snapshot-meta">';
-            echo $file_count . ' file(s) changed • ID: ' . esc_html($snap['id']);
             echo '</div>';
             echo '</li>';
         }
@@ -1314,134 +884,91 @@ function ai_pr_ui_history($nonce_action) {
     echo '</div>';
 }
 
-/* ===============
- * Helper: glob fs
- * =============== */
-
-function ai_pr_glob_recursive($baseDir, array $patterns, $allow_core) {
-    $out = [];
-    $flags = FilesystemIterator::SKIP_DOTS;
-    try {
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($baseDir, $flags));
-    } catch (Exception $e) {
-        return $out;
-    }
-    foreach ($rii as $file) {
-        if (!$file->isFile()) continue;
-        $abs = ai_pr_normalize_path($file->getPathname());
-        if (!$allow_core && !ai_pr_path_is_inside($abs, WP_CONTENT_DIR)) continue;
-        $ok = false;
-        foreach ($patterns as $pat) {
-            $pat = trim($pat);
-            if ($pat === '') continue;
-            if (fnmatch($pat, basename($abs))) { $ok = true; break; }
+/* ===================
+ * Helper: Show Preview
+ * =================== */
+function ai_pr_show_preview($ai_response, $preview_key, $nonce_action) {
+    echo '<div class="ai-styler-card" style="border-left: 4px solid #0073aa;">';
+    echo '<h2>👁️ Preview</h2>';
+    
+    echo '<div class="ai-styler-notice-info">';
+    echo '<strong>Summary:</strong> ' . esc_html($ai_response['summary']);
+    echo '</div>';
+    
+    echo '<h3>Changes to be applied:</h3>';
+    
+    foreach ($ai_response['operations'] as $op) {
+        $type = $op['type'] ?? 'UNKNOWN';
+        $path = $op['path'] ?? 'unknown';
+        $content = $op['content'] ?? '';
+        
+        $abs = ai_pr_resolve_target($path, false);
+        if (!$abs) {
+            echo '<div class="ai-styler-notice-warning">Skip (outside allowed paths): <code>' . esc_html($path) . '</code></div>';
+            continue;
         }
-        if ($ok) $out[] = $abs;
+        
+        $before = file_exists($abs) ? file_get_contents($abs) : '';
+        
+        if ($type === 'FILE') {
+            $after = $content;
+        } elseif ($type === 'APPEND') {
+            $after = rtrim($before) . "\n\n" . rtrim($content) . "\n";
+        } else {
+            $after = $content;
+        }
+        
+        echo '<div class="ai-styler-diff-container">';
+        echo ai_pr_text_diff($before, $after, 'Changes to: ' . esc_html(wp_make_link_relative($abs)));
+        echo '</div>';
     }
-    return $out;
+    
+    echo '<form method="post" style="margin-top: 20px;">';
+    wp_nonce_field($nonce_action);
+    echo '<input type="hidden" name="preview_key" value="' . esc_attr($preview_key) . '">';
+    echo '<button type="submit" name="do_apply" value="1" class="button button-primary button-large">✓ Apply These Changes</button> ';
+    echo '<a href="' . esc_url(admin_url('tools.php?page=' . AI_PR_PLUGIN_SLUG)) . '" class="button">Cancel</a>';
+    echo '<p class="description">A backup will be created automatically before applying changes.</p>';
+    echo '</form>';
+    
+    echo '</div>';
 }
 
-/* =========
- * WP-CLI
- * ========= */
-
-if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('ai-pr apply', function($args, $assoc){
-        $text   = isset($assoc['text']) ? $assoc['text'] : '';
-        $file   = isset($assoc['file']) ? $assoc['file'] : '';
-        $token  = isset($assoc['token']) ? $assoc['token'] : '';
-        $dry    = isset($assoc['dry']) ? (bool)$assoc['dry'] : false;
-        $label  = isset($assoc['label']) ? $assoc['label'] : 'apply-patch';
-        $allow_core = !empty($assoc['allow-core']);
-
-        if (!$text && $file) $text = @file_get_contents($file);
-        if (!$text) WP_CLI::error('Provide --text or --file to supply blocks.');
-
-        $blocks = ai_pr_parse_blocks($text);
-        if (!$blocks) WP_CLI::error('No blocks recognized.');
-
-        list($snapId, $snapDir) = ai_pr_start_snapshot($label);
-        foreach ($blocks as $b) {
-            $type = $b['type']; $path = $b['path']; $pathTo = $b['path_to']; $content = $b['content'];
-            $abs = ai_pr_resolve_target($path, $allow_core);
-            if (!$abs) { WP_CLI::warning("Skip (outside allowed): $path"); continue; }
-            if ($type !== 'DELETE' && $type !== 'RENAME' && !ai_pr_is_ext_ok($abs)) { WP_CLI::warning("Skip (extension policy): $path"); continue; }
-
-            $before = file_exists($abs) ? file_get_contents($abs) : '';
-            ai_pr_snapshot_add_file($snapDir, $abs, $before);
-
-            if ($type === 'FILE') {
-                $after = $content;
-                $dry ? WP_CLI::line("FILE → $path") : ai_pr_write_file($abs, $after);
-
-            } elseif ($type === 'APPEND') {
-                $after = $token !== '' ? ai_pr_apply_token_region($before, $token, $content) : (rtrim($before) . "\n\n" . rtrim($content) . "\n");
-                $dry ? WP_CLI::line("APPEND → $path") : ai_pr_write_file($abs, $after);
-
-            } elseif ($type === 'DELETE') {
-                $dry ? WP_CLI::line("DELETE → $path") : ai_pr_delete_file($abs);
-
-            } elseif ($type === 'RENAME') {
-                $absTo = ai_pr_resolve_target($pathTo, $allow_core);
-                if (!$absTo) { WP_CLI::warning("Skip RENAME (target outside allowed): {$b['path_to']}"); continue; }
-                if ($dry) {
-                    WP_CLI::line("RENAME: $path → {$b['path_to']}");
-                } else {
-                    ai_pr_rename_file($abs, $absTo);
-                    $after = file_exists($absTo) ? file_get_contents($absTo) : '';
-                    ai_pr_snapshot_add_file($snapDir, $absTo, $after);
-                }
-            }
-        }
-        ai_pr_finalize_snapshot($snapDir);
-        WP_CLI::success("Snapshot: $snapId " . ($dry ? '(dry-run)' : '(applied)'));
-    });
-
-    WP_CLI::add_command('ai-pr revert', function($args, $assoc){
-        $id = $args[0] ?? '';
-        if (!$id) WP_CLI::error('Usage: wp ai-pr revert <snapshot-id> [--dry]');
-        $dry = !empty($assoc['dry']);
-        $snap = ai_pr_load_snapshot($id);
-        if (!$snap) WP_CLI::error('Snapshot not found.');
-        list($newId, $newDir) = ai_pr_start_snapshot('revert-of-'.$id);
-
-        foreach (array_keys($snap['files']) as $abs) {
-            $absAllowed = ai_pr_resolve_target($abs, false);
-            if (!$absAllowed) { WP_CLI::warning("Skip (outside allowed): $abs"); continue; }
-            $before = file_exists($abs) ? file_get_contents($abs) : '';
-            ai_pr_snapshot_add_file($newDir, $abs, $before);
-
-            $meta = $snap['files'][$abs];
-            $blob = $snap['_dir'] . '/files/' . md5($abs) . '.before';
-            $after = $meta['exists_before'] ? (file_exists($blob) ? file_get_contents($blob) : '') : '';
-
-            if ($dry) {
-                WP_CLI::line("REVERT → $abs");
-            } else {
-                if ($meta['exists_before']) {
-                    ai_pr_write_file($abs, $after);
-                } else {
-                    ai_pr_delete_file($abs);
-                }
-            }
-        }
-        ai_pr_finalize_snapshot($newDir);
-        WP_CLI::success("Snapshot: $newId " . ($dry ? '(dry-run)' : '(applied)'));
-    });
-}
-
-/* ==================
- * Admin Notice: AI
- * ================== */
-
-add_action('admin_notices', function(){
-    if (!current_user_can('manage_options')) return;
-    $screen = get_current_screen();
-    if ($screen && $screen->id === 'tools_page_' . AI_PR_PLUGIN_SLUG) {
-        if (!function_exists('openai_wp_chat')) {
-            echo '<div class="notice notice-warning"><p><strong>AI Website Styler:</strong> AI features require the OpenAI integration. <a href="' . admin_url('admin.php?page=integrations') . '">Install OpenAI integration</a> to use AI-powered styling.</p></div>';
+/* =======================
+ * Helper: Apply Changes
+ * ======================= */
+function ai_pr_apply_changes($ai_response, $label = 'AI Styling') {
+    list($snapId, $snapDir) = ai_pr_start_snapshot($label);
+    $applied = 0;
+    
+    foreach ($ai_response['operations'] as $op) {
+        $type = $op['type'] ?? 'UNKNOWN';
+        $path = $op['path'] ?? 'unknown';
+        $content = $op['content'] ?? '';
+        
+        $abs = ai_pr_resolve_target($path, false);
+        if (!$abs) continue;
+        
+        $before = file_exists($abs) ? file_get_contents($abs) : '';
+        ai_pr_snapshot_add_file($snapDir, $abs, $before);
+        
+        if ($type === 'FILE') {
+            ai_pr_write_file($abs, $content);
+            $applied++;
+        } elseif ($type === 'APPEND') {
+            $after = rtrim($before) . "\n\n" . rtrim($content) . "\n";
+            ai_pr_write_file($abs, $after);
+            $applied++;
         }
     }
-});
-
-/* END v3.0.0 */
+    
+    ai_pr_finalize_snapshot($snapDir);
+    ai_pr_log('apply_styling', ['snapshot' => $snapId, 'label' => $label, 'files' => $applied]);
+    
+    echo '<div class="ai-styler-notice-success">';
+    echo '<strong>✓ Changes Applied Successfully!</strong><br>';
+    echo 'Snapshot created: <code>' . esc_html($snapId) . '</code><br>';
+    echo 'Files modified: ' . intval($applied) . '<br>';
+    echo '<a href="' . esc_url(home_url()) . '" target="_blank" class="button button-small" style="margin-top: 10px;">View Your Website</a>';
+    echo '</div>';
+}
