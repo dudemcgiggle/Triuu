@@ -52,4 +52,9 @@ The project is built on WordPress 6.8.3, utilizing a custom child theme (`triuu`
     - `endurance-page-cache.php` (Caching)
     - `sc-custom.php`
     - `sso.php`
+    - **AI-related plugins (added externally):**
+        - `elementor-scope-fixer.php` (28K, v1.9.0) - **DO NOT MODIFY**
+        - `ai-patch-runner.php` (9.5K, v1.2.0) - Orchestrate safe code transformations
+        - `openai-wp-service.php` (3.6K, v1.0.0) - Centralized OpenAI API service layer
+        - `openai-content-editor.php` (5.4K) - Admin helper for AI-assisted content editing
 - **Google Fonts:** Self-hosted versions of Barlow, Manrope, Roboto, Roboto Slab, Roboto Condensed, and Poppins.
