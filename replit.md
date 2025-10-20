@@ -132,6 +132,13 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
     - Database size reduced from 21M to 14M (saved additional 7MB)
     - Final optimized database size: 14M (down from original 27M)
   - Site now streamlined, secure, and optimized for performance
+- 2025-10-20: **Fixed deployment port configuration for Reserved VM**
+  - **Critical Fix:** Removed multiple external ports from `.replit` file (was exposing ports 80, 3000, 3001)
+  - Reserved VM deployments require EXACTLY ONE external port (Replit platform requirement)
+  - Port configuration now: `localPort: 5000` → `externalPort: 80` (single port only)
+  - This fix resolves deployment failures caused by multi-port configuration
+  - WordPress production deployment now works correctly at published URL
+  - Development environment unaffected (still runs on port 5000 with webview)
 
 ## Architecture
 **WordPress Setup:**
