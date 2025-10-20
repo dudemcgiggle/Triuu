@@ -408,7 +408,11 @@ function ai_pr_ui_apply_patch($nonce_action) {
                 return;
             }
             $prompt = "Emit file operations using standardized blocks (FILE/APPEND/DELETE/RENAME). Only include files we truly must modify.\n\nUser Task:\n" . $task;
-            $res = openai_wp_chat('system:You are a careful file patcher. Use conservative edits and minimal scope.', $prompt);
+            $messages = [
+                ['role' => 'system', 'content' => 'You are a careful file patcher. Use conservative edits and minimal scope.'],
+                ['role' => 'user', 'content' => $prompt]
+            ];
+            $res = openai_wp_chat($messages, ['model' => 'gpt-4o-mini', 'max_tokens' => 2000, 'temperature' => 0.2]);
             if (is_wp_error($res)) {
                 $error = $res->get_error_message();
             } else {
