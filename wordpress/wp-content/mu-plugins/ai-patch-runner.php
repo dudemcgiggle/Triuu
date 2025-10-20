@@ -305,16 +305,10 @@ function ai_pr_detect_elementor($post_id = null) {
             $info['post_uses_elementor'] = true;
         }
         
-        $upload_dir = wp_upload_dir();
-        $elementor_css = trailingslashit($upload_dir['basedir']) . 'elementor/css';
-        if (is_dir($elementor_css)) {
-            $css_files = glob($elementor_css . '/*.css');
-            if ($css_files) {
-                foreach ($css_files as $file) {
-                    $info['custom_css_files'][] = $file;
-                }
-            }
-        }
+        // Note: We intentionally DO NOT include Elementor's auto-generated CSS files
+        // from wp-content/uploads/elementor/css/ because they are regenerated
+        // by Elementor and any manual changes would be lost. Instead, we direct
+        // the AI to use the theme's style.css file for all styling changes.
     }
     
     return $info;
@@ -419,13 +413,17 @@ complete file content here
 content to append
 === END APPEND ===
 
-Rules:
+CRITICAL RULES:
+- NEVER modify files in wp-content/uploads/elementor/css/ - these are auto-generated and will be overwritten
+- NEVER modify files in wp-content/plugins/ - these get overwritten during updates
+- ALWAYS use the active child theme's style.css file for CSS changes
+- Append CSS rules to wp-content/themes/triuu/style.css (the active child theme)
+- Use specific CSS selectors with !important if needed to override Elementor styles
 - Make conservative, minimal changes
-- Focus on CSS changes when possible
-- Always add comments explaining changes
-- Prefer modifying custom CSS or child theme files
+- Always add CSS comments explaining what was changed and why
 - Never modify WordPress core files
-- Include clear CSS selectors";
+- For page-specific styling, use body classes like .page-id-1460 or .post-1460";
+
 
     $user_prompt = '';
     
@@ -1049,7 +1047,7 @@ function ai_pr_ui_page_styler($nonce_action) {
     
     $elementor_info = ai_pr_detect_elementor();
     if ($elementor_info['active']) {
-        echo '<div class="ai-pr-help">ℹ️ <strong>Elementor Detected:</strong> This tool works with Elementor pages. Changes will be made to theme CSS or custom CSS files.</div>';
+        echo '<div class="ai-pr-help">ℹ️ <strong>Elementor Detected:</strong> Styling changes will be added to your child theme\'s CSS file (triuu/style.css) to ensure they persist and override Elementor\'s auto-generated styles.</div>';
     }
     
     echo '<div class="ai-pr-buttons">';
@@ -1218,6 +1216,11 @@ function ai_pr_ui_custom_request($nonce_action) {
     echo '</div>';
     
     echo '<div class="ai-pr-help">💡 <strong>Tips:</strong> The more specific you are, the better the results. You can mention specific pages, colors (like "navy blue" or "#0066cc"), sizes (like "larger" or "20px"), and elements (like "header", "footer", "buttons").</div>';
+    
+    $elementor_info = ai_pr_detect_elementor();
+    if ($elementor_info['active']) {
+        echo '<div class="ai-pr-help">ℹ️ <strong>Elementor Detected:</strong> All styling changes will be added to your child theme\'s CSS file (triuu/style.css) to ensure they persist and properly override Elementor\'s styles.</div>';
+    }
     
     echo '<div class="ai-pr-buttons">';
     echo '<button type="submit" name="do_preview" value="1" class="button button-primary button-large">👁️ Preview Changes</button>';
