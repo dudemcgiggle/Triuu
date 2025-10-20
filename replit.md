@@ -5,14 +5,12 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
 
 ## Project Structure
 - `wordpress/` - WordPress core installation
-- `wordpress/wp-content/themes/triuu/` - **Active Triuu theme** (copied from original import)
+- `wordpress/wp-content/themes/triuu/` - **Active Triuu theme** (child theme with all customizations)
 - `wordpress/wp-content/themes/hello-elementor/` - Parent Hello Elementor theme
-- `Triuu/` - Original theme files from GitHub import (archived, not actively used)
-- `wp-content/` - Original wp-content from GitHub import (archived, not actively used)
-- `assets/` - Original assets from GitHub import (archived, not actively used)
 - `router.php` - PHP server routing script for WordPress
+- `attached_assets/` - Static assets from original import (656M)
 
-**Important:** To edit the active theme, modify files in `wordpress/wp-content/themes/triuu/`, NOT the root-level directories.
+**Important:** To edit the active theme, modify files in `wordpress/wp-content/themes/triuu/`
 
 ## Current State
 - **Fully configured and running** on Replit with production database imported
@@ -39,7 +37,7 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
 - 2025-10-18: **Integrated production customizations**
   - Updated hello-elementor parent theme with production version
   - Installed must-use plugins (password protection, custom calendar, caching)
-  - Installed 17 production plugins (Elementor Pro, Jetpack, Yoast SEO, WPForms, etc.)
+  - Initially installed 17 production plugins (later streamlined to 8 essential plugins)
   - Added custom admin styling (CSS, JS, images)
 - 2025-10-18: **Fixed Google Fonts loading issues**
   - Downloaded 135 Google Font files locally (Barlow, Manrope, Roboto, Roboto Slab, Roboto Condensed, Poppins)
@@ -105,6 +103,14 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - Removed duplicate custom style functions from parent theme
   - Cleaned up 3 unnecessary functions.php copies (Triuu/, wp-content/, attached_assets/)
   - **Note:** Triuu child theme exists but needs to be activated in WordPress admin (Appearance → Themes)
+- 2025-10-20: **Complete WordPress housekeeping and optimization**
+  - Cleaned up Action Scheduler: Deleted 4 past-due background tasks (resolved warning)
+  - Removed unnecessary plugins: Jetpack, Image Optimization, WP File Manager, WP Migrate DB, Akismet, Creative Mail, WP Plugin Hostgator, hello.php
+  - Removed archived directories: Triuu/ (11M), wp-content/ (11M), assets/ (11M) - freed up ~33M disk space
+  - Deleted error logs and temporary files
+  - **Active plugins reduced from 12 to 8:** Elementor, Elementor Pro, Google Analytics, Google Calendar Events, Yoast SEO, WPForms Lite, OptinMonster, Triuu Sermons Manager
+  - Must-use plugins: custom-calendar.php, hec-password-form.php, endurance-page-cache.php, sc-custom.php, sso.php
+  - Site now streamlined, secure, and optimized for performance
 
 ## Architecture
 **WordPress Setup:**
