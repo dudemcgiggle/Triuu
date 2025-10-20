@@ -107,7 +107,10 @@ All styling changes are appended to `wp-content/themes/triuu/style.css` to ensur
 - Requires OpenAI API key (configured via `OPENAI_API_KEY` environment variable)
 - Uses transient storage to ensure preview/apply consistency
 
-### Recent Changes (Oct 2025)
-- **v3.0.0 Complete Redesign**: Rewritten from developer-centric "AI Patch Runner" to user-friendly "AI Website Styler"
-- **Fixed Preview/Apply Bug**: Now uses transient storage to ensure previewed changes exactly match applied changes
-- **Fixed Elementor CSS Issue**: AI now appends CSS to child theme instead of modifying Elementor's auto-generated files, ensuring changes persist
+### Recent Changes (Oct 20, 2025)
+- **v3.0.0 Complete Redesign COMPLETED**: Rewritten from developer-centric "AI Patch Runner" to user-friendly "AI Website Styler" with 4-tab interface
+- **Fixed Preview/Apply Bug**: Now uses transient storage to ensure previewed changes exactly match applied changes (no duplicate AI calls)
+- **Fixed Elementor CSS Issue**: AI now forbidden from modifying wp-content/uploads/elementor/css/ files, always appends CSS to child theme style.css
+- **Added Helper Functions**: WordPress page/post selector, Elementor detection, theme file detection, and AI prompt builder
+- **Modern UI/UX**: Color-coded notices, dynamic form fields with JavaScript, responsive design, and collapsible diffs
+- **Preserved Core Functions**: All snapshot management, path security, file operations, and rollback features remain intact
