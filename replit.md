@@ -54,58 +54,60 @@ The project is built on WordPress 6.8.3, utilizing a custom child theme (`triuu`
     - `sso.php`
     - **AI-related plugins (added externally):**
         - `elementor-scope-fixer.php` (28K, v1.9.0) - **DO NOT MODIFY**
-        - `ai-patch-runner.php` (9.5K, v1.2.0) - Orchestrate safe code transformations
+        - `ai-patch-runner.php` (57K, v3.0.0 "AI Website Styler") - User-friendly AI styling assistant
         - `openai-wp-service.php` (3.6K, v1.0.0) - Centralized OpenAI API service layer
         - `openai-content-editor.php` (5.4K) - Admin helper for AI-assisted content editing
 - **Google Fonts:** Self-hosted versions of Barlow, Manrope, Roboto, Roboto Slab, Roboto Condensed, and Poppins.
 
-## AI Patch Runner Usage
+## AI Website Styler Usage
 
-The **AI Patch Runner** MU plugin (`ai-patch-runner.php`) provides AI-powered file patching capabilities for safe code transformations. It's fully integrated with the OpenAI WP Service layer.
+The **AI Website Styler** MU plugin (`ai-patch-runner.php` v3.0.0) provides an intuitive, user-friendly interface for making styling changes to the WordPress site using AI. It's fully integrated with the OpenAI WP Service layer.
 
 ### Access
-Navigate to **WordPress Admin → Tools → AI Patch Runner**
+Navigate to **WordPress Admin → Tools → AI Website Styler**
 
-### Features
-1. **Apply Patch** - Apply file changes using standardized block syntax or AI generation
-2. **Search & Replace** - Regex-based find/replace across theme/plugin files
-3. **Revert** - Roll back any snapshot to restore previous file states
-4. **Snapshots** - Browse all saved snapshots with file manifests
-5. **About** - Plugin information and usage tips
+### Features (4 Tabs)
+1. **Quick Tasks** - Template-based common styling operations with simple forms:
+   - Change colors (background, header, footer, buttons, links, headings)
+   - Change fonts and typography (body text, headings, navigation)
+   - Adjust spacing (sections, paragraphs, header/footer padding)
 
-### AI Mode Usage
-The plugin can automatically generate file patches using OpenAI:
-1. Select "Use AI" mode in the Apply Patch tab
-2. Describe your desired changes in plain English
-3. Click "Generate Preview" to see proposed changes (dry-run)
-4. Review the diff output carefully
-5. Click "Apply Changes" to write files (uncheck dry-run first)
+2. **Page Styler** - Target specific pages or posts for styling changes:
+   - Select any page/post from a dropdown
+   - Describe styling changes in plain English
+   - Elementor-aware with context for proper CSS targeting
 
-**Example AI Task:**
-```
-Add a new function to wp-content/themes/triuu/functions.php that 
-enqueues a custom script for the contact form validation
-```
+3. **Custom Request** - Free-form natural language interface:
+   - Describe any styling change in plain English
+   - AI interprets and generates appropriate CSS
+   - Works with all pages and site-wide elements
 
-### Block Syntax (Manual Mode)
-You can also provide explicit file operations:
-```
-=== FILE: wp-content/themes/triuu/custom-script.js ===
-console.log('Hello World');
-=== END FILE ===
+4. **History** - Snapshot management and rollback:
+   - View all past changes with user-friendly names
+   - One-click restore to any previous state
+   - Creates new snapshot when restoring (so restores can be undone)
 
-=== APPEND: wp-content/themes/triuu/functions.php ===
-// Custom enqueue
-wp_enqueue_script('custom-validation', get_stylesheet_directory_uri() . '/custom-script.js');
-=== END APPEND ===
-```
+### How It Works
+The plugin uses a two-step workflow:
+1. **Preview**: Describe your changes → AI generates CSS → Shows diff preview
+2. **Apply**: Review preview → Click "Apply Changes" → Changes written to theme CSS
+
+All styling changes are appended to `wp-content/themes/triuu/style.css` to ensure they persist and properly override Elementor's auto-generated styles. This prevents changes from being lost when Elementor regenerates its CSS files.
+
+### Example Usage
+1. Go to AI Website Styler → Custom Request tab
+2. Type: "Make the Services page background light gray"
+3. Click "Preview Changes" to see what CSS will be added
+4. Click "Apply Changes" to implement the styling
 
 ### Security & Constraints
-- Default scope: `wp-content` directory only (themes, plugins, uploads)
-- Requires explicit opt-in for core WordPress files (`wp-config.php`, etc.)
-- All changes create automatic snapshots in `wp-content/uploads/ai-patch-runner/snapshots/`
-- Always use dry-run mode first to preview changes
+- All changes create automatic snapshots for easy rollback
+- Only modifies `wp-content` directory (themes, never core files)
+- Explicitly avoids Elementor's auto-generated CSS files
 - Requires OpenAI API key (configured via `OPENAI_API_KEY` environment variable)
+- Uses transient storage to ensure preview/apply consistency
 
-### Integration Fix (Oct 2025)
-Fixed critical function signature mismatch where `ai-patch-runner.php` was calling `openai_wp_chat()` with incorrect arguments. The plugin now properly uses the array-based message format required by `openai-wp-service.php`.
+### Recent Changes (Oct 2025)
+- **v3.0.0 Complete Redesign**: Rewritten from developer-centric "AI Patch Runner" to user-friendly "AI Website Styler"
+- **Fixed Preview/Apply Bug**: Now uses transient storage to ensure previewed changes exactly match applied changes
+- **Fixed Elementor CSS Issue**: AI now appends CSS to child theme instead of modifying Elementor's auto-generated files, ensuring changes persist
