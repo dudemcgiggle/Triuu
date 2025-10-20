@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Where your WordPress lives (you already confirmed this)
+WP_PATH="${WP_PATH:-./wordpress}"
+
+# Sentinel files Replit tends to notice (any write will do)
+SENT_CHILD="${SENT_CHILD:-$WP_PATH/wp-content/themes/triuu/.replit-index-heartbeat}"
+SENT_ROOT="${SENT_ROOT:-./.replit-index-heartbeat}"
+
+# Run the real WP-CLI (phar in repo) with the correct --path
+php wp-cli.phar --path="$WP_PATH" "$@"
+
+# Nudge the indexer after successful command
+# 1) inside the active child theme
+# 2) at repo root (some builds only rescan roots)
+date +%s > "$SENT_CHILD" 2>/dev/null || true
+date +%s > "$SENT_ROOT"  2>/dev/null || true

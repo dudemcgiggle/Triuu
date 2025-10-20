@@ -1,0 +1,9 @@
+/*
+Theme Name: Triuu
+Template: hello-elementor
+Version: 1.0.0
+Text Domain: triuu
+*/
+
+/* ai-test: child css visible */
+.u-test-outline { outline: 2px dashed rgba(0,0,0,0.55); outline-offset: 4px; }
