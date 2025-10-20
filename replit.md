@@ -58,3 +58,54 @@ The project is built on WordPress 6.8.3, utilizing a custom child theme (`triuu`
         - `openai-wp-service.php` (3.6K, v1.0.0) - Centralized OpenAI API service layer
         - `openai-content-editor.php` (5.4K) - Admin helper for AI-assisted content editing
 - **Google Fonts:** Self-hosted versions of Barlow, Manrope, Roboto, Roboto Slab, Roboto Condensed, and Poppins.
+
+## AI Patch Runner Usage
+
+The **AI Patch Runner** MU plugin (`ai-patch-runner.php`) provides AI-powered file patching capabilities for safe code transformations. It's fully integrated with the OpenAI WP Service layer.
+
+### Access
+Navigate to **WordPress Admin → Tools → AI Patch Runner**
+
+### Features
+1. **Apply Patch** - Apply file changes using standardized block syntax or AI generation
+2. **Search & Replace** - Regex-based find/replace across theme/plugin files
+3. **Revert** - Roll back any snapshot to restore previous file states
+4. **Snapshots** - Browse all saved snapshots with file manifests
+5. **About** - Plugin information and usage tips
+
+### AI Mode Usage
+The plugin can automatically generate file patches using OpenAI:
+1. Select "Use AI" mode in the Apply Patch tab
+2. Describe your desired changes in plain English
+3. Click "Generate Preview" to see proposed changes (dry-run)
+4. Review the diff output carefully
+5. Click "Apply Changes" to write files (uncheck dry-run first)
+
+**Example AI Task:**
+```
+Add a new function to wp-content/themes/triuu/functions.php that 
+enqueues a custom script for the contact form validation
+```
+
+### Block Syntax (Manual Mode)
+You can also provide explicit file operations:
+```
+=== FILE: wp-content/themes/triuu/custom-script.js ===
+console.log('Hello World');
+=== END FILE ===
+
+=== APPEND: wp-content/themes/triuu/functions.php ===
+// Custom enqueue
+wp_enqueue_script('custom-validation', get_stylesheet_directory_uri() . '/custom-script.js');
+=== END APPEND ===
+```
+
+### Security & Constraints
+- Default scope: `wp-content` directory only (themes, plugins, uploads)
+- Requires explicit opt-in for core WordPress files (`wp-config.php`, etc.)
+- All changes create automatic snapshots in `wp-content/uploads/ai-patch-runner/snapshots/`
+- Always use dry-run mode first to preview changes
+- Requires OpenAI API key (configured via `OPENAI_API_KEY` environment variable)
+
+### Integration Fix (Oct 2025)
+Fixed critical function signature mismatch where `ai-patch-runner.php` was calling `openai_wp_chat()` with incorrect arguments. The plugin now properly uses the array-based message format required by `openai-wp-service.php`.
