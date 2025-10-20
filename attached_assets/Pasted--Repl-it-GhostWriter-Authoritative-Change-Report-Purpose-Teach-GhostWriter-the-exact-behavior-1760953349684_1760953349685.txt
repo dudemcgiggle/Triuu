@@ -1,0 +1,278 @@
+# Repl.it GhostWriter — Authoritative Change Report
+
+Purpose: Teach GhostWriter the exact behaviors, constraints, and patterns we now follow in this project so suggestions stay aligned with our implemented changes.
+
+---
+
+## 1) What actually changed
+
+### 1.1 Elementor HTML widget (Tri-UU pages)
+We standardized every Elementor HTML widget for these pages to use a **single house wrapper** and a **page-scope wrapper**, and we refactored CSS to avoid double-scoping and header collisions.
+
+- Outer wrapper (house scope, **markup only**):
+  - `<div class="tri-county-widget" data-ai-scoped="1">`
+- Inner wrapper (page scope, **used in CSS selectors**):
+  - `<div class="triuu-our-organization">`
+
+**All CSS selectors in widget styles now begin with `.triuu-our-organization` only.**  
+We removed any `.tri-county-widget` tokens from widget CSS selectors.
+
+We also added a **local header element** to avoid styling the global site header:
+- Use `<header class="local-page-header">…</header>` within the page wrapper.
+- Style `.local-page-header` instead of targeting bare `header`.
+
+### 1.2 Modal UX & accessibility (widget-local enhancement)
+We introduced an **inline**, widget-scoped JavaScript enhancer that:
+- Closes on **ESC**,
+- Traps focus inside the modal while open,
+- Restores focus to the **trigger** on close,
+- Closes on **backdrop click**,
+- Opts images inside the widget into `loading="lazy"`.
+
+This script is pasted **at the bottom of the same Elementor HTML widget** that declares the modals. No global assets or plugin edits were made.
+
+---
+
+## 2) What did NOT change (lock these)
+- **MU plugin (“Elementor ScopeFixer”)**: Do **not** modify. We rolled back from attempting an update after a CSS regression during Repl.it deployment.
+- **AI PatchRunner / OpenAI Content Editor / OpenAI WP Service**: No code changes merged. These tools remain as-is (see Section 5 for intent/usage boundaries GhostWriter should respect).
+
+---
+
+## 3) Canonical widget structure (use this pattern going forward)
+
+### 3.1 HTML skeleton
+```html
+<div class="tri-county-widget" data-ai-scoped="1">
+  <div class="triuu-our-organization">
+    <style>
+      .triuu-our-organization {
+        --accent-color: #614E6B;
+        --hover-color: #A5849F;
+        --body-bg: #f5f5f5;
+        --container-bg: #ffffff;
+        --placeholder-bg: #dddddd;
+        --card-border: #dddddd;
+        font-family: 'Barlow', sans-serif;
+        line-height: 1.5;
+        color: #333333;
+        font-weight: 300;
+        background: var(--body-bg);
+      }
+
+      .triuu-our-organization * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      .triuu-our-organization .page-wrapper {
+        max-width: 1200px;
+        margin: 1em auto;
+        padding: 1em;
+        background: var(--container-bg);
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      }
+
+      /* Local header so styles never hit the global <header> */
+      .triuu-our-organization .local-page-header {
+        background: var(--accent-color);
+        color: #fff;
+        padding: 1em;
+        text-align: center;
+        margin-bottom: 1em;
+      }
+    </style>
+
+    <div class="page-wrapper">
+      <header class="local-page-header">
+        <h1>Page Title</h1>
+      </header>
+
+      <!-- Page sections / cards / modals markup here -->
+    </div>
+
+    <!-- Inline modal enhancer script goes right before closing wrappers (see Section 4) -->
+  </div>
+</div>
+3.2 Selector usage (DO / DON’T)
+css
+Copy code
+/* DO: always start selectors with the page scope */
+.triuu-our-organization .card-grid { /* styles */ }
+.triuu-our-organization .read-more-btn { /* styles */ }
+.triuu-our-organization .modal { /* styles */ }
+
+/* DON'T: never include the house scope inside widget CSS */
+.triuu-our-organization .tri-county-widget .card-grid { /* forbidden */ }
+.tri-county-widget .triuu-our-organization .card-grid { /* forbidden */ }
+
+/* DON'T: avoid targeting bare header; use the local header class */
+header { /* forbidden in widgets */ }
+4) Modal enhancer (widget-local, scoped, no global deps)
+Paste this inline at the bottom of the same Elementor HTML widget that contains the modals.
+
+html
+Copy code
+<script>
+/*
+  Widget-Local Modal Enhancer (scoped to nearest .tri-county-widget)
+  Adds: ESC close, focus trap, restore focus, backdrop-click close, lazy images
+*/
+(function () {
+  function root(el){
+    while(el && el.parentElement && !el.classList.contains('tri-county-widget')) el = el.parentElement;
+    return (el && el.classList && el.classList.contains('tri-county-widget')) ? el : document.querySelector('.tri-county-widget');
+  }
+  var ROOT = root(document.currentScript || document.body);
+  if (!ROOT) return;
+
+  function focusables(c){
+    return Array.prototype.slice.call(c.querySelectorAll([
+      'a[href]','area[href]','button:not([disabled])',
+      'input:not([disabled]):not([type="hidden"])','select:not([disabled])',
+      'textarea:not([disabled])','iframe','[tabindex]:not([tabindex="-1"])',
+      '[contenteditable="true"]'
+    ].join(','))).filter(function(el){
+      return el.offsetParent !== null || el === document.activeElement;
+    });
+  }
+
+  var lastTriggerById = Object.create(null);
+  var trap = Object.create(null);
+
+  function enableTrap(modal){
+    if (trap[modal.id]) return;
+    function onKey(e){
+      if (e.key === 'Escape') { e.preventDefault(); closeModalSafe(modal.id); return; }
+      if (e.key === 'Tab') {
+        var L = focusables(modal); if (!L.length) return;
+        var first = L[0], last = L[L.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    function onBackdrop(e){ if (e.target === modal) { closeModalSafe(modal.id); } }
+    modal.addEventListener('keydown', onKey);
+    modal.addEventListener('click', onBackdrop);
+    trap[modal.id] = { onKey: onKey, onBackdrop: onBackdrop };
+  }
+
+  function disableTrap(modal){
+    var r = trap[modal.id]; if (!r) return;
+    modal.removeEventListener('keydown', r.onKey);
+    modal.removeEventListener('click', r.onBackdrop);
+    delete trap[modal.id];
+  }
+
+  function openModalSafe(id, trigger){
+    var m = document.getElementById(id); if (!m) return;
+    m.setAttribute('aria-modal','true');
+    m.setAttribute('role', m.getAttribute('role') || 'dialog');
+    m.removeAttribute('aria-hidden');
+    m.style.display = 'flex';
+    if (trigger) lastTriggerById[id] = trigger;
+    var L = focusables(m);
+    if (L.length) { L[0].focus(); }
+    else { var x = m.querySelector('.close-btn') || m; x.setAttribute('tabindex','-1'); x.focus(); }
+    enableTrap(m);
+  }
+
+  function closeModalSafe(id){
+    var m = document.getElementById(id); if (!m) return;
+    m.style.display = 'none';
+    m.setAttribute('aria-hidden','true');
+    disableTrap(m);
+    var t = lastTriggerById[id];
+    if (t && document.body.contains(t)) { try { t.focus(); } catch(e){} }
+  }
+
+  window.openModal  = function(id){ openModalSafe(id);  };
+  window.closeModal = function(id){ closeModalSafe(id); };
+
+  function isOpenCall(el){
+    var oc = (el.getAttribute('onclick') || '').replace(/\s+/g,'');
+    return /^openModal\(['"]/.test(oc);
+  }
+
+  ROOT.addEventListener('click', function(e){
+    var t = e.target;
+    var opener = t.closest('[data-modal-open]');
+    if (opener) {
+      e.preventDefault();
+      openModalSafe(opener.getAttribute('data-modal-open'), opener);
+      return;
+    }
+    var c = t.closest('[onclick]');
+    if (c && isOpenCall(c)) {
+      var m = c.getAttribute('onclick').match(/openModal\(['"]([^'"]+)['"]\)/);
+      if (m && m[1]) { lastTriggerById[m[1]] = c; }
+    }
+  });
+
+  ROOT.querySelectorAll('[data-modal-open], a[onclick], button[onclick]').forEach(function(el){
+    el.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') {
+        var id = el.getAttribute('data-modal-open');
+        if (!id) { var m = (el.getAttribute('onclick') || '').match(/openModal\(['"]([^'"]+)['"]\)/); id = m && m[1]; }
+        if (id) { e.preventDefault(); openModalSafe(id, el); }
+      }
+    });
+  });
+
+  ROOT.querySelectorAll('img:not([loading])').forEach(function(img){
+    img.setAttribute('loading','lazy');
+  });
+})();
+</script>
+5) Tools present (intent & boundaries GhostWriter must respect)
+5.1 MU plugin (“Elementor ScopeFixer”)
+Intent: sanitize widget HTML (remove XML PIs), remove @import in CSS safely, and guard against over-scoping.
+
+Current status: do not edit. It stays as-is due to a recent regression during Repl.it deployment.
+
+5.2 AI PatchRunner
+Intent: orchestrate safe, idempotent, reviewable code/content transformations (dry-run → apply).
+
+Boundaries for GhostWriter:
+
+When proposing multi-file or regex edits, express them as PatchRunner tasks (dry-run first) instead of ad-hoc repo-wide find/replace.
+
+5.3 OpenAI Content Editor
+Intent: admin-only helper to draft/transform content with preview-before-apply.
+
+Boundaries:
+
+Don’t bind it to theme/templates.
+
+No secrets in code; env/WP constants for config.
+
+5.4 OpenAI WP Service
+Intent: centralized service for outbound AI calls (timeouts, backoff, sanitization).
+
+Boundaries:
+
+All AI features must call this service; do not create new HTTP clients elsewhere.
+
+Use env-driven config; do not commit keys.
+
+6) Hygiene rules GhostWriter must enforce in suggestions
+No @import inside widget <style>. Fonts come from Theme/Site Settings.
+
+No XML declarations inside widget HTML.
+
+ASCII-only code output (no smart quotes/NBSP).
+
+Prefer relative paths or $PSScriptRoot in scripts; avoid user-absolute paths.
+
+Keep changes idempotent; include progress messages where relevant.
+
+7) Acceptance checklist for any change touching these pages
+ Widget outer wrapper is exactly: <div class="tri-county-widget" data-ai-scoped="1">
+
+ Inner page wrapper present: <div class="triuu-our-organization">
+
+ All CSS selectors start with .triuu-our-organization (no .tri-county-widget in CSS)
+
+ No @import in <style>; no <?xml …?> in markup
+
+ If modals are used: inline modal enhancer is included; ESC-close, focus-trap, focus-restore, and backdrop-close verified
+
+ No edits to MU plugin, OpenAI service internals, or PatchRunner core unless explicitly requested as a discrete task (with dry-run)
+
