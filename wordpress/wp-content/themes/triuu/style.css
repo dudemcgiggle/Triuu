@@ -1,14 +1,14 @@
 .triuu-county-widget .triuu_services {
-	--accent-color: #614E6B; /* Accent color for elements */
-	--hover-color: #A5849F; /* Color on hover */
-	--body-bg: #fff; /* Background color for body */
-	--container-bg: #ffffff; /* Background color for containers */
-	--placeholder-bg: #dddddd; /* Background color for placeholders */
-	--card-border: #dddddd; /* Border color for cards */
-	font-family: 'Barlow', sans-serif; /* Font family for text */
-	color: #000000; /* Text color */
-	line-height: 1.5; /* Line height for text */
-	font-weight: 200; /* Font weight */
+        --accent-color: #614E6B; /* Accent color for elements */
+        --hover-color: #A5849F; /* Color on hover */
+        --body-bg: #fff; /* Background color for body */
+        --container-bg: #ffffff; /* Background color for containers */
+        --placeholder-bg: #dddddd; /* Background color for placeholders */
+        --card-border: #dddddd; /* Border color for cards */
+        font-family: 'Barlow', sans-serif; /* Font family for text */
+        color: #000000; /* Text color */
+        line-height: 1.5; /* Line height for text */
+        font-weight: 200; /* Font weight */
 }
 
 /* Change background color for Services page */
@@ -26,7 +26,7 @@
 }
 
 .page-id-591 .elementor-container {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
 }
 
 .page-id-300 { background-color: #ffffff !important; }
