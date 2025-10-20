@@ -105,10 +105,10 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
   - **Note:** Triuu child theme exists but needs to be activated in WordPress admin (Appearance → Themes)
 - 2025-10-20: **Complete WordPress housekeeping and optimization**
   - Cleaned up Action Scheduler: Deleted 4 past-due background tasks (resolved warning)
-  - Removed unnecessary plugins: Jetpack, Image Optimization, WP File Manager, WP Migrate DB, Akismet, Creative Mail, WP Plugin Hostgator, hello.php
+  - Removed unnecessary plugins: Jetpack, Image Optimization, WP File Manager, WP Migrate DB, Akismet, Creative Mail, WP Plugin Hostgator, hello.php, OptinMonster
   - Removed archived directories: Triuu/ (11M), wp-content/ (11M), assets/ (11M) - freed up ~33M disk space
   - Deleted error logs and temporary files
-  - **Active plugins reduced from 12 to 8:** Elementor, Elementor Pro, Google Analytics, Google Calendar Events, Yoast SEO, WPForms Lite, OptinMonster, Triuu Sermons Manager
+  - **Active plugins reduced from 12 to 7:** Elementor, Elementor Pro, Google Analytics, Google Calendar Events, Yoast SEO, WPForms Lite, Triuu Sermons Manager
   - Must-use plugins: custom-calendar.php, hec-password-form.php, endurance-page-cache.php, sc-custom.php, sso.php
   - Site now streamlined, secure, and optimized for performance
 
