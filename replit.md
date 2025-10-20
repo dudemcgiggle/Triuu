@@ -116,6 +116,14 @@ This is a WordPress theme based on Hello Elementor, customized for the Triuu sit
     - Database size reduced from 27M to 21M (saved 6MB)
   - **Active plugins reduced from 12 to 6:** Elementor, Elementor Pro, Google Analytics, Google Calendar Events, Yoast SEO, Triuu Sermons Manager
   - Must-use plugins: custom-calendar.php, hec-password-form.php, endurance-page-cache.php, sc-custom.php, sso.php
+  - **Removed unwanted pages:**
+    - Deleted Contact page (no contact form implementation yet)
+    - Deleted Sample Page (WordPress default)
+    - Deleted duplicate "About" page (kept "About Us")
+    - Deleted Blog page (not used)
+    - Deleted Events page (calendar shown on Home page)
+    - Deleted Elementor #31 template page
+    - **Only 6 legitimate pages remain:** Home, About Us, Our Organization, Services, Privacy Policy, Accessibility Statement
   - Site now streamlined, secure, and optimized for performance
 
 ## Architecture
