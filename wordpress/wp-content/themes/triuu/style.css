@@ -1,20 +1,17 @@
-/*
-Theme Name: Triuu
-Template: hello-elementor
-Version: 1.0.0
-Text Domain: triuu
-*/
+.triuu-county-widget .triuu_services {
+	--accent-color: #614E6B; /* Accent color for elements */
+	--hover-color: #A5849F; /* Color on hover */
+	--body-bg: #fff; /* Background color for body */
+	--container-bg: #ffffff; /* Background color for containers */
+	--placeholder-bg: #dddddd; /* Background color for placeholders */
+	--card-border: #dddddd; /* Border color for cards */
+	font-family: 'Barlow', sans-serif; /* Font family for text */
+	color: #000000; /* Text color */
+	line-height: 1.5; /* Line height for text */
+	font-weight: 200; /* Font weight */
+}
 
-/* ai-test: child css visible */
-.u-test-outline { outline: 2px dashed rgba(0,0,0,0.55); outline-offset: 4px; }
-
-
-/* AI Patch Runner APPEND 2025-10-20T11:19:14+00:00 */
-/* ai-test: child css visible */
-.u-test-outline { outline: 2px dashed rgba(0,0,0,0.55); outline-offset: 4px; }
-
-
-/* AI Patch Runner APPEND 2025-10-20T11:19:35+00:00 */
-/* AI:start:sandbox */
-/* sandbox-css v1 */
-/* AI:end:sandbox */
+/* Change background color for Services page */
+.page-id-XX {
+    background-color: #ffffff;
+}
