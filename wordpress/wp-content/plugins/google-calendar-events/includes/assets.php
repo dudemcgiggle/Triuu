@@ -74,31 +74,61 @@ class Assets
 
 	/**
 	 * Enqueue scripts and styles.
-	 *
+	 * Add action to check post type and shortcode when post is available
 	 * @since 3.0.0
 	 */
 	public function enqueue()
 	{
-		add_action('wp_enqueue_scripts', [$this, 'load'], 10);
+		add_action('wp', [$this, 'check_load_assets']);
+	}
 
-		do_action('simcal_enqueue_assets');
+	/**
+	 * Check if we should load assets.
+	 *
+	 * @since 3.5.6
+	 */
+	public function check_load_assets()
+	{
+		// Only load assets if it's a calendar post type, if we detect calendar shortcode, or if gce_widget is active
+		$load_assets = false;
 
-		// Improves compatibility with themes and plugins using Isotope and Masonry.
-		add_action(
-			'wp_enqueue_scripts',
-			function () {
-				if (wp_script_is('simcal-qtip', 'enqueued')) {
-					wp_enqueue_script(
-						'simplecalendar-imagesloaded',
-						SIMPLE_CALENDAR_ASSETS . 'generated/vendor/imagesloaded.pkgd.min.js',
-						['simcal-qtip'],
-						SIMPLE_CALENDAR_VERSION,
-						true
-					);
-				}
-			},
-			1000
-		);
+		if (is_singular('calendar')) {
+			$load_assets = true;
+		}
+
+		if (is_singular() && !$load_assets) {
+			global $post;
+			if (isset($post->post_content) && has_shortcode($post->post_content, 'calendar')) {
+				$load_assets = true;
+			}
+		}
+
+		if (!$load_assets && is_active_widget(false, false, 'gce_widget', true)) {
+			$load_assets = true;
+		}
+
+		if ($load_assets) {
+			add_action('wp_enqueue_scripts', [$this, 'load'], 10);
+
+			do_action('simcal_enqueue_assets');
+
+			// Improves compatibility with themes and plugins using Isotope and Masonry.
+			add_action(
+				'wp_enqueue_scripts',
+				function () {
+					if (wp_script_is('simcal-qtip', 'enqueued')) {
+						wp_enqueue_script(
+							'simplecalendar-imagesloaded',
+							SIMPLE_CALENDAR_ASSETS . 'generated/vendor/imagesloaded.pkgd.min.js',
+							['simcal-qtip'],
+							SIMPLE_CALENDAR_VERSION,
+							true
+						);
+					}
+				},
+				1000
+			);
+		}
 	}
 
 	/**
