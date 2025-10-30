@@ -1006,8 +1006,8 @@ class TRIUU_Sermons_Manager {
         ?>
         <div class="triuu-book-club-section" style="
             font-family: 'Barlow', sans-serif;
-            margin: 2rem 0;
-            padding: 1.5rem 0;
+            margin: 0;
+            padding: 0;
         ">
             <h2 style="
                 font-family: 'Barlow Condensed', sans-serif;
@@ -1023,18 +1023,18 @@ class TRIUU_Sermons_Manager {
                 border-bottom: 2px solid #A5849F;
             ">Monthly Book Club</h2>
             
-            <div style="margin-top: 1.5rem; color: #666666; line-height: 1.6;">
-                <p style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 300;">
+            <div style="margin-top: 1rem; color: #666666; line-height: 1.6;">
+                <p style="margin: 0 0 0.4rem 0; font-size: 1rem; font-weight: 300;">
                     <strong style="font-weight: 400;">Meeting Schedule:</strong> 1:00 PM — Fourth Monday of each month
                 </p>
-                <p style="margin: 0 0 1.5rem 0; font-size: 1rem; font-weight: 300;">
+                <p style="margin: 0 0 1rem 0; font-size: 1rem; font-weight: 300;">
                     <strong style="font-weight: 400;">Contact:</strong> Nancy Garrison — <a href="mailto:garrisonnancy@yahoo.com" style="color: #614E6B; text-decoration: none; border-bottom: 1px solid #A5849F; transition: color 0.3s ease;" onmouseover="this.style.color='#A5849F'" onmouseout="this.style.color='#614E6B'">garrisonnancy@yahoo.com</a>
                 </p>
                 
                 <?php if (!empty($next_meeting_date)) : ?>
                 <div style="
-                    margin: 1.5rem 0;
-                    padding: 1.25rem;
+                    margin: 0;
+                    padding: 1rem 1.25rem;
                     background: #f9f9f9;
                     border-left: 3px solid #614E6B;
                 ">
@@ -1070,18 +1070,18 @@ class TRIUU_Sermons_Manager {
                 <?php endif; ?>
                 
                 <?php if (!empty($atts['pdf_url'])) : ?>
-                <div style="text-align: center; margin-top: 1.5rem;">
+                <div style="text-align: center; margin-top: 1rem;">
                     <a href="<?php echo esc_url($atts['pdf_url']); ?>" target="_blank" rel="noopener noreferrer" style="
                         display: inline-block;
                         background: #614E6B;
                         color: white;
-                        padding: 0.75rem 2rem;
+                        padding: 0.65rem 1.75rem;
                         text-decoration: none;
                         font-weight: 400;
-                        font-size: 1rem;
+                        font-size: 0.95rem;
                         transition: background 0.3s ease;
                         text-transform: uppercase;
-                        letter-spacing: 0.05em;
+                        letter-spacing: 0.03em;
                         font-family: 'Barlow Condensed', sans-serif;
                     " onmouseover="this.style.background='#A5849F'" onmouseout="this.style.background='#614E6B'">
                         Download Reading List
