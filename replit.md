@@ -112,8 +112,16 @@ All styling changes are appended to `wp-content/themes/triuu/style.css` to ensur
 - **Google Calendar Integration COMPLETED**: Added `[triuu_upcoming_events]` shortcode to TRIUU Sermons Manager plugin to display live calendar events from Google Calendar API
 - **News & Events Page Reorganized**: Moved "Late Breaking · The Week Ahead" section immediately after Sunday Service section for better visibility
 - **Secure API Credentials**: Google Calendar API credentials stored as environment variables (GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID)
-- **Dynamic Week Ahead**: Calendar events automatically grouped by day of week (Monday-Sunday), showing next 7 days with times and details
-- **Event Filtering**: Sunday services automatically excluded from the week ahead display
+- **Full Event Details Display**: Events now show complete information with full dates (e.g., "Friday, October 31, 2025"), times, locations, and descriptions in chronological order
+- **Enhanced UX for Events**:
+  - Event titles increased to 1.1rem font size for better readability
+  - All event locations converted to clickable Google Maps links that open in new windows for easy directions
+  - All URLs in event descriptions automatically converted to clickable links with target="_blank"
+  - Smart HTML handling: Preserves both plain text and HTML-formatted descriptions from Google Calendar
+- **Event Filtering**: 
+  - Sunday services automatically excluded from the week ahead display
+  - Past events filtered out - only events starting today or later are displayed
+  - Shows next 7 days of upcoming events from current date
 
 ### Previous Changes (Oct 20, 2025)
 - **v3.0.0 Complete Redesign COMPLETED**: Rewritten from developer-centric "AI Patch Runner" to user-friendly "AI Website Styler" with 4-tab interface
