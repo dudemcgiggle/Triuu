@@ -34,6 +34,7 @@ The project is built on WordPress 6.8.3, utilizing a custom child theme (`triuu`
 **Feature Specifications:**
 - **Sermons Manager:** Custom WordPress plugin to manage and display upcoming sermons dynamically.
 - **Google Calendar Integration:** Live calendar events from Google Calendar API displayed on News & Events page via `[triuu_upcoming_events]` shortcode. Fetches next 7 days of events, excludes Sunday services, displays full event details with custom styling.
+- **Book Club Shortcode:** `[triuu_book_club]` shortcode displays meeting time (1:00 pm - Monthly), Nancy's clickable email, next meeting date from Google Calendar, and Zoom link.
 - **Events Styling:** Custom CSS class `.triuu-new-events` with brand colors (--accent: #614E6B, --accent-2: #A5849F, --ink: #4A566D) and Barlow font applied to calendar events section.
 - **Smart Location Links:** Event locations automatically link to Google Maps for physical addresses; Zoom meetings link directly to Zoom URLs extracted from event descriptions.
 - **Global Styling:** Custom CSS applied via `wp_head` hook for consistent header and section styling.
