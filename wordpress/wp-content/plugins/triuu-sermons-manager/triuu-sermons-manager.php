@@ -592,25 +592,18 @@ class TRIUU_Sermons_Manager {
     }
     
     public function upcoming_events_shortcode($atts) {
-        $atts = shortcode_atts(array(
-            'api_key' => '',
-            'calendar_id' => '',
-            'count' => 7,
-        ), $atts);
+        $api_key = getenv('GOOGLE_CALENDAR_API_KEY');
+        $calendar_id = getenv('GOOGLE_CALENDAR_ID');
         
-        if (empty($atts['api_key']) || empty($atts['calendar_id'])) {
-            return '<p><strong>Error:</strong> shortcode needs <code>api_key</code> &amp; <code>calendar_id</code>.</p>';
+        if (empty($api_key) || empty($calendar_id)) {
+            return '<p><strong>Error:</strong> Google Calendar credentials not configured.</p>';
         }
-        
-        $api_key = sanitize_text_field($atts['api_key']);
-        $calendar_id = sanitize_text_field($atts['calendar_id']);
-        $count = intval($atts['count']);
         
         $tz = function_exists('wp_timezone') ? wp_timezone() : new DateTimeZone('America/New_York');
         $now = new DateTimeImmutable('now', $tz);
         
         $timeMin = $now->setTimezone(new DateTimeZone('UTC'))->format(DateTime::RFC3339);
-        $timeMax = $now->modify('+90 days')->setTimezone(new DateTimeZone('UTC'))->format(DateTime::RFC3339);
+        $timeMax = $now->modify('+7 days')->setTimezone(new DateTimeZone('UTC'))->format(DateTime::RFC3339);
         
         $url = 'https://www.googleapis.com/calendar/v3/calendars/' .
                rawurlencode($calendar_id) . '/events?' .
@@ -620,7 +613,7 @@ class TRIUU_Sermons_Manager {
                    'timeMax' => $timeMax,
                    'singleEvents' => 'true',
                    'orderBy' => 'startTime',
-                   'maxResults' => 50,
+                   'maxResults' => 100,
                ), '', '&', PHP_QUERY_RFC3986);
         
         $resp = wp_remote_get($url);
@@ -633,7 +626,9 @@ class TRIUU_Sermons_Manager {
             return '<p><strong>Google API error:</strong> ' . esc_html($data['error']['message']) . '</p>';
         }
         
-        $events = array();
+        $events_by_day = array();
+        $day_order = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+        
         foreach ($data['items'] ?? array() as $item) {
             $title = sanitize_text_field($item['summary'] ?? '');
             
@@ -643,34 +638,55 @@ class TRIUU_Sermons_Manager {
             
             $start = $item['start']['dateTime'] ?? $item['start']['date'];
             $dt = (new DateTimeImmutable($start))->setTimezone($tz);
+            $day_name = $dt->format('l');
             
-            $events[] = array(
-                'title' => $title,
-                'date' => $dt->format('l, F j'),
-                'time' => isset($item['start']['dateTime']) ? $dt->format('g:i a') : 'All Day',
-                'datetime' => $dt,
-            );
+            $time_str = isset($item['start']['dateTime']) ? $dt->format('g:i a') : '';
+            $end_time_str = '';
             
-            if (count($events) >= $count) {
-                break;
+            if (isset($item['end']['dateTime'])) {
+                $end_dt = (new DateTimeImmutable($item['end']['dateTime']))->setTimezone($tz);
+                $end_time_str = $end_dt->format('g:i a');
             }
+            
+            $event_text = '';
+            if ($time_str && $end_time_str) {
+                $event_text = $time_str . '&ndash;' . $end_time_str . ' &mdash; ' . $title;
+            } elseif ($time_str) {
+                $event_text = $time_str . ' &mdash; ' . $title;
+            } else {
+                $event_text = $title;
+            }
+            
+            if (!isset($events_by_day[$day_name])) {
+                $events_by_day[$day_name] = array();
+            }
+            
+            $events_by_day[$day_name][] = $event_text;
         }
         
-        if (empty($events)) {
-            return '<p>No upcoming events at this time.</p>';
+        if (empty($events_by_day)) {
+            return '<p>No upcoming events this week.</p>';
         }
+        
+        $current_date = $now->format('F j, Y');
         
         ob_start();
         ?>
-        <div class="upcoming-events-list">
-            <?php foreach ($events as $event) : ?>
-                <div class="event-item">
-                    <div class="event-date"><?php echo esc_html($event['date']); ?></div>
-                    <div class="event-time"><?php echo esc_html($event['time']); ?></div>
-                    <div class="event-title"><?php echo esc_html($event['title']); ?></div>
-                </div>
+      <h2 id="agenda-title">Late Breaking &middot; The Week Ahead (<?php echo esc_html($current_date); ?>)</h2>
+      <div class="agenda">
+        <?php foreach ($day_order as $day) : ?>
+          <?php if (isset($events_by_day[$day])) : ?>
+          <div class="day">
+          <h4><?php echo esc_html($day); ?></h4>
+          <ul>
+            <?php foreach ($events_by_day[$day] as $event) : ?>
+            <li><?php echo $event; ?></li>
             <?php endforeach; ?>
-        </div>
+          </ul>
+          </div>
+          <?php endif; ?>
+        <?php endforeach; ?>
+      </div>
         <?php
         return ob_get_clean();
     }
