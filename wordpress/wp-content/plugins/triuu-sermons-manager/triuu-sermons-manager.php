@@ -682,38 +682,36 @@ class TRIUU_Sermons_Manager {
                 return '';
             }
             
-            $has_html = preg_match('/<[^>]+>/', $text);
+            $has_html = (stripos($text, '<a ') !== false || stripos($text, '<br') !== false || 
+                        stripos($text, '<p>') !== false || stripos($text, '<strong>') !== false);
             
             if ($has_html) {
-                $allowed_html = array(
-                    'a' => array(
-                        'href' => array(),
-                        'target' => array(),
-                        'rel' => array(),
-                    ),
-                    'br' => array(),
-                    'p' => array(),
-                    'strong' => array(),
-                    'em' => array(),
-                );
-                $text = wp_kses($text, $allowed_html);
-                
                 $text = preg_replace(
-                    '!<a\s+([^>]*\s+)?href="([^"]+)"([^>]*)>!i',
-                    '<a $1href="$2" target="_blank" rel="noopener noreferrer"$3>',
+                    '!<a\s+([^>]*)href=(["\'])([^"\']+)\2([^>]*)>!i',
+                    '<a $1href=$2$3$2 target="_blank" rel="noopener noreferrer"$4>',
                     $text
                 );
             } else {
-                $text = esc_html($text);
+                $text = nl2br(esc_html($text));
             }
             
-            $text = preg_replace(
-                '!(?<!href="|href=\')(?<!">)(https?://[^\s<]+)(?!</a>)!',
-                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+            $result = preg_replace_callback(
+                '!(https?://[^\s<"\']+)!i',
+                function($matches) use ($text) {
+                    $url = $matches[1];
+                    $pos = strpos($text, $url);
+                    if ($pos !== false) {
+                        $before = substr($text, max(0, $pos - 10), 10);
+                        if (strpos($before, 'href=') !== false) {
+                            return $matches[0];
+                        }
+                    }
+                    return '<a href="' . esc_url($url) . '" target="_blank" rel="noopener noreferrer">' . esc_html($url) . '</a>';
+                },
                 $text
             );
             
-            return $text;
+            return $result !== null ? $result : $text;
         };
         
         $create_maps_link = function($location) {
