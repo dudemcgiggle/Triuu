@@ -884,10 +884,13 @@ class TRIUU_Sermons_Manager {
     }
     
     public function book_club_shortcode($atts) {
+        $atts = shortcode_atts(array(
+            'pdf_url' => '',
+        ), $atts, 'triuu_book_club');
+        
         $api_key = getenv('GOOGLE_CALENDAR_API_KEY');
         $calendar_id = getenv('GOOGLE_CALENDAR_ID');
         
-        $next_meeting = null;
         $next_meeting_date = '';
         $zoom_url = '';
         
@@ -939,17 +942,80 @@ class TRIUU_Sermons_Manager {
         
         ob_start();
         ?>
-        <p style="margin: 0 0 0.5rem 0;">
-            <strong>Meets 1:00 pm — Monthly.</strong> Contact: Nancy Garrison &lt;<a href="mailto:garrisonnancy@yahoo.com" style="color: #614E6B; text-decoration: underline;">garrisonnancy@yahoo.com</a>&gt;
-        </p>
-        <?php if (!empty($next_meeting_date)) : ?>
-        <p style="margin: 0 0 0.5rem 0; color: #614E6B; font-weight: 600;">
-            📅 Next meeting: <?php echo esc_html($next_meeting_date); ?>
-            <?php if (!empty($zoom_url)) : ?>
-                <br><a href="<?php echo esc_url($zoom_url); ?>" target="_blank" rel="noopener noreferrer" style="color: #614E6B; text-decoration: underline;">Join via Zoom</a>
+        <div class="triuu-book-club-section" style="
+            background: linear-gradient(135deg, #f8f5f9 0%, #ffffff 100%);
+            border-left: 4px solid #614E6B;
+            padding: 1.75rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(97, 78, 107, 0.1);
+            font-family: 'Barlow', sans-serif;
+            margin: 1rem 0;
+        ">
+            <div style="margin-bottom: 1.25rem;">
+                <p style="margin: 0 0 0.75rem 0; font-size: 1rem; line-height: 1.6; color: #4A566D;">
+                    <strong style="font-size: 1.05rem; color: #614E6B;">Monthly Book Club</strong><br>
+                    Meeting time: <strong>1:00 PM</strong> | Fourth Monday of each month
+                </p>
+                <p style="margin: 0; font-size: 0.95rem; color: #666;">
+                    Contact: <a href="mailto:garrisonnancy@yahoo.com" style="color: #614E6B; text-decoration: none; font-weight: 600; border-bottom: 2px solid #A5849F; transition: all 0.3s ease;">Nancy Garrison</a>
+                </p>
+            </div>
+            
+            <?php if (!empty($next_meeting_date)) : ?>
+            <div style="
+                background: white;
+                padding: 1rem 1.25rem;
+                border-radius: 6px;
+                margin-bottom: 1.25rem;
+                border: 1px solid #e9e4eb;
+            ">
+                <p style="margin: 0; color: #614E6B; font-weight: 600; font-size: 1rem;">
+                    📅 Upcoming Meeting
+                </p>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1.05rem; color: #4A566D; font-weight: 500;">
+                    <?php echo esc_html($next_meeting_date); ?>
+                </p>
+                <?php if (!empty($zoom_url)) : ?>
+                <p style="margin: 0.75rem 0 0 0;">
+                    <a href="<?php echo esc_url($zoom_url); ?>" target="_blank" rel="noopener noreferrer" style="
+                        display: inline-block;
+                        background: #614E6B;
+                        color: white;
+                        padding: 0.6rem 1.5rem;
+                        border-radius: 5px;
+                        text-decoration: none;
+                        font-weight: 600;
+                        font-size: 0.95rem;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 2px 4px rgba(97, 78, 107, 0.2);
+                    " onmouseover="this.style.background='#A5849F'; this.style.boxShadow='0 4px 8px rgba(165, 132, 159, 0.3)';" onmouseout="this.style.background='#614E6B'; this.style.boxShadow='0 2px 4px rgba(97, 78, 107, 0.2)';">
+                        🎥 Join via Zoom
+                    </a>
+                </p>
+                <?php endif; ?>
+            </div>
             <?php endif; ?>
-        </p>
-        <?php endif; ?>
+            
+            <?php if (!empty($atts['pdf_url'])) : ?>
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="<?php echo esc_url($atts['pdf_url']); ?>" target="_blank" rel="noopener noreferrer" style="
+                    display: inline-block;
+                    background: linear-gradient(135deg, #614E6B 0%, #7a6285 100%);
+                    color: white;
+                    padding: 0.85rem 2rem;
+                    border-radius: 6px;
+                    text-decoration: none;
+                    font-weight: 700;
+                    font-size: 1rem;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 3px 6px rgba(97, 78, 107, 0.25);
+                    letter-spacing: 0.3px;
+                " onmouseover="this.style.background='linear-gradient(135deg, #A5849F 0%, #b899af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 12px rgba(165, 132, 159, 0.35)';" onmouseout="this.style.background='linear-gradient(135deg, #614E6B 0%, #7a6285 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 6px rgba(97, 78, 107, 0.25)';">
+                    📄 Download Reading List (PDF)
+                </a>
+            </div>
+            <?php endif; ?>
+        </div>
         <?php
         return ob_get_clean();
     }
