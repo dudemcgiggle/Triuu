@@ -551,12 +551,43 @@ class TRIUU_Sermons_Manager {
             <div class="feature">
                 <div class="date-badge" aria-hidden="true">TBD</div>
                 <div>
-                    <div class="kicker">Sunday Service</div>
-                    <h2 id="feature-title">Sunday Service</h2>
-                    <div class="meta">Live in person and on Zoom</div>
-                    <p>Check back soon for upcoming sermon information.</p>
-                    <p style="margin:.75rem 0 0 0;">
-                        <a class="btn" href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank" rel="noopener">Launch Zoom Service</a>
+                    <div class="kicker" style="
+                        font-size: 0.85rem;
+                        text-transform: uppercase;
+                        color: #999999;
+                        font-weight: 400;
+                        letter-spacing: 0.1em;
+                        margin-bottom: 0.5rem;
+                    ">Sunday Service</div>
+                    <h2 id="feature-title" style="
+                        font-family: 'Barlow', sans-serif;
+                        font-size: 2rem;
+                        text-transform: uppercase;
+                        color: #C8A8CF;
+                        font-weight: 300;
+                        letter-spacing: 0.02em;
+                        margin: 0 0 0.75rem 0;
+                        line-height: 1.2;
+                    ">Sunday Service</h2>
+                    <div class="meta" style="
+                        font-style: italic;
+                        color: #999999;
+                        font-size: 0.95rem;
+                        margin-bottom: 1rem;
+                        font-weight: 300;
+                    ">Live in person and on Zoom</div>
+                    <p style="color: #666666; font-weight: 300; line-height: 1.6;">Check back soon for upcoming sermon information.</p>
+                    <p style="margin:1rem 0 0 0;">
+                        <a class="btn" href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank" rel="noopener" style="
+                            display: inline-block;
+                            background: #614E6B;
+                            color: white;
+                            padding: 0.65rem 1.75rem;
+                            text-decoration: none;
+                            font-weight: 400;
+                            font-size: 0.95rem;
+                            transition: background 0.3s ease;
+                        " onmouseover="this.style.background='#A5849F'" onmouseout="this.style.background='#614E6B'">Launch Zoom Service</a>
                     </p>
                 </div>
             </div>
@@ -579,12 +610,43 @@ class TRIUU_Sermons_Manager {
         <div class="feature">
             <div class="date-badge" aria-hidden="true"><?php echo esc_html($date_badge); ?></div>
             <div>
-                <div class="kicker">Sunday Service</div>
-                <h2 id="feature-title"><?php echo esc_html($next_sermon['title']); ?></h2>
-                <div class="meta"><?php echo esc_html($next_sermon['reverend']); ?> &middot; Live in person and on Zoom</div>
-                <p><?php echo esc_html($next_sermon['description']); ?></p>
-                <p style="margin:.75rem 0 0 0;">
-                    <a class="btn" href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank" rel="noopener">Launch Zoom Service</a>
+                <div class="kicker" style="
+                    font-size: 0.85rem;
+                    text-transform: uppercase;
+                    color: #999999;
+                    font-weight: 400;
+                    letter-spacing: 0.1em;
+                    margin-bottom: 0.5rem;
+                ">Sunday Service</div>
+                <h2 id="feature-title" style="
+                    font-family: 'Barlow', sans-serif;
+                    font-size: 2rem;
+                    text-transform: uppercase;
+                    color: #C8A8CF;
+                    font-weight: 300;
+                    letter-spacing: 0.02em;
+                    margin: 0 0 0.75rem 0;
+                    line-height: 1.2;
+                "><?php echo esc_html($next_sermon['title']); ?></h2>
+                <div class="meta" style="
+                    font-style: italic;
+                    color: #999999;
+                    font-size: 0.95rem;
+                    margin-bottom: 1rem;
+                    font-weight: 300;
+                "><?php echo esc_html($next_sermon['reverend']); ?> &middot; Live in person and on Zoom</div>
+                <p style="color: #666666; font-weight: 300; line-height: 1.6;"><?php echo esc_html($next_sermon['description']); ?></p>
+                <p style="margin:1rem 0 0 0;">
+                    <a class="btn" href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank" rel="noopener" style="
+                        display: inline-block;
+                        background: #614E6B;
+                        color: white;
+                        padding: 0.65rem 1.75rem;
+                        text-decoration: none;
+                        font-weight: 400;
+                        font-size: 0.95rem;
+                        transition: background 0.3s ease;
+                    " onmouseover="this.style.background='#A5849F'" onmouseout="this.style.background='#614E6B'">Launch Zoom Service</a>
                 </p>
             </div>
         </div>
