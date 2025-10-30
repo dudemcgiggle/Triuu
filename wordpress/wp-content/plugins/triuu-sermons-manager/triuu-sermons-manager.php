@@ -659,8 +659,8 @@ class TRIUU_Sermons_Manager {
                 $time_str = 'All Day';
             }
             
-            $description = !empty($item['description']) ? sanitize_text_field($item['description']) : '';
-            $location = !empty($item['location']) ? sanitize_text_field($item['location']) : '';
+            $description = !empty($item['description']) ? $item['description'] : '';
+            $location = !empty($item['location']) ? $item['location'] : '';
             
             $events[] = array(
                 'date' => $full_date,
@@ -677,6 +677,50 @@ class TRIUU_Sermons_Manager {
         
         $current_date = $now->format('F j, Y');
         
+        $make_links_clickable = function($text) {
+            if (empty($text)) {
+                return '';
+            }
+            
+            $has_html = preg_match('/<[^>]+>/', $text);
+            
+            if ($has_html) {
+                $allowed_html = array(
+                    'a' => array(
+                        'href' => array(),
+                        'target' => array(),
+                        'rel' => array(),
+                    ),
+                    'br' => array(),
+                    'p' => array(),
+                    'strong' => array(),
+                    'em' => array(),
+                );
+                $text = wp_kses($text, $allowed_html);
+                
+                $text = preg_replace(
+                    '!<a\s+([^>]*\s+)?href="([^"]+)"([^>]*)>!i',
+                    '<a $1href="$2" target="_blank" rel="noopener noreferrer"$3>',
+                    $text
+                );
+            } else {
+                $text = esc_html($text);
+            }
+            
+            $text = preg_replace(
+                '!(?<!href="|href=\')(?<!">)(https?://[^\s<]+)(?!</a>)!',
+                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+                $text
+            );
+            
+            return $text;
+        };
+        
+        $create_maps_link = function($location) {
+            $maps_url = 'https://www.google.com/maps/search/' . urlencode($location);
+            return $maps_url;
+        };
+        
         ob_start();
         ?>
       <h2 id="agenda-title">Late Breaking &middot; The Week Ahead (<?php echo esc_html($current_date); ?>)</h2>
@@ -686,17 +730,17 @@ class TRIUU_Sermons_Manager {
             <div style="font-weight: 700; color: #614E6B; margin-bottom: 0.25rem;">
               <?php echo esc_html($event['date']); ?>
             </div>
-            <div style="font-weight: 600; color: #4A566D; margin-bottom: 0.25rem;">
+            <div style="font-weight: 600; color: #4A566D; margin-bottom: 0.25rem; font-size: 1.1rem;">
               <?php echo $event['time']; ?> &mdash; <?php echo esc_html($event['title']); ?>
             </div>
             <?php if (!empty($event['location'])) : ?>
               <div style="font-style: italic; color: #666; margin-bottom: 0.25rem;">
-                📍 <?php echo esc_html($event['location']); ?>
+                📍 <a href="<?php echo esc_url($create_maps_link($event['location'])); ?>" target="_blank" rel="noopener noreferrer" style="color: #614E6B; text-decoration: underline;"><?php echo esc_html($event['location']); ?></a>
               </div>
             <?php endif; ?>
             <?php if (!empty($event['description'])) : ?>
               <div style="color: #666; margin-top: 0.5rem;">
-                <?php echo esc_html($event['description']); ?>
+                <?php echo $make_links_clickable($event['description']); ?>
               </div>
             <?php endif; ?>
           </div>
