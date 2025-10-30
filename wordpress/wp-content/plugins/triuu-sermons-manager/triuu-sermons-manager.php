@@ -32,6 +32,7 @@ class TRIUU_Sermons_Manager {
         add_shortcode('triuu_upcoming_sermons', array($this, 'upcoming_sermons_shortcode'));
         add_shortcode('triuu_next_sermon', array($this, 'next_sermon_shortcode'));
         add_shortcode('triuu_featured_sermon', array($this, 'featured_sermon_shortcode'));
+        add_shortcode('triuu_upcoming_events', array($this, 'upcoming_events_shortcode'));
     }
     
     public function add_admin_menu() {
@@ -585,6 +586,90 @@ class TRIUU_Sermons_Manager {
                     <a class="btn" href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank" rel="noopener">Launch Zoom Service</a>
                 </p>
             </div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+    
+    public function upcoming_events_shortcode($atts) {
+        $atts = shortcode_atts(array(
+            'api_key' => '',
+            'calendar_id' => '',
+            'count' => 7,
+        ), $atts);
+        
+        if (empty($atts['api_key']) || empty($atts['calendar_id'])) {
+            return '<p><strong>Error:</strong> shortcode needs <code>api_key</code> &amp; <code>calendar_id</code>.</p>';
+        }
+        
+        $api_key = sanitize_text_field($atts['api_key']);
+        $calendar_id = sanitize_text_field($atts['calendar_id']);
+        $count = intval($atts['count']);
+        
+        $tz = function_exists('wp_timezone') ? wp_timezone() : new DateTimeZone('America/New_York');
+        $now = new DateTimeImmutable('now', $tz);
+        
+        $timeMin = $now->setTimezone(new DateTimeZone('UTC'))->format(DateTime::RFC3339);
+        $timeMax = $now->modify('+90 days')->setTimezone(new DateTimeZone('UTC'))->format(DateTime::RFC3339);
+        
+        $url = 'https://www.googleapis.com/calendar/v3/calendars/' .
+               rawurlencode($calendar_id) . '/events?' .
+               http_build_query(array(
+                   'key' => $api_key,
+                   'timeMin' => $timeMin,
+                   'timeMax' => $timeMax,
+                   'singleEvents' => 'true',
+                   'orderBy' => 'startTime',
+                   'maxResults' => 50,
+               ), '', '&', PHP_QUERY_RFC3986);
+        
+        $resp = wp_remote_get($url);
+        if (is_wp_error($resp)) {
+            return '<p><strong>Network error:</strong> ' . esc_html($resp->get_error_message()) . '</p>';
+        }
+        
+        $data = json_decode(wp_remote_retrieve_body($resp), true);
+        if (!empty($data['error']['message'])) {
+            return '<p><strong>Google API error:</strong> ' . esc_html($data['error']['message']) . '</p>';
+        }
+        
+        $events = array();
+        foreach ($data['items'] ?? array() as $item) {
+            $title = sanitize_text_field($item['summary'] ?? '');
+            
+            if (stripos($title, 'sunday service') !== false) {
+                continue;
+            }
+            
+            $start = $item['start']['dateTime'] ?? $item['start']['date'];
+            $dt = (new DateTimeImmutable($start))->setTimezone($tz);
+            
+            $events[] = array(
+                'title' => $title,
+                'date' => $dt->format('l, F j'),
+                'time' => isset($item['start']['dateTime']) ? $dt->format('g:i a') : 'All Day',
+                'datetime' => $dt,
+            );
+            
+            if (count($events) >= $count) {
+                break;
+            }
+        }
+        
+        if (empty($events)) {
+            return '<p>No upcoming events at this time.</p>';
+        }
+        
+        ob_start();
+        ?>
+        <div class="upcoming-events-list">
+            <?php foreach ($events as $event) : ?>
+                <div class="event-item">
+                    <div class="event-date"><?php echo esc_html($event['date']); ?></div>
+                    <div class="event-time"><?php echo esc_html($event['time']); ?></div>
+                    <div class="event-title"><?php echo esc_html($event['title']); ?></div>
+                </div>
+            <?php endforeach; ?>
         </div>
         <?php
         return ob_get_clean();
