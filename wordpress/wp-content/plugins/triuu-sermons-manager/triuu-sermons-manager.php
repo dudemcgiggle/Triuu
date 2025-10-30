@@ -662,12 +662,18 @@ class TRIUU_Sermons_Manager {
             $description = !empty($item['description']) ? $item['description'] : '';
             $location = !empty($item['location']) ? $item['location'] : '';
             
+            $zoom_url = '';
+            if (preg_match('!https?://zoom\.us/[^\s<"\']+!i', $description, $matches)) {
+                $zoom_url = $matches[0];
+            }
+            
             $events[] = array(
                 'date' => $full_date,
                 'time' => $time_str,
                 'title' => $title,
                 'description' => $description,
                 'location' => $location,
+                'zoom_url' => $zoom_url,
             );
         }
         
@@ -721,28 +727,100 @@ class TRIUU_Sermons_Manager {
         
         ob_start();
         ?>
+      <style>
+      .triuu-new-events {
+        --accent: #614E6B;
+        --accent-2: #A5849F;
+        --ink: #4A566D;
+        --muted: #666666;
+        --line: #dddddd;
+        --bg: #ffffff;
+        --chip: #f5f5f7;
+        font-family: "Barlow", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: var(--muted);
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .triuu-new-events h2 {
+        color: var(--ink);
+      }
+      .triuu-new-events .event-date {
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 0.25rem;
+      }
+      .triuu-new-events .event-title {
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 0.25rem;
+        font-size: 1.1rem;
+      }
+      .triuu-new-events .event-location {
+        font-style: italic;
+        color: var(--muted);
+        margin-bottom: 0.25rem;
+      }
+      .triuu-new-events .event-location a {
+        color: var(--accent);
+        text-decoration: underline;
+      }
+      .triuu-new-events .event-location a:hover {
+        color: var(--accent-2);
+      }
+      .triuu-new-events .event-description {
+        color: var(--muted);
+        margin-top: 0.5rem;
+      }
+      .triuu-new-events .event-item {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--line);
+      }
+      </style>
+      <div class="triuu-new-events">
       <h2 id="agenda-title">Late Breaking &middot; The Week Ahead (<?php echo esc_html($current_date); ?>)</h2>
       <div class="events-list" style="margin-top: 1rem;">
         <?php foreach ($events as $event) : ?>
-          <div class="event-item" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #ddd;">
-            <div style="font-weight: 700; color: #614E6B; margin-bottom: 0.25rem;">
+          <div class="event-item">
+            <div class="event-date">
               <?php echo esc_html($event['date']); ?>
             </div>
-            <div style="font-weight: 600; color: #4A566D; margin-bottom: 0.25rem; font-size: 1.1rem;">
+            <div class="event-title">
               <?php echo $event['time']; ?> &mdash; <?php echo esc_html($event['title']); ?>
             </div>
             <?php if (!empty($event['location'])) : ?>
-              <div style="font-style: italic; color: #666; margin-bottom: 0.25rem;">
-                📍 <a href="<?php echo esc_url($create_maps_link($event['location'])); ?>" target="_blank" rel="noopener noreferrer" style="color: #614E6B; text-decoration: underline;"><?php echo esc_html($event['location']); ?></a>
+              <?php
+              $location_url = '';
+              $location_text = $event['location'];
+              
+              if (!empty($event['zoom_url']) && stripos($event['location'], 'zoom') !== false) {
+                  $location_url = $event['zoom_url'];
+              } else {
+                  $location_url = $create_maps_link($event['location']);
+              }
+              ?>
+              <div class="event-location">
+                📍 <a href="<?php echo esc_url($location_url); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($location_text); ?></a>
               </div>
             <?php endif; ?>
             <?php if (!empty($event['description'])) : ?>
-              <div style="color: #666; margin-top: 0.5rem;">
-                <?php echo $make_links_clickable($event['description']); ?>
+              <?php
+              $description_display = $event['description'];
+              if (!empty($event['zoom_url'])) {
+                  $description_display = preg_replace('!<a[^>]*>' . preg_quote($event['zoom_url'], '!') . '</a>!i', '', $description_display);
+                  $description_display = str_replace($event['zoom_url'], '', $description_display);
+                  $description_display = trim($description_display);
+              }
+              ?>
+              <?php if (!empty($description_display)) : ?>
+              <div class="event-description">
+                <?php echo $make_links_clickable($description_display); ?>
               </div>
+              <?php endif; ?>
             <?php endif; ?>
           </div>
         <?php endforeach; ?>
+      </div>
       </div>
         <?php
         return ob_get_clean();
