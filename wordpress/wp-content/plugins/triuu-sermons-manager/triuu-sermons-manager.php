@@ -626,8 +626,7 @@ class TRIUU_Sermons_Manager {
             return '<p><strong>Google API error:</strong> ' . esc_html($data['error']['message']) . '</p>';
         }
         
-        $events_by_day = array();
-        $day_order = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+        $events = array();
         
         foreach ($data['items'] ?? array() as $item) {
             $title = sanitize_text_field($item['summary'] ?? '');
@@ -638,33 +637,37 @@ class TRIUU_Sermons_Manager {
             
             $start = $item['start']['dateTime'] ?? $item['start']['date'];
             $dt = (new DateTimeImmutable($start))->setTimezone($tz);
-            $day_name = $dt->format('l');
             
-            $time_str = isset($item['start']['dateTime']) ? $dt->format('g:i a') : '';
-            $end_time_str = '';
+            $full_date = $dt->format('l, F j, Y');
             
-            if (isset($item['end']['dateTime'])) {
-                $end_dt = (new DateTimeImmutable($item['end']['dateTime']))->setTimezone($tz);
-                $end_time_str = $end_dt->format('g:i a');
-            }
-            
-            $event_text = '';
-            if ($time_str && $end_time_str) {
-                $event_text = $time_str . '&ndash;' . $end_time_str . ' &mdash; ' . $title;
-            } elseif ($time_str) {
-                $event_text = $time_str . ' &mdash; ' . $title;
+            $time_str = '';
+            if (isset($item['start']['dateTime'])) {
+                $start_time = $dt->format('g:i a');
+                
+                if (isset($item['end']['dateTime'])) {
+                    $end_dt = (new DateTimeImmutable($item['end']['dateTime']))->setTimezone($tz);
+                    $end_time = $end_dt->format('g:i a');
+                    $time_str = $start_time . '&ndash;' . $end_time;
+                } else {
+                    $time_str = $start_time;
+                }
             } else {
-                $event_text = $title;
+                $time_str = 'All Day';
             }
             
-            if (!isset($events_by_day[$day_name])) {
-                $events_by_day[$day_name] = array();
-            }
+            $description = !empty($item['description']) ? sanitize_text_field($item['description']) : '';
+            $location = !empty($item['location']) ? sanitize_text_field($item['location']) : '';
             
-            $events_by_day[$day_name][] = $event_text;
+            $events[] = array(
+                'date' => $full_date,
+                'time' => $time_str,
+                'title' => $title,
+                'description' => $description,
+                'location' => $location,
+            );
         }
         
-        if (empty($events_by_day)) {
+        if (empty($events)) {
             return '<p>No upcoming events this week.</p>';
         }
         
@@ -673,18 +676,26 @@ class TRIUU_Sermons_Manager {
         ob_start();
         ?>
       <h2 id="agenda-title">Late Breaking &middot; The Week Ahead (<?php echo esc_html($current_date); ?>)</h2>
-      <div class="agenda">
-        <?php foreach ($day_order as $day) : ?>
-          <?php if (isset($events_by_day[$day])) : ?>
-          <div class="day">
-          <h4><?php echo esc_html($day); ?></h4>
-          <ul>
-            <?php foreach ($events_by_day[$day] as $event) : ?>
-            <li><?php echo $event; ?></li>
-            <?php endforeach; ?>
-          </ul>
+      <div class="events-list" style="margin-top: 1rem;">
+        <?php foreach ($events as $event) : ?>
+          <div class="event-item" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #ddd;">
+            <div style="font-weight: 700; color: #614E6B; margin-bottom: 0.25rem;">
+              <?php echo esc_html($event['date']); ?>
+            </div>
+            <div style="font-weight: 600; color: #4A566D; margin-bottom: 0.25rem;">
+              <?php echo $event['time']; ?> &mdash; <?php echo esc_html($event['title']); ?>
+            </div>
+            <?php if (!empty($event['location'])) : ?>
+              <div style="font-style: italic; color: #666; margin-bottom: 0.25rem;">
+                📍 <?php echo esc_html($event['location']); ?>
+              </div>
+            <?php endif; ?>
+            <?php if (!empty($event['description'])) : ?>
+              <div style="color: #666; margin-top: 0.5rem;">
+                <?php echo esc_html($event['description']); ?>
+              </div>
+            <?php endif; ?>
           </div>
-          <?php endif; ?>
         <?php endforeach; ?>
       </div>
         <?php
