@@ -738,48 +738,104 @@ class TRIUU_Sermons_Manager {
         --chip: #f5f5f7;
         font-family: "Barlow", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
         color: var(--muted);
-        line-height: 1.4;
+        line-height: 1.6;
         font-weight: 500;
+        background: linear-gradient(135deg, #fafafa 0%, #f5f5f7 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(97, 78, 107, 0.08);
+        margin: 2rem 0;
       }
       .triuu-new-events h2 {
-        color: var(--ink);
+        color: var(--accent);
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 1.5rem 0;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 3px solid var(--accent);
+        padding-bottom: 1rem;
+      }
+      .triuu-new-events .events-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+      @media (min-width: 768px) {
+        .triuu-new-events .events-list {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 2rem;
+        }
+      }
+      .triuu-new-events .event-item {
+        background: var(--bg);
+        border-radius: 8px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        border-left: 4px solid var(--accent);
+        transition: all 0.3s ease;
+        position: relative;
+      }
+      .triuu-new-events .event-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(97, 78, 107, 0.15);
+        border-left-color: var(--accent-2);
       }
       .triuu-new-events .event-date {
         font-weight: 700;
         color: var(--accent);
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
       .triuu-new-events .event-title {
         font-weight: 600;
         color: var(--ink);
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.75rem;
         font-size: 1.1rem;
+        line-height: 1.4;
       }
       .triuu-new-events .event-location {
         font-style: italic;
         color: var(--muted);
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
       }
       .triuu-new-events .event-location a {
         color: var(--accent);
-        text-decoration: underline;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: all 0.2s ease;
       }
       .triuu-new-events .event-location a:hover {
         color: var(--accent-2);
+        border-bottom-color: var(--accent-2);
       }
       .triuu-new-events .event-description {
         color: var(--muted);
-        margin-top: 0.5rem;
+        margin-top: 0.75rem;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--line);
       }
-      .triuu-new-events .event-item {
-        margin-bottom: 1.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--line);
+      .triuu-new-events .event-description a {
+        color: var(--accent);
+        text-decoration: underline;
+      }
+      .triuu-new-events .event-description a:hover {
+        color: var(--accent-2);
       }
       </style>
       <div class="triuu-new-events">
       <h2 id="agenda-title">Late Breaking &middot; The Week Ahead (<?php echo esc_html($current_date); ?>)</h2>
-      <div class="events-list" style="margin-top: 1rem;">
+      <div class="events-list">
         <?php foreach ($events as $event) : ?>
           <div class="event-item">
             <div class="event-date">
