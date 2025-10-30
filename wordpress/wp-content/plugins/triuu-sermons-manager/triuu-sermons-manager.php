@@ -943,78 +943,90 @@ class TRIUU_Sermons_Manager {
         ob_start();
         ?>
         <div class="triuu-book-club-section" style="
-            background: linear-gradient(135deg, #f8f5f9 0%, #ffffff 100%);
-            border-left: 4px solid #614E6B;
-            padding: 1.75rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(97, 78, 107, 0.1);
             font-family: 'Barlow', sans-serif;
-            margin: 1rem 0;
+            margin: 2rem 0;
+            padding: 1.5rem 0;
         ">
-            <div style="margin-bottom: 1.25rem;">
-                <p style="margin: 0 0 0.75rem 0; font-size: 1rem; line-height: 1.6; color: #4A566D;">
-                    <strong style="font-size: 1.05rem; color: #614E6B;">Monthly Book Club</strong><br>
-                    Meeting time: <strong>1:00 PM</strong> | Fourth Monday of each month
-                </p>
-                <p style="margin: 0; font-size: 0.95rem; color: #666;">
-                    Contact: <a href="mailto:garrisonnancy@yahoo.com" style="color: #614E6B; text-decoration: none; font-weight: 600; border-bottom: 2px solid #A5849F; transition: all 0.3s ease;">Nancy Garrison</a>
-                </p>
-            </div>
+            <h2 style="
+                font-family: 'Barlow Condensed', sans-serif;
+                font-size: 1.7em;
+                color: #666666;
+                font-style: normal;
+                margin-bottom: 0;
+                font-weight: 400;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                text-align: center;
+                padding-bottom: 0.5em;
+                border-bottom: 2px solid #A5849F;
+            ">Monthly Book Club</h2>
             
-            <?php if (!empty($next_meeting_date)) : ?>
-            <div style="
-                background: white;
-                padding: 1rem 1.25rem;
-                border-radius: 6px;
-                margin-bottom: 1.25rem;
-                border: 1px solid #e9e4eb;
-            ">
-                <p style="margin: 0; color: #614E6B; font-weight: 600; font-size: 1rem;">
-                    📅 Upcoming Meeting
+            <div style="margin-top: 1.5rem; color: #666666; line-height: 1.6;">
+                <p style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 300;">
+                    <strong style="font-weight: 400;">Meeting Schedule:</strong> 1:00 PM — Fourth Monday of each month
                 </p>
-                <p style="margin: 0.5rem 0 0 0; font-size: 1.05rem; color: #4A566D; font-weight: 500;">
-                    <?php echo esc_html($next_meeting_date); ?>
+                <p style="margin: 0 0 1.5rem 0; font-size: 1rem; font-weight: 300;">
+                    <strong style="font-weight: 400;">Contact:</strong> Nancy Garrison — <a href="mailto:garrisonnancy@yahoo.com" style="color: #614E6B; text-decoration: none; border-bottom: 1px solid #A5849F; transition: color 0.3s ease;" onmouseover="this.style.color='#A5849F'" onmouseout="this.style.color='#614E6B'">garrisonnancy@yahoo.com</a>
                 </p>
-                <?php if (!empty($zoom_url)) : ?>
-                <p style="margin: 0.75rem 0 0 0;">
+                
+                <?php if (!empty($next_meeting_date)) : ?>
+                <div style="
+                    margin: 1.5rem 0;
+                    padding: 1.25rem;
+                    background: #f9f9f9;
+                    border-left: 3px solid #614E6B;
+                ">
+                    <p style="
+                        margin: 0 0 0.5rem 0;
+                        font-family: 'Barlow Condensed', sans-serif;
+                        font-size: 1.2em;
+                        text-transform: uppercase;
+                        color: #614E6B;
+                        font-weight: 400;
+                        letter-spacing: 0.05em;
+                    ">Next Meeting</p>
+                    <p style="margin: 0 0 0.75rem 0; font-size: 1.05rem; color: #4A566D; font-weight: 300;">
+                        <?php echo esc_html($next_meeting_date); ?>
+                    </p>
+                    <?php if (!empty($zoom_url)) : ?>
                     <a href="<?php echo esc_url($zoom_url); ?>" target="_blank" rel="noopener noreferrer" style="
                         display: inline-block;
                         background: #614E6B;
                         color: white;
-                        padding: 0.6rem 1.5rem;
-                        border-radius: 5px;
+                        padding: 0.6rem 1.75rem;
                         text-decoration: none;
-                        font-weight: 600;
+                        font-weight: 400;
                         font-size: 0.95rem;
-                        transition: all 0.3s ease;
-                        box-shadow: 0 2px 4px rgba(97, 78, 107, 0.2);
-                    " onmouseover="this.style.background='#A5849F'; this.style.boxShadow='0 4px 8px rgba(165, 132, 159, 0.3)';" onmouseout="this.style.background='#614E6B'; this.style.boxShadow='0 2px 4px rgba(97, 78, 107, 0.2)';">
-                        🎥 Join via Zoom
+                        transition: background 0.3s ease;
+                        text-transform: uppercase;
+                        letter-spacing: 0.03em;
+                    " onmouseover="this.style.background='#A5849F'" onmouseout="this.style.background='#614E6B'">
+                        Launch Zoom Meeting
                     </a>
-                </p>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($atts['pdf_url'])) : ?>
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <a href="<?php echo esc_url($atts['pdf_url']); ?>" target="_blank" rel="noopener noreferrer" style="
+                        display: inline-block;
+                        background: #614E6B;
+                        color: white;
+                        padding: 0.75rem 2rem;
+                        text-decoration: none;
+                        font-weight: 400;
+                        font-size: 1rem;
+                        transition: background 0.3s ease;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                        font-family: 'Barlow Condensed', sans-serif;
+                    " onmouseover="this.style.background='#A5849F'" onmouseout="this.style.background='#614E6B'">
+                        Download Reading List
+                    </a>
+                </div>
                 <?php endif; ?>
             </div>
-            <?php endif; ?>
-            
-            <?php if (!empty($atts['pdf_url'])) : ?>
-            <div style="text-align: center; margin-top: 1rem;">
-                <a href="<?php echo esc_url($atts['pdf_url']); ?>" target="_blank" rel="noopener noreferrer" style="
-                    display: inline-block;
-                    background: linear-gradient(135deg, #614E6B 0%, #7a6285 100%);
-                    color: white;
-                    padding: 0.85rem 2rem;
-                    border-radius: 6px;
-                    text-decoration: none;
-                    font-weight: 700;
-                    font-size: 1rem;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 3px 6px rgba(97, 78, 107, 0.25);
-                    letter-spacing: 0.3px;
-                " onmouseover="this.style.background='linear-gradient(135deg, #A5849F 0%, #b899af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 12px rgba(165, 132, 159, 0.35)';" onmouseout="this.style.background='linear-gradient(135deg, #614E6B 0%, #7a6285 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 6px rgba(97, 78, 107, 0.25)';">
-                    📄 Download Reading List (PDF)
-                </a>
-            </div>
-            <?php endif; ?>
         </div>
         <?php
         return ob_get_clean();
