@@ -33,6 +33,7 @@ class TRIUU_Sermons_Manager {
         add_shortcode('triuu_next_sermon', array($this, 'next_sermon_shortcode'));
         add_shortcode('triuu_featured_sermon', array($this, 'featured_sermon_shortcode'));
         add_shortcode('triuu_upcoming_events', array($this, 'upcoming_events_shortcode'));
+        add_shortcode('triuu_book_club', array($this, 'book_club_shortcode'));
     }
     
     public function add_admin_menu() {
@@ -878,6 +879,77 @@ class TRIUU_Sermons_Manager {
         <?php endforeach; ?>
       </div>
       </div>
+        <?php
+        return ob_get_clean();
+    }
+    
+    public function book_club_shortcode($atts) {
+        $api_key = getenv('GOOGLE_CALENDAR_API_KEY');
+        $calendar_id = getenv('GOOGLE_CALENDAR_ID');
+        
+        $next_meeting = null;
+        $next_meeting_date = '';
+        $zoom_url = '';
+        
+        if (!empty($api_key) && !empty($calendar_id)) {
+            $tz = function_exists('wp_timezone') ? wp_timezone() : new DateTimeZone('America/New_York');
+            $now = new DateTimeImmutable('now', $tz);
+            
+            $timeMin = $now->setTimezone(new DateTimeZone('UTC'))->format(DateTime::RFC3339);
+            $timeMax = $now->modify('+180 days')->setTimezone(new DateTimeZone('UTC'))->format(DateTime::RFC3339);
+            
+            $url = 'https://www.googleapis.com/calendar/v3/calendars/' .
+                   rawurlencode($calendar_id) . '/events?' .
+                   http_build_query(array(
+                       'key' => $api_key,
+                       'timeMin' => $timeMin,
+                       'timeMax' => $timeMax,
+                       'singleEvents' => 'true',
+                       'orderBy' => 'startTime',
+                       'maxResults' => 50,
+                   ), '', '&', PHP_QUERY_RFC3986);
+            
+            $resp = wp_remote_get($url);
+            if (!is_wp_error($resp)) {
+                $data = json_decode(wp_remote_retrieve_body($resp), true);
+                
+                foreach ($data['items'] ?? array() as $item) {
+                    $title = $item['summary'] ?? '';
+                    
+                    if (stripos($title, 'book') !== false && stripos($title, 'club') !== false) {
+                        $start = $item['start']['dateTime'] ?? $item['start']['date'];
+                        $dt = (new DateTimeImmutable($start))->setTimezone($tz);
+                        
+                        if ($dt >= $now) {
+                            $next_meeting_date = $dt->format('l, F j, Y');
+                            if (isset($item['start']['dateTime'])) {
+                                $next_meeting_date .= ' at ' . $dt->format('g:i a');
+                            }
+                            
+                            if (!empty($item['description']) && preg_match('!https?://zoom\.us/[^\s<"\']+!i', $item['description'], $matches)) {
+                                $zoom_url = $matches[0];
+                            }
+                            
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        ob_start();
+        ?>
+        <p style="margin: 0 0 0.5rem 0;">
+            <strong>Meets 1:00 pm — Monthly.</strong> Contact: Nancy Garrison &lt;<a href="mailto:garrisonnancy@yahoo.com" style="color: #614E6B; text-decoration: underline;">garrisonnancy@yahoo.com</a>&gt;
+        </p>
+        <?php if (!empty($next_meeting_date)) : ?>
+        <p style="margin: 0 0 0.5rem 0; color: #614E6B; font-weight: 600;">
+            📅 Next meeting: <?php echo esc_html($next_meeting_date); ?>
+            <?php if (!empty($zoom_url)) : ?>
+                <br><a href="<?php echo esc_url($zoom_url); ?>" target="_blank" rel="noopener noreferrer" style="color: #614E6B; text-decoration: underline;">Join via Zoom</a>
+            <?php endif; ?>
+        </p>
+        <?php endif; ?>
         <?php
         return ob_get_clean();
     }
