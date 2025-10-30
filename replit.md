@@ -116,10 +116,16 @@ All styling changes are appended to `wp-content/themes/triuu/style.css` to ensur
 - **Secure API Credentials**: Google Calendar API credentials stored as environment variables (GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID)
 - **Full Event Details Display**: Events now show complete information with full dates (e.g., "Friday, October 31, 2025"), times, locations, and descriptions in chronological order
 - **Enhanced UX for Events**:
+  - Two-column responsive grid layout on desktop (single column on mobile)
+  - Card-style event items with gradient background, rounded corners, and subtle shadows
+  - Hover effects with transform and enhanced shadows for interactivity
   - Event titles increased to 1.1rem font size for better readability
   - All event locations converted to clickable Google Maps links that open in new windows for easy directions
+  - Zoom meetings automatically link to Zoom URLs (not Google Maps)
   - All URLs in event descriptions automatically converted to clickable links with target="_blank"
   - Smart HTML handling: Preserves both plain text and HTML-formatted descriptions from Google Calendar
+  - Uppercase title styling with centered layout and accent border
+  - Color-coded dates and location links with brand colors
 - **Event Filtering**: 
   - Sunday services automatically excluded from the week ahead display
   - Past events filtered out - only events starting today or later are displayed
