@@ -31,6 +31,7 @@ class TRIUU_Sermons_Manager {
         add_action('admin_init', array($this, 'register_settings'));
         add_shortcode('triuu_upcoming_sermons', array($this, 'upcoming_sermons_shortcode'));
         add_shortcode('triuu_next_sermon', array($this, 'next_sermon_shortcode'));
+        add_shortcode('triuu_featured_sermon', array($this, 'featured_sermon_shortcode'));
     }
     
     public function add_admin_menu() {
@@ -525,6 +526,67 @@ class TRIUU_Sermons_Manager {
                 break;
         }
         
+        return ob_get_clean();
+    }
+    
+    public function featured_sermon_shortcode($atts) {
+        $today = current_time('Y-m-d');
+        $sermons = get_option('triuu_sermons_data', array());
+        $sermons = wp_unslash($sermons);
+        
+        $upcoming_sermons = array_filter($sermons, function($sermon) use ($today) {
+            return $sermon['date'] >= $today;
+        });
+        
+        usort($upcoming_sermons, function($a, $b) {
+            return strcmp($a['date'], $b['date']);
+        });
+        
+        if (empty($upcoming_sermons)) {
+            // Fallback if no upcoming sermons
+            ob_start();
+            ?>
+            <div class="feature">
+                <div class="date-badge" aria-hidden="true">TBD</div>
+                <div>
+                    <div class="kicker">Sunday Service</div>
+                    <h2 id="feature-title">Sunday Service</h2>
+                    <div class="meta">Live in person and on Zoom</div>
+                    <p>Check back soon for upcoming sermon information.</p>
+                    <p style="margin:.75rem 0 0 0;">
+                        <a class="btn" href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank" rel="noopener">Launch Zoom Service</a>
+                    </p>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
+        }
+        
+        $next_sermon = reset($upcoming_sermons);
+        
+        $date_badge = '';
+        if (!empty($next_sermon['date'])) {
+            $date_obj = DateTime::createFromFormat('Y-m-d', $next_sermon['date']);
+            if ($date_obj) {
+                $date_badge = $date_obj->format('M j');
+            }
+        }
+        
+        ob_start();
+        ?>
+        <div class="feature">
+            <div class="date-badge" aria-hidden="true"><?php echo esc_html($date_badge); ?></div>
+            <div>
+                <div class="kicker">Sunday Service</div>
+                <h2 id="feature-title"><?php echo esc_html($next_sermon['title']); ?></h2>
+                <div class="meta"><?php echo esc_html($next_sermon['reverend']); ?> &middot; Live in person and on Zoom</div>
+                <p><?php echo esc_html($next_sermon['description']); ?></p>
+                <p style="margin:.75rem 0 0 0;">
+                    <a class="btn" href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank" rel="noopener">Launch Zoom Service</a>
+                </p>
+            </div>
+        </div>
+        <?php
         return ob_get_clean();
     }
 }
