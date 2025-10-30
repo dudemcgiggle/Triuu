@@ -422,7 +422,7 @@ class TRIUU_Sermons_Manager {
     }
     
     public function upcoming_sermons_shortcode($atts) {
-        $today = date('Y-m-d');
+        $today = current_time('Y-m-d');
         $sermons = get_option('triuu_sermons_data', array());
         $sermons = wp_unslash($sermons);
         
@@ -479,7 +479,7 @@ class TRIUU_Sermons_Manager {
             'format' => 'full', // 'full', 'title', 'date', 'speaker'
         ), $atts);
         
-        $today = date('Y-m-d');
+        $today = current_time('Y-m-d');
         $sermons = get_option('triuu_sermons_data', array());
         $sermons = wp_unslash($sermons);
         
