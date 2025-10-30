@@ -112,14 +112,21 @@ All styling changes are appended to `wp-content/themes/triuu/style.css` to ensur
 - Uses transient storage to ensure preview/apply consistency
 
 ### Recent Changes (Oct 30, 2025)
-- **Book Club Section Redesign COMPLETED**: Enhanced `[triuu_book_club]` shortcode with professional card-style layout, gradient backgrounds, improved typography, and optional PDF download button
-  - Professional card design with gradient background (#f8f5f9 to white) and purple left border
-  - Clear visual hierarchy with "Monthly Book Club" header and meeting details
-  - Nancy's email displayed as clickable link with elegant underline hover effect
-  - Upcoming meeting displayed in white card with date, time, and Zoom button
-  - Zoom button with hover effects (purple #614E6B → hover #A5849F)
+- **Sunday Service Section Redesign COMPLETED**: Updated `[triuu_featured_sermon]` shortcode to match site's elegant, minimal aesthetic
+  - "SUNDAY SERVICE" label in small uppercase gray text with wide letter-spacing
+  - Sermon titles in large uppercase light purple (#C8A8CF) with Barlow font
+  - Reverend name and location in italic gray text
+  - Light font weights (300-400) throughout for elegant, refined look
+  - "Launch Zoom Service" button with smooth hover transitions (purple → lavender)
+  - Date badge kept as is (user preference)
+- **Book Club Section Redesign COMPLETED**: Enhanced `[triuu_book_club]` shortcode with professional layout matching site styling
+  - "MONTHLY BOOK CLUB" header with horizontal line (Barlow Condensed, uppercase)
+  - Clean layout with meeting schedule and contact information
+  - Nancy's email with elegant hover effect
+  - "Next Meeting" section with gray background and purple left border
+  - "LAUNCH ZOOM MEETING" button with hover effects
   - Optional PDF download button via shortcode attribute: `[triuu_book_club pdf_url="URL"]`
-  - Fully responsive design with proper spacing and shadows
+  - All styling matches site's minimal, professional aesthetic
 - **Google Calendar Integration COMPLETED**: Added `[triuu_upcoming_events]` shortcode to TRIUU Sermons Manager plugin to display live calendar events from Google Calendar API
 - **News & Events Page Reorganized**: Moved "Late Breaking · The Week Ahead" section immediately after Sunday Service section for better visibility
 - **Secure API Credentials**: Google Calendar API credentials stored as environment variables (GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID)
