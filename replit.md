@@ -35,6 +35,8 @@ The project is built on WordPress 6.8.3, utilizing a custom child theme (`triuu`
 - **Sermons Manager:** Custom WordPress plugin to manage and display upcoming sermons dynamically.
 - **Google Calendar Integration:** Live calendar events from Google Calendar API displayed on News & Events page via `[triuu_upcoming_events]` shortcode. Fetches next 7 days of events, excludes Sunday services, displays full event details with custom styling.
 - **Book Club Shortcode:** `[triuu_book_club]` shortcode displays meeting time (1:00 pm - Monthly), Nancy's clickable email, next meeting date from Google Calendar, and Zoom link.
+- **Food Drive Shortcode:** `[triuu_food_drive]` shortcode displays weekly food drive information with consistent card-style layout matching site design.
+- **Nu to UU Class Shortcode:** `[triuu_nu_to_uu]` shortcode displays "Nu to UU" class information with date, time, contact info, and consistent styling.
 - **Events Styling:** Custom CSS class `.triuu-new-events` with brand colors (--accent: #614E6B, --accent-2: #A5849F, --ink: #4A566D) and Barlow font applied to calendar events section.
 - **Smart Location Links:** Event locations automatically link to Google Maps for physical addresses; Zoom meetings link directly to Zoom URLs extracted from event descriptions.
 - **Global Styling:** Custom CSS applied via `wp_head` hook for consistent header and section styling.
@@ -112,6 +114,10 @@ All styling changes are appended to `wp-content/themes/triuu/style.css` to ensur
 - Uses transient storage to ensure preview/apply consistency
 
 ### Recent Changes (Oct 30, 2025)
+- **Food Drive & Nu to UU Sections Created**: Added matching card-style shortcodes for consistent site-wide styling
+  - `[triuu_food_drive]` shortcode displays weekly food drive information
+  - `[triuu_nu_to_uu]` shortcode displays "Nu to UU" class details
+  - Both match the Monthly Book Club card design with uppercase headers, horizontal lines, and proper spacing
 - **Sunday Service Section Redesign COMPLETED**: Updated `[triuu_featured_sermon]` shortcode to match site's elegant, minimal aesthetic
   - "SUNDAY SERVICE" label in small uppercase gray text with wide letter-spacing
   - Sermon titles in large uppercase light purple (#C8A8CF) with Barlow font
@@ -127,6 +133,7 @@ All styling changes are appended to `wp-content/themes/triuu/style.css` to ensur
   - "LAUNCH ZOOM MEETING" button with hover effects
   - Optional PDF download button via shortcode attribute: `[triuu_book_club pdf_url="URL"]`
   - All styling matches site's minimal, professional aesthetic
+  - Tighter spacing with minimal padding/margins for clean layout
 - **Google Calendar Integration COMPLETED**: Added `[triuu_upcoming_events]` shortcode to TRIUU Sermons Manager plugin to display live calendar events from Google Calendar API
 - **News & Events Page Reorganized**: Moved "Late Breaking · The Week Ahead" section immediately after Sunday Service section for better visibility
 - **Secure API Credentials**: Google Calendar API credentials stored as environment variables (GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID)
