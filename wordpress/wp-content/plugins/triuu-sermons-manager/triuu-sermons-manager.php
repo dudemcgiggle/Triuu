@@ -30,6 +30,7 @@ class TRIUU_Sermons_Manager {
         add_action('admin_init', array($this, 'handle_sermon_actions'));
         add_action('admin_init', array($this, 'register_settings'));
         add_shortcode('triuu_upcoming_sermons', array($this, 'upcoming_sermons_shortcode'));
+        add_shortcode('triuu_next_sermon', array($this, 'next_sermon_shortcode'));
     }
     
     public function add_admin_menu() {
@@ -469,6 +470,60 @@ class TRIUU_Sermons_Manager {
                 </p>
             </div>
         <?php endif;
+        
+        return ob_get_clean();
+    }
+    
+    public function next_sermon_shortcode($atts) {
+        $atts = shortcode_atts(array(
+            'format' => 'full', // 'full', 'title', 'date', 'speaker'
+        ), $atts);
+        
+        $today = date('Y-m-d');
+        $sermons = get_option('triuu_sermons_data', array());
+        $sermons = wp_unslash($sermons);
+        
+        $upcoming_sermons = array_filter($sermons, function($sermon) use ($today) {
+            return $sermon['date'] >= $today;
+        });
+        
+        usort($upcoming_sermons, function($a, $b) {
+            return strcmp($a['date'], $b['date']);
+        });
+        
+        if (empty($upcoming_sermons)) {
+            return 'Sunday Service (In person &amp; Zoom)';
+        }
+        
+        $next_sermon = reset($upcoming_sermons);
+        
+        $formatted_date = '';
+        if (!empty($next_sermon['date'])) {
+            $date_obj = DateTime::createFromFormat('Y-m-d', $next_sermon['date']);
+            if ($date_obj) {
+                $formatted_date = $date_obj->format('F j, Y');
+            }
+        }
+        
+        ob_start();
+        
+        switch ($atts['format']) {
+            case 'title':
+                echo esc_html($next_sermon['title']);
+                break;
+            case 'date':
+                echo esc_html($formatted_date);
+                break;
+            case 'speaker':
+                echo esc_html($next_sermon['reverend']);
+                break;
+            case 'full':
+            default:
+                ?>
+                <strong><?php echo esc_html($next_sermon['title']); ?></strong> by <?php echo esc_html($next_sermon['reverend']); ?>
+                <?php
+                break;
+        }
         
         return ob_get_clean();
     }
