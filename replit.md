@@ -33,6 +33,7 @@ The project is built on WordPress 6.8.3, utilizing a custom child theme (`triuu`
 
 **Feature Specifications:**
 - **Sermons Manager:** Custom WordPress plugin to manage and display upcoming sermons dynamically.
+- **Google Calendar Integration:** Live calendar events from Google Calendar API displayed on News & Events page via `[triuu_upcoming_events]` shortcode. Fetches next 7 days of events, excludes Sunday services, groups by day of week.
 - **Global Styling:** Custom CSS applied via `wp_head` hook for consistent header and section styling.
 - **Responsive Images:** Images are configured to be responsive with `width: 100%; height: auto; display: block;`.
 
@@ -107,7 +108,14 @@ All styling changes are appended to `wp-content/themes/triuu/style.css` to ensur
 - Requires OpenAI API key (configured via `OPENAI_API_KEY` environment variable)
 - Uses transient storage to ensure preview/apply consistency
 
-### Recent Changes (Oct 20, 2025)
+### Recent Changes (Oct 30, 2025)
+- **Google Calendar Integration COMPLETED**: Added `[triuu_upcoming_events]` shortcode to TRIUU Sermons Manager plugin to display live calendar events from Google Calendar API
+- **News & Events Page Reorganized**: Moved "Late Breaking · The Week Ahead" section immediately after Sunday Service section for better visibility
+- **Secure API Credentials**: Google Calendar API credentials stored as environment variables (GOOGLE_CALENDAR_API_KEY, GOOGLE_CALENDAR_ID)
+- **Dynamic Week Ahead**: Calendar events automatically grouped by day of week (Monday-Sunday), showing next 7 days with times and details
+- **Event Filtering**: Sunday services automatically excluded from the week ahead display
+
+### Previous Changes (Oct 20, 2025)
 - **v3.0.0 Complete Redesign COMPLETED**: Rewritten from developer-centric "AI Patch Runner" to user-friendly "AI Website Styler" with 4-tab interface
 - **Fixed Preview/Apply Bug**: Now uses transient storage to ensure previewed changes exactly match applied changes (no duplicate AI calls)
 - **Fixed Elementor CSS Issue**: AI now forbidden from modifying wp-content/uploads/elementor/css/ files, always appends CSS to child theme style.css
