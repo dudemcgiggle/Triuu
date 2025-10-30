@@ -638,6 +638,10 @@ class TRIUU_Sermons_Manager {
             $start = $item['start']['dateTime'] ?? $item['start']['date'];
             $dt = (new DateTimeImmutable($start))->setTimezone($tz);
             
+            if ($dt < $now) {
+                continue;
+            }
+            
             $full_date = $dt->format('l, F j, Y');
             
             $time_str = '';
