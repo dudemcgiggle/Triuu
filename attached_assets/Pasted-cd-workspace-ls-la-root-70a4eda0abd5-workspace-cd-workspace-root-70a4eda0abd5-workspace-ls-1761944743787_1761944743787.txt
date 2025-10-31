@@ -1,0 +1,189 @@
+cd /workspace
+ls -la
+root@70a4eda0abd5:/workspace# cd /workspace
+root@70a4eda0abd5:/workspace# ls -la
+total 12
+drwxr-xr-x  3 root root 4096 Oct 31 19:38 .
+drwxr-xr-x 20 root root 4096 Oct 31 19:38 ..
+drwxr-xr-x  7 root root 4096 Oct 31 21:04 Triuu
+
+I’m wondering if the repository might actually be in Triuu. Let’s check for replit.md there.
+root@70a4eda0abd5:/workspace# cat replit.md
+cat: replit.md: No such file or directory
+root@70a4eda0abd5:/workspace# ls -la Triuu
+total 44
+drwxr-xr-x 7 root root 4096 Oct 31 21:04 .
+drwxr-xr-x 3 root root 4096 Oct 31 19:38 ..
+drwxr-xr-x 8 root root 4096 Oct 31 21:04 .git
+-rw-r--r-- 1 root root  126 Oct 31 19:38 .gitattributes
+-rw-r--r-- 1 root root  874 Oct 31 19:38 .gitignore
+-rw-r--r-- 1 root root    7 Oct 31 19:38 LICENSE
+-rw-r--r-- 1 root root   91 Oct 31 19:38 README.md
+drwxr-xr-x 8 root root 4096 Oct 31 21:04 Triuu
+drwxr-xr-x 6 root root 4096 Oct 31 19:38 assets
+drwxr-xr-x 2 root root 4096 Oct 31 21:04 docs
+drwxr-xr-x 3 root root 4096 Oct 31 19:38 wp-content
+
+It seems like Triuu might not have a replit.md. I'll check the docs folder, though.
+root@70a4eda0abd5:/workspace# ls -la /workspace/wordpress
+ls: cannot access '/workspace/wordpress': No such file or directory
+root@70a4eda0abd5:/workspace# ls -la Triuu/wp-content/plugins
+ls: cannot access 'Triuu/wp-content/plugins': No such file or directory
+
+Hmm, I need to check if the real structure is inside Triuu/wordpress, not just Triuu.
+root@70a4eda0abd5:/workspace# ls -la Triuu/wp-content
+total 12
+drwxr-xr-x 3 root root 4096 Oct 31 19:38 .
+drwxr-xr-x 7 root root 4096 Oct 31 21:04 ..
+drwxr-xr-x 3 root root 4096 Oct 31 19:38 themes
+root@70a4eda0abd5:/workspace# ls -la Triuu/Triuu
+total 224
+drwxr-xr-x 8 root root   4096 Oct 31 21:04 .
+drwxr-xr-x 7 root root   4096 Oct 31 21:04 ..
+-rw-r--r-- 1 root root    325 Oct 31 19:38 .gitignore
+-rw-r--r-- 1 root root      7 Oct 31 19:38 LICENSE
+-rw-r--r-- 1 root root     91 Oct 31 19:38 README.md
+drwxr-xr-x 6 root root   4096 Oct 31 19:38 assets
+-rw-r--r-- 1 root root   1489 Oct 31 19:38 comments.php
+-rw-r--r-- 1 root root    615 Oct 31 19:38 footer.php
+-rw-r--r-- 1 root root   9418 Oct 31 21:04 functions.php
+-rw-r--r-- 1 root root   1458 Oct 31 19:38 header.php
+drwxr-xr-x 4 root root   4096 Oct 31 19:38 includes
+-rw-r--r-- 1 root root    999 Oct 31 19:38 index.php
+drwxr-xr-x 3 root root   4096 Oct 31 19:38 modules
+-rw-r--r-- 1 root root  16429 Oct 31 19:38 readme.txt
+-rw-r--r-- 1 root root 110816 Oct 31 19:38 screenshot.png
+-rw-r--r-- 1 root root    270 Oct 31 19:38 sidebar.php
+-rw-r--r-- 1 root root   1267 Oct 31 21:04 style.css
+drwxr-xr-x 2 root root   4096 Oct 31 19:38 template-parts
+-rw-r--r-- 1 root root    508 Oct 31 19:38 theme.json
+-rw-r--r-- 1 root root   4109 Oct 31 19:38 theme.php
+drwxr-xr-x 4 root root   4096 Oct 31 19:38 vendor
+drwxr-xr-x 3 root root   4096 Oct 31 19:38 wp-content
+
+I'm noticing wp-content inside the theme folder—could WordPress structure be nested? Interesting!
+root@70a4eda0abd5:/workspace# find /workspace -maxdepth 2 -name 'replit.md'
+
+Looks like no file found. Maybe the instructions were wrong. I'll check the plugin folder.
+root@70a4eda0abd5:/workspace# ls -la Triuu/Triuu/wp-content
+total 12
+drwxr-xr-x 3 root root 4096 Oct 31 19:38 .
+drwxr-xr-x 8 root root 4096 Oct 31 21:04 ..
+drwxr-xr-x 7 root root 4096 Oct 31 19:38 uploads
+
+This is strange; I wonder if the repo is split or if there's a separate branch.
+root@70a4eda0abd5:/workspace# cd /workspace/Triuu
+root@70a4eda0abd5:/workspace/Triuu# git status -sb
+## work
+
+I’m on the "work" branch. I think I should check the instructions or README.
+root@70a4eda0abd5:/workspace/Triuu# ls
+LICENSE  README.md  Triuu  assets  docs  wp-content
+root@70a4eda0abd5:/workspace/Triuu# ls -la wp-content
+total 12
+drwxr-xr-x 3 root root 4096 Oct 31 19:38 .
+drwxr-xr-x 7 root root 4096 Oct 31 21:04 ..
+drwxr-xr-x 3 root root 4096 Oct 31 19:38 themes
+
+I think the plugin might be missing or zipped—let’s search for the shortcode.
+root@70a4eda0abd5:/workspace/Triuu# rg "featured_sermon_shortcode" -n
+
+It looks like the plugin is missing. I'll check for any relevant submodules or zipped files.
+root@70a4eda0abd5:/workspace/Triuu# cat .gitmodules
+cat: .gitmodules: No such file or directory
+root@70a4eda0abd5:/workspace/Triuu# rg "Next Sunday Service" -n
+Triuu/functions.php
+209:                        $out['kicker'] = 'Next Sunday Service';
+216:                        $out['kicker'] = 'Next Sunday Service';
+
+wp-content/themes/hello-elementor/functions.php
+209:                        $out['kicker'] = 'Next Sunday Service';
+216:                        $out['kicker'] = 'Next Sunday Service';
+
+Looks like the plugin might only be in the WP environment, not the repo. I'll check the docs or functions to figure this out.
+root@70a4eda0abd5:/workspace/Triuu# sed -n '150,260p' Triuu/functions.php
+
+        // Typekit (optional) – keep null version for CDN caching
+        if ( apply_filters( 'hello_elementor_load_typekit', true ) ) {
+                wp_enqueue_style( 'hello-typekit', 'https://use.typekit.net/dcl5phc.css', [], null );
+        }
+}
+add_action( 'wp_enqueue_scripts', 'hello_elementor_enqueue_styles_clean', 20 );
+
+/** Resource hints for Typekit (preconnect/dns-prefetch) */
+function hello_elementor_resource_hints_clean( $hints, $rel ) {
+        if ( in_array( $rel, [ 'preconnect', 'dns-prefetch' ], true ) ) {
+                $hints[] = 'https://use.typekit.net';
+                $hints[] = 'https://fonts.adobe.com';
+        }
+        return $hints;
+}
+add_filter( 'wp_resource_hints', 'hello_elementor_resource_hints_clean', 10, 2 );
+
+/* ------------------------------------------------------------------------- *
+ * Elementor locations
+ * ------------------------------------------------------------------------- */
+function hello_elementor_register_locations_clean( $manager ) {
+        if ( apply_filters( 'hello_elementor_register_elementor_locations', true ) ) {
+                $manager->register_all_core_location();
+        }
+}
+add_action( 'elementor/theme/register_locations', 'hello_elementor_register_locations_clean' );
+
+/* ------------------------------------------------------------------------- *
+ * Meta description from Page/Post excerpt (singular only)
+ * ------------------------------------------------------------------------- */
+function hello_elementor_meta_description_clean() {
+        if ( ! is_singular() || ! apply_filters( 'hello_elementor_description_meta_tag', true ) ) return;
+        $post = get_queried_object();
+        if ( ! empty( $post->post_excerpt ) ) {
+                printf( "<meta name=\"description\" content=\"%s\" />\n", esc_attr( wp_strip_all_tags( $post->post_excerpt ) ) )
+;
+        }
+}
+add_action( 'wp_head', 'hello_elementor_meta_description_clean', 1 );
+
+/* ------------------------------------------------------------------------- *
+ * body_open shim (legacy)
+ * ------------------------------------------------------------------------- */
+if ( ! function_exists( 'hello_elementor_body_open' ) ) {
+        function hello_elementor_body_open() { wp_body_open(); }
+}
+
+/* ------------------------------------------------------------------------- *
+ * TriUU featured sermon shortcode tweaks
+ * ------------------------------------------------------------------------- */
+add_filter(
+        'shortcode_atts_triuu_featured_sermon',
+        function ( $out, $pairs, $atts ) {
+                // Respect custom kicker text supplied via shortcode attributes.
+                if ( isset( $atts['kicker'] ) && '' !== trim( wp_strip_all_tags( (string) $atts['kicker'] ) ) ) {
+                        return $out;
+                }
+
+                if ( empty( $out['kicker'] ) ) {
+                        $out['kicker'] = 'Next Sunday Service';
+                        return $out;
+                }
+
+                $normalized = trim( wp_strip_all_tags( (string) $out['kicker'] ) );
+
+                if ( '' === $normalized || 'Sunday Service' === $normalized ) {
+                        $out['kicker'] = 'Next Sunday Service';
+                }
+
+                return $out;
+        },
+        10,
+        3
+);
+
+Looks like I need to modify the plugin to adjust the kicker string, not the theme.
+root@70a4eda0abd5:/workspace/Triuu# rg "TRIUU_Sermons_Manager" -n
+
+I’ll check the assets folder—maybe the missing plugin is zipped there after all.
+root@70a4eda0abd5:/workspace/Triuu# find . -maxdepth 2 -type d -name 'plugins'
+
+There are no plugin directories. I should review the docs to confirm the instructions.
+root@70a4eda0abd5:/workspace/Triuu# ls docs
+triuu-featured-sermon-classes.md
