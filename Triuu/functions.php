@@ -25,12 +25,17 @@ if ( ! defined( 'HELLO_THEME_ASSETS_URL' ) )  define( 'HELLO_THEME_ASSETS_URL', 
  * Version helper: uses filemtime() in WP_DEBUG to bust cache in Local; falls back to theme version.
  */
 function hello_asset_ver( $rel_path_from_theme_root ) {
-	$abs = trailingslashit( get_template_directory() ) . ltrim( $rel_path_from_theme_root, '/\\' );
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && file_exists( $abs ) ) {
-		$mtime = @filemtime( $abs );
-		if ( $mtime ) return (string) $mtime;
-	}
-	return HELLO_ELEMENTOR_VERSION;
+        $relative_path = ltrim( $rel_path_from_theme_root, '/\\' );
+        $absolute_path = get_theme_file_path( $relative_path );
+
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $absolute_path && file_exists( $absolute_path ) ) {
+                $mtime = @filemtime( $absolute_path );
+                if ( $mtime ) {
+                        return (string) $mtime;
+                }
+        }
+
+        return HELLO_ELEMENTOR_VERSION;
 }
 
 /* ------------------------------------------------------------------------- *
@@ -97,23 +102,23 @@ function hello_elementor_enqueue_styles_clean() {
 
 	// Base style.css (parent/child aware)
 	if ( $stylesheet !== $template ) {
-		wp_enqueue_style( 'hello-parent',
-			trailingslashit( get_template_directory_uri() ) . 'style.css',
-			[],
-			hello_asset_ver( 'style.css' )
-		);
-		wp_enqueue_style( 'hello-child',
-			trailingslashit( get_stylesheet_directory_uri() ) . 'style.css',
-			[ 'hello-parent' ],
-			hello_asset_ver( 'style.css' )
-		);
+                wp_enqueue_style( 'hello-parent',
+                        trailingslashit( get_template_directory_uri() ) . 'style.css',
+                        [],
+                        hello_asset_ver( 'style.css' )
+                );
+                wp_enqueue_style( 'hello-child',
+                        trailingslashit( get_stylesheet_directory_uri() ) . 'style.css',
+                        [ 'hello-parent' ],
+                        hello_asset_ver( 'style.css' )
+                );
 		$base_dep = 'hello-child';
 	} else {
-		wp_enqueue_style( 'hello-base',
-			trailingslashit( get_template_directory_uri() ) . 'style.css',
-			[],
-			hello_asset_ver( 'style.css' )
-		);
+                wp_enqueue_style( 'hello-base',
+                        trailingslashit( get_template_directory_uri() ) . 'style.css',
+                        [],
+                        hello_asset_ver( 'style.css' )
+                );
 		$base_dep = 'hello-base';
 	}
 
