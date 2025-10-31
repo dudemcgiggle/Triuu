@@ -1,0 +1,33 @@
+Codex (the OpenAI model family specialized for code) **can** work with local files — but not automatically. It depends on *how* you’re running it. Let’s clarify the modes:
+
+1. **Via the OpenAI API or a local script** — yes, you can absolutely read, analyze, or modify local files *if you explicitly give your code access*. Codex doesn’t “see” your filesystem by itself. You’d write a small wrapper script that loads files (like `.py`, `.ps1`, `.html`, etc.), sends their contents to the Codex API, and then saves Codex’s output back to disk. The model doesn’t get native read/write privileges — you provide the text.
+
+   Example (Python pseudo-flow):
+
+   ```python
+   with open("my_script.ps1", "r", encoding="utf-8") as f:
+       code = f.read()
+
+   prompt = f"Fix this PowerShell 5.1 script:\n\n{code}"
+
+   response = client.chat.completions.create(
+       model="gpt-4o-mini",
+       messages=[{"role": "user", "content": prompt}]
+   )
+
+   fixed_code = response.choices[0].message.content
+   with open("my_script_fixed.ps1", "w", encoding="utf-8") as f:
+       f.write(fixed_code)
+   ```
+
+2. **Inside an IDE like VS Code or Cursor** — Codex-style models are integrated with your editor, so they “see” local files through the extension’s sandbox. That’s how features like *“Explain this function”*, *“Refactor this file”*, or *“Generate unit tests”* work — the editor sends file contents to the model behind the scenes.
+
+3. **Completely offline?** No — OpenAI Codex models (and GPT-4-Turbo / GPT-5-code versions) require network access to OpenAI’s API. There’s no local-only Codex runtime that executes purely on your machine.
+
+So in short:
+
+* It can *work on* local files that you feed it.
+* It cannot *browse* your filesystem or discover files by itself.
+* You stay in control of what’s sent and written back.
+
+If you’re thinking of wiring it into a local fixer pipeline (like your PS 5.1 script repair tool), it’s already halfway there — your Python driver loads each `.ps1` and uses OpenAI completions to rewrite them. That’s exactly “Codex working on local files,” just under your orchestration.
