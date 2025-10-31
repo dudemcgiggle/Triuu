@@ -1,0 +1,160 @@
+═══════════════════════════════════════════════════════════════════════════
+  CRITICAL: READ THIS FIRST - CODEX ENVIRONMENT LIMITATIONS
+═══════════════════════════════════════════════════════════════════════════
+
+IMPORTANT ENVIRONMENTAL FACTS:
+
+1. YOU ARE IN AN ISOLATED CONTAINER
+   - Your location: /workspace/Triuu/
+   - Live WordPress location: /home/runner/workspace/ (DIFFERENT ENVIRONMENT)
+   - You CANNOT access the running WordPress site from your container
+   - You are working with a Git clone, NOT the live installation
+
+2. THE PLUGIN FILE YOU SEE IS A STUB
+   - You see: 214 lines in wordpress/wp-content/plugins/triuu-sermons-manager/
+   - Reality: The live plugin has 1000+ lines with complete implementations
+   - The live plugin has all three shortcodes fully functional:
+     * [triuu_featured_sermon] - Lines 534-600 (in live version)
+     * [triuu_upcoming_events] - Lines 657-800 (in live version)
+     * [triuu_book_club] - Lines 941-1000 (in live version)
+
+3. WHAT YOU CAN DO
+   ✅ Read all documentation files in this repository
+   ✅ Understand the architecture and technical specifications
+   ✅ Suggest changes or improvements
+   ✅ Work on files within the Git repository
+   
+4. WHAT YOU CANNOT DO
+   ❌ Access or modify the running WordPress site at /home/runner/workspace/
+   ❌ Test changes on the live WordPress installation
+   ❌ Execute PHP code against the live database
+   ❌ See the complete 1000+ line plugin file
+
+═══════════════════════════════════════════════════════════════════════════
+  STEP-BY-STEP: GETTING ORIENTED
+═══════════════════════════════════════════════════════════════════════════
+
+STEP 1: Pull Latest Changes from GitHub
+----------------------------------------
+cd /workspace/Triuu
+git remote -v
+git fetch origin --all
+git pull origin work
+
+(Note: You may get network errors due to container restrictions)
+
+STEP 2: Read the Navigation Guide
+----------------------------------
+cat CODEX-START-HERE.md
+
+This file contains:
+- Project overview and purpose
+- Key file locations (in the LIVE environment, not yours)
+- Architecture decisions
+- Development workflow
+
+STEP 3: Review Technical Documentation
+---------------------------------------
+Read these files in order:
+
+1. replit.md - Complete technical architecture and user preferences
+   cat replit.md
+
+2. TRI-UU-COMPLETE-TECHNICAL-SPECIFICATION.md - Full project specs
+   cat TRI-UU-COMPLETE-TECHNICAL-SPECIFICATION.md
+
+3. TRIUU-SERMONS-SYSTEM-SUMMARY.md - Sermon management system details
+   cat TRIUU-SERMONS-SYSTEM-SUMMARY.md
+
+4. SERVICES-PAGE-REDESIGN-GUIDE.md - UI/UX design specifications
+   cat SERVICES-PAGE-REDESIGN-GUIDE.md
+
+STEP 4: Understand Your Limitations
+------------------------------------
+The files you see in /workspace/Triuu/ are:
+- A Git clone of the repository
+- NOT the running WordPress installation
+- Missing the complete plugin implementations
+
+The LIVE WordPress site at /home/runner/workspace/ has:
+- Complete 1000+ line plugin with all shortcodes
+- Full theme customizations
+- SQLite database with production data
+- All Elementor configurations
+- MU plugins (ai-patch-runner.php, elementor-scope-fixer.php, etc.)
+
+You CANNOT access the live environment from your container.
+
+═══════════════════════════════════════════════════════════════════════════
+  WHAT TO DO IF ASKED TO MAKE CHANGES
+═══════════════════════════════════════════════════════════════════════════
+
+IF ASKED TO MODIFY THE WORDPRESS SITE:
+---------------------------------------
+Respond with:
+
+"I'm in an isolated container and cannot access the running WordPress 
+installation at /home/runner/workspace/. The Replit Agent has full access 
+to the live site and can make these changes directly.
+
+Please ask the Replit Agent to make the changes you need."
+
+IF ASKED TO REVIEW CODE OR PROVIDE SUGGESTIONS:
+------------------------------------------------
+You CAN:
+- Read the documentation
+- Understand the architecture from the specs
+- Provide suggestions based on what you read
+- Propose changes to files in the Git repository
+
+But remember: Changes to this Git clone won't affect the live site.
+
+═══════════════════════════════════════════════════════════════════════════
+  KEY TECHNICAL DETAILS FROM DOCUMENTATION
+═══════════════════════════════════════════════════════════════════════════
+
+WORDPRESS SETUP:
+- Version: 6.8.3
+- Database: SQLite (wp-sqlite-db plugin)
+- Server: PHP 8.2.23 development server on 0.0.0.0:5000
+- Theme: Custom child theme "triuu" based on Hello Elementor
+
+SHORTCODE ARCHITECTURE:
+- All shortcodes output with wrapper: .triuu-county-widget > .page-wrapper
+- CSS is centralized in wp-content/themes/triuu/style.css
+- 1200px max-width, centered layout
+- Never modify Elementor CSS files in wp-content/uploads/elementor/css/
+
+DESIGN SYSTEM:
+- Brand Colors: #614E6B (primary), #A5849F (secondary), #4A566D (tertiary)
+- Typography: Barlow (body), self-hosted Google Fonts
+- Max Width: 1200px centered containers
+
+CRITICAL RULES:
+1. Never modify elementor-scope-fixer.php MU plugin (treat as black box)
+2. Elementor CSS method must remain "external"
+3. All styling changes go in theme stylesheet, never Elementor uploads
+4. Widget structure must follow .triuu-county-widget > .page-wrapper pattern
+
+GOOGLE CALENDAR INTEGRATION:
+- API Key: GOOGLE_CALENDAR_API_KEY (environment secret)
+- Calendar ID: GOOGLE_CALENDAR_ID (environment secret)
+- Displays next 7 days of events
+- Excludes Sunday services
+- Smart location links (Zoom vs Google Maps)
+
+═══════════════════════════════════════════════════════════════════════════
+  SUMMARY: YOUR ROLE
+═══════════════════════════════════════════════════════════════════════════
+
+You are reading documentation in an isolated container.
+You can understand the architecture and provide suggestions.
+You CANNOT modify the running WordPress site.
+
+For actual changes to the WordPress site, users must work with the 
+Replit Agent who has direct access to the live installation.
+
+Your best contribution: Understanding the documentation and providing
+architectural insights, suggestions, or reviewing proposed changes.
+
+═══════════════════════════════════════════════════════════════════════════
