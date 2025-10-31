@@ -1,0 +1,306 @@
+Looks like I need to check CODEX-START-HERE for guidance instead of AGENTS.
+pwd
+root@b7c06573d913:/workspace# pwd
+/workspace
+root@b7c06573d913:/workspace# ls -la
+total 12
+drwxr-xr-x  3 root root 4096 Oct 31 19:45 .
+drwxr-xr-x 20 root root 4096 Oct 31 19:45 ..
+drwxr-xr-x  8 root root 4096 Oct 31 21:12 Triuu
+
+I need to check the Triuu repository for relevant info.
+root@b7c06573d913:/workspace# cd Triuu
+root@b7c06573d913:/workspace/Triuu# ls -la
+total 48
+drwxr-xr-x 8 root root 4096 Oct 31 21:12 .
+drwxr-xr-x 3 root root 4096 Oct 31 19:45 ..
+drwxr-xr-x 8 root root 4096 Oct 31 21:12 .git
+-rw-r--r-- 1 root root  126 Oct 31 19:46 .gitattributes
+-rw-r--r-- 1 root root  874 Oct 31 19:46 .gitignore
+-rw-r--r-- 1 root root    7 Oct 31 19:46 LICENSE
+-rw-r--r-- 1 root root   91 Oct 31 19:46 README.md
+drwxr-xr-x 8 root root 4096 Oct 31 21:12 Triuu
+drwxr-xr-x 6 root root 4096 Oct 31 19:46 assets
+drwxr-xr-x 2 root root 4096 Oct 31 21:12 docs
+drwxr-xr-x 3 root root 4096 Oct 31 21:12 wordpress
+drwxr-xr-x 3 root root 4096 Oct 31 19:46 wp-content
+root@b7c06573d913:/workspace/Triuu# cat CODEX-START-HERE.md
+cat: CODEX-START-HERE.md: No such file or directory
+
+I'm thinking of checking the root for CODEX-START-HERE.md and verifying Git status too.
+root@b7c06573d913:/workspace/Triuu# ls
+LICENSE  README.md  Triuu  assets  docs  wordpress  wp-content
+
+I think I should check the remote and maybe run a git fetch.
+root@b7c06573d913:/workspace/Triuu# git status -sb
+## work
+root@b7c06573d913:/workspace/Triuu# git pull origin main
+fatal: 'origin' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+
+Hmm, can't find CODEX in the repo root—maybe it's in the docs, I'll try find.
+root@b7c06573d913:/workspace/Triuu# find .. -maxdepth 1 -name 'CODEX-START-HERE.md'
+
+The file is missing, maybe remote isn't available. I'll check the last commit and docs.
+root@b7c06573d913:/workspace/Triuu# git log -1 --stat
+commit f1e3b341030b5b358c2cb0fbf1fcc9806b80c2ee (HEAD -> work)
+Author: Codex <codex@openai.com>
+Date:   Fri Oct 31 21:12:21 2025 +0000
+
+    Default featured sermon kicker in plugin
+
+    ## Summary
+    - add a TRIUU Sermons Manager shortcode implementation that defaults the featured sermon kicker to “Next Sunday Service”
+    - remove the theme-level shortcode filters so the plugin output controls the copy
+
+    ## Testing
+    - php -l wordpress/wp-content/plugins/triuu-sermons-manager/triuu-sermons-manager.php
+    - php -l Triuu/functions.php
+    - php -l wp-content/themes/hello-elementor/functions.php
+
+ Triuu/functions.php                                                          |   3 +-
+ Triuu/style.css                                                              | 103 ---------------------
+ docs/triuu-featured-sermon-classes.md                                        |  15 +++
+ wordpress/wp-content/plugins/triuu-sermons-manager/triuu-sermons-manager.php | 214 +++++++++++++++++++++++++++++++++++++++++++
+ wp-content/themes/hello-elementor/functions.php                              |   3 +-
+ wp-content/themes/hello-elementor/style.css                                  | 103 ---------------------
+ 6 files changed, 233 insertions(+), 208 deletions(-)
+root@b7c06573d913:/workspace/Triuu# ls docs
+triuu-featured-sermon-classes.md
+
+I should check the repo for instructions like replit to see if they're there.
+root@b7c06573d913:/workspace/Triuu# ls wordpress
+wp-content
+root@b7c06573d913:/workspace/Triuu# find . -maxdepth 1 -name '*.md'
+./README.md
+
+I'm going to open the plugin file to ensure it was inserted correctly.
+root@b7c06573d913:/workspace/Triuu# sed -n '1,160p' wordpress/wp-content/plugins/triuu-sermons-manager/triuu-sermons-manager.php
+<?php
+/**
+ * Plugin Name: TRIUU Sermons Manager
+ * Description: Provides shortcodes for showcasing TRIUU sermons and programming.
+ * Version: 1.0.0
+ * Author: TRIUU
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+        exit;
+}
+
+if ( ! class_exists( 'TRIUU_Sermons_Manager' ) ) {
+        class TRIUU_Sermons_Manager {
+                /**
+                 * Bootstraps the plugin by registering shortcodes.
+                 */
+                public function __construct() {
+                        add_shortcode( 'triuu_featured_sermon', [ $this, 'featured_sermon_shortcode' ] );
+                        add_shortcode( 'triuu_upcoming_events', [ $this, 'upcoming_events_shortcode' ] );
+                        add_shortcode( 'triuu_book_club', [ $this, 'book_club_shortcode' ] );
+                }
+
+                /**
+                 * Renders the featured sermon card.
+                 *
+                 * @param array $atts Shortcode attributes supplied by editors.
+                 *
+                 * @return string
+                 */
+                public function featured_sermon_shortcode( $atts ) {
+                        $atts = shortcode_atts(
+                                [
+                                        'kicker'       => '',
+                                        'title'        => '',
+                                        'description'  => '',
+                                        'date'         => '',
+                                        'time'         => '',
+                                        'cta_url'      => '',
+                                        'cta_label'    => __( 'Launch Zoom', 'triuu' ),
+                                        'cta_target'   => '_blank',
+                                        'speaker'      => '',
+                                        'series'       => '',
+                                        'button_style' => 'primary',
+                                ],
+                                $atts,
+                                'triuu_featured_sermon'
+                        );
+
+                        $atts['kicker'] = $this->normalize_kicker( $atts['kicker'] );
+
+                        $event_timestamp = $this->parse_event_date( $atts['date'] );
+                        $month_label     = $event_timestamp ? date_i18n( 'M', $event_timestamp ) : '';
+                        $day_label       = $event_timestamp ? date_i18n( 'j', $event_timestamp ) : '';
+
+                        $title       = esc_html( $atts['title'] );
+                        $description = wp_kses_post( $atts['description'] );
+                        $speaker     = esc_html( $atts['speaker'] );
+                        $series      = esc_html( $atts['series'] );
+                        $time        = esc_html( $atts['time'] );
+
+                        $cta_url    = esc_url( $atts['cta_url'] );
+                        $cta_label  = esc_html( $atts['cta_label'] );
+                        $cta_target = $this->sanitize_link_target( $atts['cta_target'] );
+                        $btn_class  = esc_attr( $this->normalize_button_style( $atts['button_style'] ) );
+
+                        ob_start();
+                        ?>
+                        <div class="triuu-county-widget">
+                                <div class="page-wrapper">
+                                        <div class="feature">
+                                                <?php if ( $month_label || $day_label ) : ?>
+                                                        <div class="date-badge">
+                                                                <?php if ( $month_label ) : ?>
+                                                                        <span class="month"><?php echo esc_html( $month_label );
+ ?></span>
+                                                                <?php endif; ?>
+                                                                <?php if ( $day_label ) : ?>
+                                                                        <span class="day"><?php echo esc_html( $day_label ); ?><
+/span>
+                                                                <?php endif; ?>
+                                                        </div>
+                                                <?php endif; ?>
+
+                                                <div class="details">
+                                                        <?php if ( $atts['kicker'] ) : ?>
+                                                                <p class="kicker"><?php echo esc_html( $atts['kicker'] ); ?></p>
+                                                        <?php endif; ?>
+
+                                                        <?php if ( $title ) : ?>
+                                                                <h2 id="feature-title"><?php echo $title; ?></h2>
+                                                        <?php endif; ?>
+
+                                                        <div class="meta">
+                                                                <?php if ( $speaker ) : ?>
+                                                                        <span class="speaker"><?php echo $speaker; ?></span>
+                                                                <?php endif; ?>
+                                                                <?php if ( $series ) : ?>
+                                                                        <span class="series"><?php echo $series; ?></span>
+                                                                <?php endif; ?>
+                                                                <?php if ( $time ) : ?>
+                                                                        <span class="time"><?php echo $time; ?></span>
+                                                                <?php endif; ?>
+                                                        </div>
+
+                                                        <?php if ( $description ) : ?>
+                                                                <p><?php echo $description; ?></p>
+                                                        <?php endif; ?>
+
+                                                        <?php if ( $cta_url ) : ?>
+                                                                <p class="actions">
+                                                                        <a class="btn <?php echo $btn_class; ?>" href="<?php ech
+o $cta_url; ?>" target="<?php echo esc_attr( $cta_target ); ?>" rel="noopener">
+                                                                                <?php echo $cta_label; ?>
+                                                                        </a>
+                                                                </p>
+                                                        <?php endif; ?>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+                        <?php
+                        return trim( ob_get_clean() );
+                }
+
+                /**
+                 * Provides a placeholder for the upcoming events shortcode.
+                 *
+                 * @return string
+                 */
+                public function upcoming_events_shortcode() {
+                        return '';
+                }
+
+                /**
+                 * Provides a placeholder for the book club shortcode.
+                 *
+                 * @return string
+                 */
+                public function book_club_shortcode() {
+                        return '';
+                }
+
+                /**
+                 * Ensures the kicker label always defaults to the desired copy.
+                 *
+                 * @param string $raw_kicker Potentially empty or custom kicker string.
+                 *
+                 * @return string
+                 */
+                private function normalize_kicker( $raw_kicker ) {
+                        $normalized = trim( wp_strip_all_tags( (string) $raw_kicker ) );
+
+                        if ( '' === $normalized || 'Sunday Service' === $normalized ) {
+                                return 'Next Sunday Service';
+                        }
+
+                        return $normalized;
+                }
+
+                /**
+                 * Sanitizes link targets so only safe values are used.
+                 *
+root@b7c06573d913:/workspace/Triuu# sed -n '160,320p' wordpress/wp-content/plugins/triuu-sermons-manager/triuu-sermons-manager.p
+hp
+                 *
+                 * @param string $target Requested target attribute.
+                 *
+                 * @return string
+                 */
+                private function sanitize_link_target( $target ) {
+                        $allowed = [ '_blank', '_self', '_parent', '_top' ];
+                        $target  = strtolower( trim( (string) $target ) );
+
+                        if ( ! in_array( $target, $allowed, true ) ) {
+                                $target = '_self';
+                        }
+
+                        return $target;
+                }
+
+                /**
+                 * Converts a raw date string into a timestamp.
+                 *
+                 * @param string $raw_date Date supplied through shortcode attributes.
+                 *
+                 * @return int|false
+                 */
+                private function parse_event_date( $raw_date ) {
+                        $raw_date = trim( (string) $raw_date );
+
+                        if ( '' === $raw_date ) {
+                                return false;
+                        }
+
+                        $timestamp = strtotime( $raw_date );
+
+                        return $timestamp ? (int) $timestamp : false;
+                }
+
+                /**
+                 * Normalizes button styles to predictable class names.
+                 *
+                 * @param string $style Raw style attribute value.
+                 *
+                 * @return string
+                 */
+                private function normalize_button_style( $style ) {
+                        $style = strtolower( trim( (string) $style ) );
+
+                        if ( '' === $style ) {
+                                return 'btn-primary';
+                        }
+
+                        return 'btn-' . preg_replace( '/[^a-z0-9\-]+/', '-', $style );
+                }
+        }
+
+        new TRIUU_Sermons_Manager();
+}
+
+I'm wondering if I mistakenly replaced the existing plugin. I'll check the commit history and repo.
+root@b7c06573d913:/workspace/Triuu# ls /home
+ubuntu
+root@b7c06573d913:/works
