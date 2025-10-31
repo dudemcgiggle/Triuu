@@ -756,7 +756,7 @@ class TRIUU_Sermons_Manager {
             
             if ($has_html) {
                 $text = preg_replace(
-                    '!<a\s+([^>]*)href=(["\'])([^"\']+)\2([^>]*)>!i',
+                    '#<a\s+([^>]*)href=(["\'])([^"\']+)\2([^>]*)>#i',
                     '<a $1href=$2$3$2 target="_blank" rel="noopener noreferrer"$4>',
                     $text
                 );
@@ -765,16 +765,9 @@ class TRIUU_Sermons_Manager {
             }
             
             $result = preg_replace_callback(
-                '!(https?://[^\s<"\']+)!i',
-                function($matches) use ($text) {
+                '#(?<!href=["\'])(?<!href=)(https?://[^\s<"\']+)#i',
+                function($matches) {
                     $url = $matches[1];
-                    $pos = strpos($text, $url);
-                    if ($pos !== false) {
-                        $before = substr($text, max(0, $pos - 10), 10);
-                        if (strpos($before, 'href=') !== false) {
-                            return $matches[0];
-                        }
-                    }
                     return '<a href="' . esc_url($url) . '" target="_blank" rel="noopener noreferrer">' . esc_html($url) . '</a>';
                 },
                 $text
