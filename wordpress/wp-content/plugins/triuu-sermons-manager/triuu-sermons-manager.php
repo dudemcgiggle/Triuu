@@ -548,6 +548,8 @@ class TRIUU_Sermons_Manager {
             // Fallback if no upcoming sermons
             ob_start();
             ?>
+            <div class="triuu-county-widget">
+            <div class="page-wrapper">
             <div class="feature">
                 <div class="date-badge" aria-hidden="true">TBD</div>
                 <div>
@@ -591,6 +593,8 @@ class TRIUU_Sermons_Manager {
                     </p>
                 </div>
             </div>
+            </div>
+            </div>
             <?php
             return ob_get_clean();
         }
@@ -607,6 +611,8 @@ class TRIUU_Sermons_Manager {
         
         ob_start();
         ?>
+        <div class="triuu-county-widget">
+        <div class="page-wrapper">
         <div class="feature">
             <div class="date-badge" aria-hidden="true"><?php echo esc_html($date_badge); ?></div>
             <div>
@@ -649,6 +655,8 @@ class TRIUU_Sermons_Manager {
                     " onmouseover="this.style.background='#A5849F'" onmouseout="this.style.background='#614E6B'">Launch Zoom Service</a>
                 </p>
             </div>
+        </div>
+        </div>
         </div>
         <?php
         return ob_get_clean();
@@ -783,6 +791,7 @@ class TRIUU_Sermons_Manager {
         
         ob_start();
         ?>
+      <div class="triuu-county-widget">
       <style>
       .triuu-new-events {
         --accent: #614E6B;
@@ -889,6 +898,7 @@ class TRIUU_Sermons_Manager {
         color: var(--accent-2);
       }
       </style>
+      <div class="page-wrapper">
       <div class="triuu-new-events">
       <h2 id="agenda-title">Late Breaking &middot; The Week Ahead (<?php echo esc_html($current_date); ?>)</h2>
       <div class="events-list">
@@ -932,6 +942,8 @@ class TRIUU_Sermons_Manager {
             <?php endif; ?>
           </div>
         <?php endforeach; ?>
+      </div>
+      </div>
       </div>
       </div>
         <?php
@@ -997,6 +1009,8 @@ class TRIUU_Sermons_Manager {
         
         ob_start();
         ?>
+        <div class="triuu-county-widget">
+        <div class="page-wrapper">
         <div class="triuu-book-club-section" style="
             font-family: 'Barlow', sans-serif;
             margin: 0;
@@ -1082,6 +1096,8 @@ class TRIUU_Sermons_Manager {
                 </div>
                 <?php endif; ?>
             </div>
+        </div>
+        </div>
         </div>
         <?php
         return ob_get_clean();

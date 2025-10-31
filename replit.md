@@ -111,7 +111,15 @@ All styling changes are appended to `wp-content/themes/triuu/style.css` to ensur
 - Requires OpenAI API key (configured via `OPENAI_API_KEY` environment variable)
 - Uses transient storage to ensure preview/apply consistency
 
-### Recent Changes (Oct 30, 2025)
+### Recent Changes (Oct 31, 2025)
+- **Centered Container Layout COMPLETED**: Wrapped all three shortcodes with `.triuu-county-widget` and `.page-wrapper` structure matching Services page
+  - All three shortcodes (`[triuu_featured_sermon]`, `[triuu_upcoming_events]`, `[triuu_book_club]`) now use centered 1200px container
+  - Container CSS centralized in theme stylesheet (`wp-content/themes/triuu/style.css`) following WordPress best practices
+  - Applied consistent styling: `max-width: 1200px`, `margin: 0 auto`, white background with box shadow
+  - Eliminated CSS duplication - single `.triuu-county-widget .page-wrapper` definition serves all shortcodes
+  - News & Events page now has unified, professional layout matching Services page design
+
+### Previous Changes (Oct 30, 2025)
 - **Sunday Service Section Redesign COMPLETED**: Updated `[triuu_featured_sermon]` shortcode to match site's elegant, minimal aesthetic
   - "SUNDAY SERVICE" label in small uppercase gray text with wide letter-spacing
   - Sermon titles in large uppercase light purple (#C8A8CF) with Barlow font
