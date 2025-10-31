@@ -1,0 +1,101 @@
+I need to locate AGENTS.md to check what guidance it provides.
+root@2c131f8c0434:/workspace# cd Triuu
+root@2c131f8c0434:/workspace/Triuu# ls
+LICENSE  README.md  Triuu  assets  docs  wp-content
+
+I'll look for the AGENTS.md file now.
+root@2c131f8c0434:/workspace/Triuu# find .. -name AGENTS.md -print
+root@2c131f8c0434:/workspace/Triuu# ls
+LICENSE  README.md  Triuu  assets  docs  wp-content
+
+I need to check replit.md for any additional instructions or insights.
+root@2c131f8c0434:/workspace/Triuu# ls docs
+triuu-featured-sermon-classes.md
+
+I should check the root for a replit.md file.
+root@2c131f8c0434:/workspace/Triuu# cat replit.md
+cat: replit.md: No such file or directory
+root@2c131f8c0434:/workspace/Triuu# find . -maxdepth 1 -type f
+./LICENSE
+./.gitattributes
+./README.md
+./.gitignore
+root@2c131f8c0434:/workspace/Triuu# find . -name 'replit.md' -print
+root@2c131f8c0434:/workspace/Triuu# find . -iname 'replit.md' -print
+
+Maybe the docs are named differently or zipped? I'll check the README in Triuu.
+root@2c131f8c0434:/workspace/Triuu# cat README.md                                                                               ﻿
+## Triuu Theme
+
+WordPress theme used in the Triuu site. Built for Local (Flywheel) dev.
+
+I'll check the repo with git status to see any missing files or changes.
+root@2c131f8c0434:/workspace/Triuu# git status -sb
+## work
+
+I’ll inspect the repo to check which changes weren't applied. Time to read the plugin.
+root@2c131f8c0434:/workspace/Triuu# ls Triuu
+LICENSE    comments.php   header.php  modules         sidebar.php     theme.json  wp-content
+README.md  footer.php     includes    readme.txt      style.css       theme.php
+assets     functions.php  index.php   screenshot.png  template-parts  vendor
+
+Let me check for any AGENTS.md instructions for guidance.
+root@2c131f8c0434:/workspace/Triuu# find . -name AGENTS.md -print
+
+Looks like there’s no AGENTS.md, so I’ll open the plugin file instead.
+root@2c131f8c0434:/workspace/Triuu# sed -n '520,620p' wordpress/wp-content/plugins/triuu-sermons-manager/triuu-sermons-manager.p
+hp
+sed: can't read wordpress/wp-content/plugins/triuu-sermons-manager/triuu-sermons-manager.php: No such file or directory
+
+I’m confirming if I’m in the correct repo or need to adjust the path.
+root@2c131f8c0434:/workspace/Triuu# ls wp-content/plugins
+ls: cannot access 'wp-content/plugins': No such file or directory
+
+I think the plugin might be under the top-level 'Triuu' directory. I'll search.
+root@2c131f8c0434:/workspace/Triuu# find . -maxdepth 2 -type d -name 'wp-content'
+./wp-content
+./Triuu/wp-content
+
+I need to verify the contents of the top-level wp-content directory.
+root@2c131f8c0434:/workspace/Triuu# ls wp-content
+themes
+
+The plugin might be missing. I'll look for it or outdated references.
+root@2c131f8c0434:/workspace/Triuu# find . -name 'triuu-sermons-manager.php'
+root@2c131f8c0434:/workspace/Triuu# ls Triuu/wp-content
+uploads
+
+I might be missing the plugin or it's zipped. I’ll check the git log.
+root@2c131f8c0434:/workspace/Triuu# git log --oneline | head
+8fc7084 Ensure featured sermon kicker defaults via shortcode atts
+a3acd97 Merge pull request #1 from dudemcgiggle/codex/update-wordpress-site-with-new-changes
+2e8cac8 Match feature card styles to provided design
+11b3ac5 docs: add DB dump policy note
+6c4ce38 chore: ignore plugin cache/backup folders
+b8294ec chore: enable LFS for large uploads
+50e82be content(uploads): import 2025 upload batch
+8833ba0 chore: remove unintended submodule pointers; normalize folders
+f8cdea9 feat: bring local theme/code changes into main
+980926b chore: restore assets from origin/main
+
+I’m inspecting the commit tree; maybe I’ll try adding the plugin from an earlier commit.
+root@2c131f8c0434:/workspace/Triuu# git show a3acd97:wordpress/wp-content/plugins/triuu-sermons-manager/triuu-sermons-manager.ph
+p | head
+fatal: path 'wordpress/wp-content/plugins/triuu-sermons-manager/triuu-sermons-manager.php' does not exist in 'a3acd97'
+
+I think a repo restructure might be needed—let's check the commit tree from the root.
+root@2c131f8c0434:/workspace/Triuu# git ls-tree --full-tree -r HEAD | head
+100644 blob fd3433cef95a44446b284ad723d67656c0a21188    .gitattributes
+100644 blob 551d3ad3051756c82136960794d74e12ca652591    .gitignore
+100644 blob 014fafee1f821a787719ac6772c61b2cca177269    LICENSE
+100644 blob 73d845f239526cc3f5f0e4a7a48b75637ec84f14    README.md
+100644 blob a8abbed8d8131211553c60cac2b28edb9911b3f9    Triuu/.gitignore
+100644 blob 014fafee1f821a787719ac6772c61b2cca177269    Triuu/LICENSE
+100644 blob 73d845f239526cc3f5f0e4a7a48b75637ec84f14    Triuu/README.md
+100644 blob 2aa6537cb64df5dec1f0da85bd3eabcff2b8ad3f    Triuu/assets/css/customizer-rtl.css
+100644 blob b4c1d1198b81ff9adf1818713b50ee5e684826b0    Triuu/assets/css/customizer.asset.php
+100644 blob 00f6e47e25ab7f5a2eda1292c54523be03336c5b    Triuu/assets/css/customizer.css
+
+I'm continuing to scroll to check if I can find the plugin details.
+root@2c131f8c0434:/workspace/Triuu# git ls-tree --full-tree -r HEAD | grep -i sermon | head
+100644 blob 94ce6dc093151ea0eb4437350162eea15dd6d5a1    docs
