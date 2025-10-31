@@ -34,8 +34,6 @@ class TRIUU_Sermons_Manager {
         add_shortcode('triuu_featured_sermon', array($this, 'featured_sermon_shortcode'));
         add_shortcode('triuu_upcoming_events', array($this, 'upcoming_events_shortcode'));
         add_shortcode('triuu_book_club', array($this, 'book_club_shortcode'));
-        add_shortcode('triuu_food_drive', array($this, 'food_drive_shortcode'));
-        add_shortcode('triuu_nu_to_uu', array($this, 'nu_to_uu_shortcode'));
     }
     
     public function add_admin_menu() {
@@ -1090,76 +1088,6 @@ class TRIUU_Sermons_Manager {
                     </a>
                 </div>
                 <?php endif; ?>
-            </div>
-        </div>
-        <?php
-        return ob_get_clean();
-    }
-    
-    public function food_drive_shortcode($atts) {
-        ob_start();
-        ?>
-        <div class="triuu-food-drive-section" style="
-            font-family: 'Barlow', sans-serif;
-            margin: 0;
-            padding: 0;
-        ">
-            <h2 style="
-                font-family: 'Barlow Condensed', sans-serif;
-                font-size: 1.7em;
-                color: #666666;
-                font-style: normal;
-                margin-bottom: 0;
-                font-weight: 400;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                text-align: center;
-                padding-bottom: 0.5em;
-                border-bottom: 2px solid #A5849F;
-            ">Weekly Food Drive for the Community of Gratitude Food Bank</h2>
-            
-            <div style="margin-top: 1rem; color: #666666; line-height: 1.6;">
-                <p style="margin: 0 0 0.75rem 0; font-size: 1rem; font-weight: 300;">
-                    Every Sunday, during our regular Sunday service, we invite you to bring non-perishable food items and place them in the donation cart just inside the church entrance. Thanks to the dedication of Linda and Phil, all collected items are delivered on Tuesday to the <strong style="font-weight: 400;">Community of Gratitude Food Bank</strong> in Ocklawaha, ensuring support reaches local families in-need promptly.
-                </p>
-                <p style="margin: 0; font-size: 1rem; font-weight: 300;">
-                    Whether it's a couple of canned goods from your pantry or a full grocery bag, your contribution matters. Together, we keep the cart filled and share our spirit of giving with our wider community.
-                </p>
-            </div>
-        </div>
-        <?php
-        return ob_get_clean();
-    }
-    
-    public function nu_to_uu_shortcode($atts) {
-        ob_start();
-        ?>
-        <div class="triuu-nu-to-uu-section" style="
-            font-family: 'Barlow', sans-serif;
-            margin: 0;
-            padding: 0;
-        ">
-            <h2 style="
-                font-family: 'Barlow Condensed', sans-serif;
-                font-size: 1.7em;
-                color: #666666;
-                font-style: normal;
-                margin-bottom: 0;
-                font-weight: 400;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                text-align: center;
-                padding-bottom: 0.5em;
-                border-bottom: 2px solid #A5849F;
-            ">"Nu to UU" — Class</h2>
-            
-            <div style="margin-top: 1rem; color: #666666; line-height: 1.6;">
-                <p style="margin: 0 0 0.4rem 0; font-size: 1rem; font-weight: 300;">
-                    <strong style="font-weight: 400;">Tuesday, Nov 4, 2025 · 10:00 AM–12:30 PM</strong> - Tri-County Unitarian Universalists.
-                </p>
-                <p style="margin: 0; font-size: 1rem; font-weight: 300;">
-                    Explore Unitarian Universalism and get introduced to our local congregation. RSVP in the sanctuary or contact Helene Kirschbaum at <a href="mailto:helenekirschbaum@gmail.com" style="color: #614E6B; text-decoration: none; border-bottom: 1px solid #A5849F; transition: color 0.3s ease;" onmouseover="this.style.color='#A5849F'" onmouseout="this.style.color='#614E6B'">helenekirschbaum@gmail.com</a>.
-                </p>
             </div>
         </div>
         <?php
