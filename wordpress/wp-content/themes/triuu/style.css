@@ -30,3 +30,12 @@
 }
 
 .page-id-300 { background-color: #ffffff !important; }
+
+/* Centered 1200px container wrapper for shortcodes */
+.triuu-county-widget .page-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2em 1em;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
