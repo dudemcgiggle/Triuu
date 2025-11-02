@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tri-County Unitarian Universalists - Hero Section (Self-Contained)</title>
+
+    <!-- Google Fonts - Barlow -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,200;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        /* Reset & Base Styles */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            background: #ffffff;
+        }
+
+        img { max-width: 100%; height: auto; }
+        a { text-decoration: none; }
+
+        /* Elementor Container System */
+        .e-con {
+            display: flex;
+            position: relative;
+            width: 100%;
+        }
+
+        .e-con-boxed .e-con-inner {
+            max-width: 1140px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .e-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .e-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Background */
+        .elementor-element-6e3b3031 {
+            background-color: #f8f8f8;
+            padding: 60px 20px;
+        }
+
+        /* Center content column */
+        .elementor-element-727817e6 {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Image column */
+        .elementor-element-3f235f85 {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Button Styles */
+        .elementor-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #614E6B;
+            color: #ffffff !important;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+
+        .elementor-button:hover {
+            background-color: #A5849F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .elementor-button-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Headings */
+        .elementor-heading-title {
+            margin: 15px 0;
+            line-height: 1.3;
+        }
+
+        h1.elementor-heading-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: #614E6B;
+            margin: 20px 0;
+        }
+
+        h2.elementor-heading-title {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: #614E6B;
+        }
+
+        p.elementor-heading-title {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: #666;
+            max-width: 600px;
+            margin: 15px auto;
+        }
+
+        /* Video Container */
+        .elementor-widget-video {
+            margin: 30px 0;
+        }
+
+        .elementor-video {
+            width: 100%;
+            max-width: 640px;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Image Styling */
+        .elementor-widget-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Icon Box Styling */
+        .elementor-icon-box-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .elementor-icon-box-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .elementor-icon-box-icon {
+            flex-shrink: 0;
+        }
+
+        .elementor-icon-box-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: #614E6B;
+        }
+
+        .elementor-icon-box-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #614E6B;
+            margin: 0 0 10px 0;
+        }
+
+        .elementor-icon-box-description {
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Grid for Icon Boxes */
+        .elementor-element-5a0c6dd8 .e-con-inner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 40px 20px;
+        }
+
+        /* Animations */
+        .animated {
+            animation-duration: 1s;
+            animation-fill-mode: both;
+        }
+
+        .fadeIn {
+            animation-name: fadeIn;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animated-fast {
+            animation-duration: 0.75s;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .e-con-inner {
+                flex-direction: column;
+            }
+
+            .elementor-element-6e3b3031 .e-con-inner {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1.elementor-heading-title {
+                font-size: 2rem;
+            }
+
+            .elementor-element-5a0c6dd8 .e-con-inner {
+                grid-template-columns: 1fr;
+            }
+
+            .elementor-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .e-flex {
+                flex-direction: column;
+            }
+        }
+
+        /* Alignment */
+        .elementor-align-center {
+            text-align: center;
+        }
+
+        .elementor-widget-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="elementor-element elementor-element-6e3b3031 e-flex e-con-boxed e-con e-parent" data-id="6e3b3031">
+    <div class="e-con-inner" style="display: flex; flex-wrap: wrap; gap: 40px;">
+        <!-- Left Content Column -->
+        <div class="elementor-element elementor-element-727817e6 animated-fast e-flex e-con-boxed e-con e-child animated fadeIn" data-id="727817e6" style="flex: 1; min-width: 300px;">
+            <div class="e-con-inner">
+                <!-- Zoom Button -->
+                <div class="elementor-element elementor-element-8cf149a elementor-align-center elementor-widget elementor-widget-button">
+                    <div class="elementor-widget-container">
+                        <div class="elementor-button-wrapper">
+                            <a class="elementor-button elementor-button-link elementor-size-sm" href="https://zoom.us/j/95277568906?pwd=PJeDQqyY1WMwoJRrkI9Xn4sQG36P2f.1" target="_blank">
+                                <span class="elementor-button-content-wrapper">
+                                    <span class="elementor-button-icon">
+                                        <svg aria-hidden="true" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M512 144v288c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48h88l12.3-32.9c7-18.7 24.9-31.1 44.9-31.1h125.5c20 0 37.9 12.4 44.9 31.1L376 96h88c26.5 0 48 21.5 48 48zM376 288c0-66.2-53.8-120-120-120s-120 53.8-120 120 53.8 120 120 120 120-53.8 120-120zm-32 0c0 48.5-39.5 88-88 88s-88-39.5-88-88 39.5-88 88-88 88 39.5 88 88z"></path></svg>
+                                    </span>
+                                    <span class="elementor-button-text">JOIN Sunday Zoom Service</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Welcome Text -->
+                <div class="elementor-element elementor-widget elementor-widget-heading">
+                    <div class="elementor-widget-container">
+                        <p class="elementor-heading-title elementor-size-default">We welcome you to</p>
+                    </div>
+                </div>
+
+                <!-- Main Title -->
+                <div class="elementor-element elementor-widget elementor-widget-heading">
+                    <div class="elementor-widget-container">
+                        <h1 class="elementor-heading-title elementor-size-default">Tri-County Unitarian Universalists</h1>
+                    </div>
+                </div>
+
+                <!-- Mission Statement -->
+                <div class="elementor-element elementor-widget elementor-widget-heading">
+                    <div class="elementor-widget-container">
+                        <p class="elementor-heading-title elementor-size-default">We seek individual spiritual growth, act for social justice, build friendship and community, and warmly welcome diversity.</p>
+                    </div>
+                </div>
+
+                <!-- Video -->
+                <div class="elementor-element elementor-widget elementor-widget-video">
+                    <div class="elementor-widget-container">
+                        <div class="elementor-wrapper elementor-open-inline">
+                            <iframe class="elementor-video" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" title="Intro to TCUU" src="https://www.youtube.com/embed/5QSwsXo4sjs?controls=1&rel=0&playsinline=0&cc_load_policy=0&autoplay=0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Image Column -->
+        <div class="elementor-element elementor-element-3f235f85 e-con-full e-flex e-con e-child animated fadeIn" data-id="3f235f85" style="flex: 1; min-width: 300px;">
+            <div class="elementor-element elementor-widget elementor-widget-image animated fadeIn">
+                <div class="elementor-widget-container">
+                    <img fetchpriority="high" decoding="async" src="https://d7f73166-7024-44ae-8aa6-ac6790250f9e-00-9rqlqn9o3dh0.janeway.replit.dev/wp-content/uploads/2025/09/DSC6974-HDR-Edit-Edit-1536x1024.jpg" alt="Church Interior">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Icon Boxes Section -->
+    <div class="elementor-element elementor-element-5a0c6dd8 e-grid e-con-boxed e-con e-child" data-id="5a0c6dd8">
+        <div class="e-con-inner">
+            <!-- Who We Are -->
+            <div class="elementor-element elementor-widget elementor-widget-icon-box animated fadeIn">
+                <div class="elementor-widget-container">
+                    <div class="elementor-icon-box-wrapper">
+                        <div class="elementor-icon-box-icon">
+                            <span class="elementor-icon">
+                                <svg aria-hidden="true" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg"><path d="M0 512V48C0 21.49 21.49 0 48 0h288c26.51 0 48 21.49 48 48v464L192 400 0 512z"></path></svg>
+                            </span>
+                        </div>
+                        <div class="elementor-icon-box-content">
+                            <h6 class="elementor-icon-box-title">
+                                <span>Who We Are:</span>
+                            </h6>
+                            <p class="elementor-icon-box-description">
+                                Founded in 1982, Tri-County Unitarian Universalists (Tri-UU) was established to create a supportive, loving community dedicated to spiritual growth and the pursuit of social justice.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services -->
+            <div class="elementor-element elementor-widget elementor-widget-icon-box animated fadeIn">
+                <div class="elementor-widget-container">
+                    <div class="elementor-icon-box-wrapper">
+                        <div class="elementor-icon-box-icon">
+                            <span class="elementor-icon">
+                                <svg aria-hidden="true" viewBox="0 0 640 512" xmlns="http://www.w3.org/2000/svg"><path d="M0 224v272c0 8.84 7.16 16 16 16h80V192H32c-17.67 0-32 14.33-32 32zm360-48h-24v-40c0-4.42-3.58-8-8-8h-16c-4.42 0-8 3.58-8 8v64c0 4.42 3.58 8 8 8h48c4.42 0 8-3.58 8-8v-16c0-4.42-3.58-8-8-8zm137.75-63.96l-160-106.67a32.02 32.02 0 0 0-35.5 0l-160 106.67A32.002 32.002 0 0 0 128 138.66V512h128V368c0-8.84 7.16-16 16-16h96c8.84 0 16 7.16 16 16v144h128V138.67c0-10.7-5.35-20.7-14.25-26.63zM320 256c-44.18 0-80-35.82-80-80s35.82-80 80-80 80 35.82 80 80-35.82 80-80 80zm288-64h-64v320h80c8.84 0 16-7.16 16-16V224c0-17.67-14.33-32-32-32z"></path></svg>
+                            </span>
+                        </div>
+                        <div class="elementor-icon-box-content">
+                            <h6 class="elementor-icon-box-title">
+                                <span>Services</span>
+                            </h6>
+                            <p class="elementor-icon-box-description">
+                                Join us every Sunday from 9:00 to 10:15 AM in the Chalice Room for our weekly service, offered both in person and via Zoom.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Every Day at Tri-UU -->
+            <div class="elementor-element elementor-widget elementor-widget-icon-box animated fadeIn">
+                <div class="elementor-widget-container">
+                    <div class="elementor-icon-box-wrapper">
+                        <div class="elementor-icon-box-icon">
+                            <span class="elementor-icon">
+                                <svg aria-hidden="true" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm64-192c0-8.8 7.2-16 16-16h96c8.8 0 16 7.2 16 16v96c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-96zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z"></path></svg>
+                            </span>
+                        </div>
+                        <div class="elementor-icon-box-content">
+                            <h6 class="elementor-icon-box-title">
+                                <span>Every day at Tri-UU</span>
+                            </h6>
+                            <p class="elementor-icon-box-description">
+                                Opportunities to connect and grow—through social justice initiatives, book clubs, discussion groups, meditation, potluck dinners, workshops, and more.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Times -->
+    <div class="elementor-element elementor-widget elementor-widget-heading" style="width: 100%; text-align: center; margin-top: 40px;">
+        <div class="elementor-widget-container">
+            <h2 class="elementor-heading-title elementor-size-default">Service in person and on Zoom:<br>9:00 AM – 10:15 AM</h2>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
