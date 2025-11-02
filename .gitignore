@@ -61,6 +61,15 @@ wordpress/.htaccess
 *.db-shm
 *.db-wal
 
+# SQL Dumps and Backups (SECURITY)
+*.sql
+attached_assets/*.sql
+
+# Environment and Credentials (SECURITY)
+.env
+.env.*
+wordpress/wp-config.php
+
 # Replit
 .replit
 .config/
