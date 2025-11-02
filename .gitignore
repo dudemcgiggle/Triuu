@@ -67,8 +67,12 @@ attached_assets/*.sql
 
 # Environment and Credentials (SECURITY)
 .env
-.env.*
+.env.local
+.env.*.local
 wordpress/wp-config.php
+
+# Allow .env.example (template without secrets)
+!.env.example
 
 # Replit
 .replit
