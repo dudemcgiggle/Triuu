@@ -1,0 +1,1 @@
+(function($){ $(function(){ if (window.console) { console.log("TriUU Sandbox active"); } }); })(jQuery);

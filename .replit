@@ -4,7 +4,7 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
-packages = ["unzip", "sqlite"]
+packages = ["unzip", "sqlite", "nano"]
 
 [workflows]
 runButton = "Project"
@@ -31,8 +31,20 @@ waitForPort = 5000
 outputType = "webview"
 
 [[ports]]
+localPort = 3000
+externalPort = 4200
+
+[[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 5050
+externalPort = 3002
+
+[[ports]]
+localPort = 5099
+externalPort = 3003
 
 [[ports]]
 localPort = 33353
