@@ -75,3 +75,5 @@ wordpress/wp-config.php
 .config/
 .local/
 .upm/
+pg_data/
+wordpress/wp-content/db.php.sqlite.backup
