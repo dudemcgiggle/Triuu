@@ -24,7 +24,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "php -S 0.0.0.0:5000 -t wordpress router.php"
+args = "bash start-wordpress.sh"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
@@ -37,6 +37,10 @@ externalPort = 4200
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 5432
+externalPort = 5432
 
 [[ports]]
 localPort = 5050
@@ -59,5 +63,5 @@ deploymentTarget = "vm"
 run = [
   "sh",
   "-c",
-  "cd /home/runner/$REPL_SLUG && php -S 0.0.0.0:5000 -t wordpress router.php",
+  "bash start-wordpress.sh",
 ]
