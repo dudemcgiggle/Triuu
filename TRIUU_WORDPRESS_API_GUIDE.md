@@ -1,8 +1,16 @@
 # TRI-UU WordPress Claude Code API Guide
 
+## ⚠️ Current Status: Access Issue
+
+**The API is live and ready in WordPress, but external access is currently blocked by a proxy/WAF.**
+
+For detailed status and troubleshooting, see: **[API_ACCESS_STATUS.md](./API_ACCESS_STATUS.md)**
+
 ## Overview
 
-This guide documents the custom WordPress REST API plugin created for Claude Code to interact with the TRI-UU WordPress site.
+This guide documents the custom WordPress REST API for Claude Code integration with the TRI-UU WordPress site.
+
+**Live API URL:** `https://d7f73166-7024-44ae-8aa6-ac6790250f9e-00-9rqlqn9o3dh0.janeway.replit.dev/wp-json/triuu-claude/v1`
 
 ## API Key
 
@@ -20,12 +28,14 @@ https://d7f73166-7024-44ae-8aa6-ac6790250f9e-00-9rqlqn9o3dh0.janeway.replit.dev/
 
 ## Plugin Location
 
-The WordPress plugin is located at:
+**✅ DEPLOYED AND ACTIVE**
+
+The WordPress plugin is installed at:
 ```
-/wordpress/wp-content/mu-plugins/triuu-claude-api.php
+/wordpress/wp-content/plugins/triuu-claude-api/
 ```
 
-This is a **Must-Use (MU) Plugin** which means it loads automatically when WordPress starts, without needing to be activated through the WordPress admin.
+The plugin is active and visible in WordPress admin. API key is configured in Settings → Claude Code API.
 
 ## Authentication
 
@@ -349,22 +359,21 @@ python3 test_triuu_wordpress_api.py "your-api-key" "https://your-site.com/wp-jso
 
 ## Current Status
 
-**⚠️ Important Note:** As of the latest test, all endpoints are returning **403 Access Denied**, including:
-- The main WordPress site
-- The WordPress REST API root endpoint
-- All custom API endpoints
+**Status:** 🔴 Proxy/WAF Blocking External Access
 
-This suggests:
-1. The WordPress site may not be running on the Replit URL
-2. There may be site-level authentication required
-3. The URL might be expired or incorrect
-4. The site is behind a WAF or security layer blocking requests
+The WordPress API is **live and ready** within WordPress:
+- ✅ Plugin is installed and active
+- ✅ API key is configured
+- ✅ All endpoints are registered
+- ❌ **External access blocked by Envoy proxy with 403 Forbidden**
 
-**Next Steps:**
-1. Verify the WordPress site is accessible at the provided URL
-2. Check if there's site-level authentication required
-3. Confirm the Replit instance is running
-4. Deploy the plugin file to the live WordPress instance (if different from local)
+**Issue:** An Envoy proxy in front of the WordPress site is blocking all external requests before they reach WordPress.
+
+**See [API_ACCESS_STATUS.md](./API_ACCESS_STATUS.md) for:**
+- Detailed problem analysis
+- Possible solutions
+- Access configuration steps
+- Testing procedures once access is restored
 
 ## Plugin Deployment
 
