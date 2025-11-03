@@ -64,6 +64,7 @@ wordpress/.htaccess
 # SQL Dumps and Backups (SECURITY)
 *.sql
 attached_assets/*.sql
+temp-db-info.txt
 
 # Environment and Credentials (SECURITY)
 .env
