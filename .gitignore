@@ -54,6 +54,8 @@ wordpress/wp-content/debug.log
 wordpress/wp-content/backup-db/
 wordpress/wp-content/advanced-cache.php
 wordpress/wp-content/wp-cache-config.php
+wordpress/wp-content/db.php
+wordpress/wp-content/plugins/sqlite-database-integration/
 wordpress/.htaccess
 
 # SQLite Database
