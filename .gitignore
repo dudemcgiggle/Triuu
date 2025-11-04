@@ -76,6 +76,7 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+workspace/
 
 # Replit
 .replit
