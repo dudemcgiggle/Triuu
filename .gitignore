@@ -70,6 +70,13 @@ attached_assets/*.sql
 .env.*
 wordpress/wp-config.php
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
 # Replit
 .replit
 .config/
