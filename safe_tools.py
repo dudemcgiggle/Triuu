@@ -1,6 +1,6 @@
 import os, requests
 
-SAFE_AGENT_URL = os.getenv("SAFE_AGENT_URL", "https://9a4a1c518c90.ngrok.app")
+SAFE_AGENT_URL = os.getenv("SAFE_AGENT_URL", "http://127.0.0.1:3000")
 
 def read(path):
     r = requests.post(f"{SAFE_AGENT_URL}/read", json={"path": path}, timeout=20)
